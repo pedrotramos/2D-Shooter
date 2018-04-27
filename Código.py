@@ -5,6 +5,7 @@ Created on Fri Apr 27 11:17:40 2018
 import pygame
 from pygame.locals import *
 from random import randrange
+import sys
 #===========================   Classes   ===========================#
 class Nave(pygame.sprite.Sprite):
     
@@ -36,40 +37,39 @@ tela = pygame.display.set_mode((1200, 700), 0, 32)
 pygame.display.set_caption('2D Shooter')
 
 fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
-y = 0
 
-nave = Nave('Assets/MilleniumFalcon.png', 600, 595)
+nave = Nave('Assets/X-Wing.png', 600, 595)
 nave_group = pygame.sprite.Group()
 nave_group.add(nave)
 
-#outra_nave = Nave('', 400, 800)
-#nave.group.add(outra_nave)
+#outra_nave = Nave('Assets/MilleniumFalcon.png', 600, 595)
+#nave_group.add(outra_nave)
 
 #inimigo1 = Inimigos('Assets/Inimigo1.png', 0, 0,\
 #                    randrange(-10,10), randrange(-10, 10))
 #===========================   ''   ===========================#
 relogio =  pygame.time.Clock()
 score = 0
+y = 0
 
 Game = True
 while Game:
     tempo = relogio.tick(120)
-    
+
     pressed_keys = pygame.key.get_pressed()
-#MOVER AS NAVES
-    if pressed_keys[K_LEFT] and nave.rect.x >= 5:
+#MOVER NAVE 1
+    if pressed_keys[pygame.K_LEFT] and nave.rect.x >= 5:
         nave.rect.x -= 5
-    
-    if pressed_keys[K_RIGHT] and nave.rect.x <= (1195 - nave.rect.width):
+    if pressed_keys[pygame.K_RIGHT] and nave.rect.x <= (1195 - nave.rect.width):
         nave.rect.x += 5
-    
-#   if pressed_keys[K_LEFT]:
-#       outra_raquete.rect.x -= 5
-#   elif pressed_keys[K_RIGHT]:
-#       outra_raquete.rect.x += 5
+#MOVER NAVE 2
+#    if pressed_keys[K_a] and outra_nave.rect.x >= 5:
+#        outra_nave.rect.x -= 5
+#    if pressed_keys[K_d] and outra_nave.rect.x <= (1195 - outra_nave.rect.width):
+#        outra_nave.rect.x += 5
         
     for event in pygame.event.get():
-        if event.type == QUIT:            
+        if event.type == pygame.QUIT:            
             Game = False
 
     rel_y = y % fundo.get_rect().height
