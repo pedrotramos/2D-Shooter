@@ -36,6 +36,7 @@ tela = pygame.display.set_mode((1200, 700), 0, 32)
 pygame.display.set_caption('2D Shooter')
 
 fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
+y = 0
 
 nave = Nave('Assets/MilleniumFalcon.png', 600, 595)
 nave_group = pygame.sprite.Group()
@@ -71,11 +72,15 @@ while Game:
         if event.type == QUIT:            
             Game = False
 
-    tela.blit(fundo, (0, 0))
+    rel_y = y % fundo.get_rect().height
+    tela.blit(fundo, (0, rel_y - fundo.get_rect().height))
+    if rel_y < 700:
+        tela.blit(fundo, (0, rel_y))
+    y += 2
+    
     nave_group.draw(tela)
 #   inimigos_group.draw(tela)
     
     pygame.display.update()
     
 pygame.display.quit()
-            
