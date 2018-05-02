@@ -98,11 +98,37 @@ while Game:
 
     pressed_keys = pygame.key.get_pressed()
 #MOVER NAVE 1
+    """ Movimento Vertical e Horizontal """
     if pressed_keys[pygame.K_LEFT] and nave.rect.x >= 5:
         nave.rect.x -= 5
+    if pressed_keys[pygame.K_UP] and nave.rect.y >= 5:
+        nave.rect.y -= 5
     if pressed_keys[pygame.K_RIGHT] and nave.rect.x <= (WIDTH -\
                    5 - nave.rect.width):
         nave.rect.x += 5
+    if pressed_keys[pygame.K_DOWN] and nave.rect.y <= (HEIGHT -\
+                   5 - nave.rect.height):
+        nave.rect.y += 5
+    """ Movimento Diagonal """
+    # xˆ2 + xˆ2 = 5 => 2xˆ2 = 5 => xˆ2 = 5/2 => x = 2.5ˆ(1/2) 
+    if pressed_keys[pygame.K_LEFT] and pressed_keys[pygame.K_UP] and \
+    nave.rect.x >= 5 and nave.rect.y >= 5:
+        nave.rect.x -= 2.5 ** (1/2)
+        nave.rect.y -= 2.5 ** (1/2)
+    if pressed_keys[pygame.K_LEFT] and pressed_keys[pygame.K_DOWN] and \
+    nave.rect.x >= 5 and nave.rect.y <= (HEIGHT - 5 - nave.rect.height):
+        nave.rect.x -= 2.5 ** (1/2)
+        nave.rect.y += 2.5 ** (1/2)
+    if pressed_keys[pygame.K_RIGHT] and pressed_keys[pygame.K_DOWN] and \
+    nave.rect.x <= (WIDTH - 5 - nave.rect.width) and nave.rect.y <=\
+    (HEIGHT - 5 - nave.rect.height):
+        nave.rect.x += 2.5 ** (1/2)
+        nave.rect.y += 2.5 ** (1/2)
+    if pressed_keys[pygame.K_RIGHT] and pressed_keys[pygame.K_UP] and \
+    nave.rect.x <= (WIDTH - 5 - nave.rect.width) and nave.rect.y >= 5:
+        nave.rect.x += 2.5 ** (1/2)
+        nave.rect.y -= 2.5 ** (1/2)
+    
 #MOVER NAVE 2
 #    if pressed_keys[K_a] and outra_nave.rect.x >= 5:
 #        outra_nave.rect.x -= 5
