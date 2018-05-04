@@ -5,8 +5,10 @@ Created on Fri Apr 27 11:17:40 2018
 import pygame
 from random import randrange
 
+
 #Baseado no canla do Youtube KidsCanCode
 #===========================   Classes   ===========================#
+    
 class Nave(pygame.sprite.Sprite):
     
     def __init__(self, arquivo_imagem, pos_x, pos_y):
@@ -70,6 +72,16 @@ def paused():
                 pause = False
         pygame.display.update()
         relogio.tick(FPS)       
+        
+fonte = pygame.font.match_font('arial')
+WHITE = (255, 255, 255)
+
+def desenhando_score(surf, texto, tamanho, x, y):
+    font = pygame.font.Font(fonte, tamanho)
+    superficie_texto = font.render(texto, True, WHITE)
+    rect_texto = superficie_texto.get_rect()
+    rect_texto.midtop = (x, y)
+    surf.blit(superficie_texto, rect_texto)
         
 #===========================   Iniciar   ===========================#
 pygame.init()
@@ -184,10 +196,11 @@ while Game:
         tudo.add(meteor)
         enemy_group.add(meteor)
         
-        score += 1          #colocar no próprio jogo depois
-        print(score)        
+        score += 100          
+                
 
     tudo.draw(tela)
+    desenhando_score(tela, str(score), 30, 40, 10)
     pygame.display.flip()
     
 pygame.display.quit()
