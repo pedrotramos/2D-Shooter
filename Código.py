@@ -56,8 +56,21 @@ class Inimigos(pygame.sprite.Sprite):
             self.rect.x = randrange(0, 1200)
             self.vy = randrange(1, 8)
             self.vx = randrange(-3,3)
+ 
+#===========================   Funções   ===========================#           
             
-
+def paused():
+    pause = True
+    while pause:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                pause = False
+        pygame.display.update()
+        relogio.tick(FPS)       
+        
 #===========================   Iniciar   ===========================#
 pygame.init()
 
@@ -96,7 +109,6 @@ y = 0
 
 
 Game = True
-paused = False
 while Game:
     tempo = relogio.tick(FPS)
 
@@ -149,6 +161,8 @@ while Game:
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_z:
                 nave.shoot()
+            elif event.key == pygame.K_p:
+                paused()
             
 #MOVIMENTO DA TELA#
     rel_y = y % fundo.get_rect().height
