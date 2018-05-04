@@ -5,7 +5,7 @@ Created on Fri Apr 27 11:17:40 2018
 import pygame
 from random import randrange
 
-
+RED = (255, 0, 0)
 #Baseado no canla do Youtube KidsCanCode
 #===========================   Classes   ===========================#
     
@@ -15,23 +15,23 @@ class Nave(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(arquivo_imagem)
         self.rect = self.image.get_rect()
-        self.radius = 50 
+        self.radius = 48
         self.rect.y = pos_y
-        self.rect.x = pos_x
+        self.rect.centerx = pos_x
         
     def shoot(self):
-        tiro = Tiros('Assets/tiro1.png', self.rect.x + 35, self.rect.top, 10)
+        tiro = Tiros('Assets/tiro1.png', self.rect.centerx, self.rect.top)
         tudo.add(tiro)
         bullets_group.add(tiro)
         
 class Tiros(pygame.sprite.Sprite):
-    def __init__(self, arquivo_imagem, pos_x, pos_y, vy):
+    def __init__(self, arquivo_imagem, pos_x, pos_y):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(arquivo_imagem)
         self.rect = self.image.get_rect()
         self.rect.bottom = pos_y
         self.rect.x = pos_x
-        self.vy = -vy
+        self.vy = -10
         
     def update(self):
         self.rect.y += self.vy
@@ -44,7 +44,7 @@ class Inimigos(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(arquivo_imagem)
         self.rect = self.image.get_rect()
-        self.radius = 56
+        self.radius = 43
         self.rect.y = pos_y
         self.rect.x = pos_x
         self.vy = vy
@@ -75,7 +75,6 @@ def paused():
         
 fonte = pygame.font.match_font('arial')
 WHITE = (255, 255, 255)
-
 def desenhando_score(surf, texto, tamanho, x, y):
     font = pygame.font.Font(fonte, tamanho)
     superficie_texto = font.render(texto, True, WHITE)
@@ -141,31 +140,6 @@ while Game:
     if pressed_keys[pygame.K_DOWN] and nave.rect.y <= (HEIGHT -\
                    5 - nave.rect.height):
         nave.rect.y += 5
-    """ Movimento Diagonal """
-    # xˆ2 + xˆ2 = 25 => 2xˆ2 = 25 => xˆ2 = 25/2 => x = 12.5ˆ(1/2) 
-    if pressed_keys[pygame.K_LEFT] and pressed_keys[pygame.K_UP] and \
-    nave.rect.x >= 5 and nave.rect.y >= 5:
-        nave.rect.x -= 12.5 ** (1/2)
-        nave.rect.y -= 12.5 ** (1/2)
-    if pressed_keys[pygame.K_LEFT] and pressed_keys[pygame.K_DOWN] and \
-    nave.rect.x >= 5 and nave.rect.y <= (HEIGHT - 5 - nave.rect.height):
-        nave.rect.x -= 12.5 ** (1/2)
-        nave.rect.y += 12.5 ** (1/2)
-    if pressed_keys[pygame.K_RIGHT] and pressed_keys[pygame.K_DOWN] and \
-    nave.rect.x <= (WIDTH - 5 - nave.rect.width) and nave.rect.y <=\
-    (HEIGHT - 5 - nave.rect.height):
-        nave.rect.x += 12.5 ** (1/2)
-        nave.rect.y += 12.5 ** (1/2)
-    if pressed_keys[pygame.K_RIGHT] and pressed_keys[pygame.K_UP] and \
-    nave.rect.x <= (WIDTH - 5 - nave.rect.width) and nave.rect.y >= 5:
-        nave.rect.x += 12.5 ** (1/2)
-        nave.rect.y -= 12.5 ** (1/2)
-    
-#MOVER NAVE 2
-#    if pressed_keys[K_a] and outra_nave.rect.x >= 5:
-#        outra_nave.rect.x -= 5
-#    if pressed_keys[K_d] and outra_nave.rect.x <= (1195 - outra_nave.rect.width):
-#        outra_nave.rect.x += 5
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:            
@@ -181,11 +155,12 @@ while Game:
     tela.blit(fundo, (0, rel_y - fundo.get_rect().height))
     if rel_y < HEIGHT:
         tela.blit(fundo, (0, rel_y))
-    y += 3
+    y += 10
     
     tudo.update()
     
-    hits = pygame.sprite.spritecollide(nave, enemy_group, False)
+    hits = pygame.sprite.spritecollide(nave, enemy_group, False,\
+                                       pygame.sprite.collide_circle)
     if hits:
         Game = False
     
@@ -198,7 +173,6 @@ while Game:
         
         score += 100          
                 
-
     tudo.draw(tela)
     desenhando_score(tela, str(score), 30, 40, 10)
     pygame.display.flip()
