@@ -3,10 +3,9 @@
 Created on Fri Apr 27 11:17:40 2018
 """
 import pygame
-from pygame.locals import *
 from random import randrange
-import sys
 
+#Baseado no canla do Youtube KidsCanCode
 #===========================   Classes   ===========================#
 class Nave(pygame.sprite.Sprite):
     
@@ -14,6 +13,7 @@ class Nave(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(arquivo_imagem)
         self.rect = self.image.get_rect()
+        self.radius = 50 
         self.rect.y = pos_y
         self.rect.x = pos_x
         
@@ -42,6 +42,7 @@ class Inimigos(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(arquivo_imagem)
         self.rect = self.image.get_rect()
+        self.radius = 56
         self.rect.y = pos_y
         self.rect.x = pos_x
         self.vy = vy
