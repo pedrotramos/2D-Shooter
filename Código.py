@@ -182,17 +182,43 @@ def loop():
         if pressed_keys[pygame.K_ESCAPE]:
             Game = False
         
-        """ Movimento Vertical e Horizontal """
-        if pressed_keys[pygame.K_LEFT] and nave.rect.x >= 5:
+            #MOVER NAVE 1
+            """ Movimento Vertical e Horizontal """
+        if pressed_keys[pygame.K_LEFT] and not pressed_keys[pygame.K_UP] and not\
+        pressed_keys[pygame.K_DOWN] and not pressed_keys[pygame.K_RIGHT] and \
+        nave.rect.x >= 5:
             nave.rect.x -= 5
-        if pressed_keys[pygame.K_UP] and nave.rect.y >= 5:
+        if pressed_keys[pygame.K_UP] and not pressed_keys[pygame.K_LEFT] and not\
+        pressed_keys[pygame.K_DOWN] and not pressed_keys[pygame.K_RIGHT] and \
+        nave.rect.y >= 5:
             nave.rect.y -= 5
-        if pressed_keys[pygame.K_RIGHT] and nave.rect.x <= (WIDTH -\
-                       5 - nave.rect.width):
+        if pressed_keys[pygame.K_RIGHT] and not pressed_keys[pygame.K_UP] and not\
+        pressed_keys[pygame.K_DOWN] and not pressed_keys[pygame.K_LEFT] and \
+        nave.rect.x <= (WIDTH - 5 - nave.rect.width):
             nave.rect.x += 5
-        if pressed_keys[pygame.K_DOWN] and nave.rect.y <= (HEIGHT -\
-                       5 - nave.rect.height):
+        if pressed_keys[pygame.K_DOWN] and not pressed_keys[pygame.K_UP] and not\
+        pressed_keys[pygame.K_RIGHT] and not pressed_keys[pygame.K_LEFT] and\
+        nave.rect.y <= (HEIGHT - 5 - nave.rect.height):
             nave.rect.y += 5
+        """ Movimento Diagonal """
+        # xˆ2 + xˆ2 = 25 => 2xˆ2 = 25 => xˆ2 = 25/2 => x = 12.5ˆ(1/2) 
+        if pressed_keys[pygame.K_LEFT] and pressed_keys[pygame.K_UP] and \
+        nave.rect.x >= 5 and nave.rect.y >= 5:
+            nave.rect.x -= 12.5 ** (1/2)
+            nave.rect.y -= 12.5 ** (1/2)
+        if pressed_keys[pygame.K_LEFT] and pressed_keys[pygame.K_DOWN] and \
+        nave.rect.x >= 5 and nave.rect.y <= (HEIGHT - 5 - nave.rect.height):
+            nave.rect.x -= 12.5 ** (1/2)
+            nave.rect.y += 12.5 ** (1/2)
+        if pressed_keys[pygame.K_RIGHT] and pressed_keys[pygame.K_DOWN] and \
+        nave.rect.x <= (WIDTH - 5 - nave.rect.width) and nave.rect.y <=\
+        (HEIGHT - 5 - nave.rect.height):
+            nave.rect.x += 12.5 ** (1/2)
+            nave.rect.y += 12.5 ** (1/2)
+        if pressed_keys[pygame.K_RIGHT] and pressed_keys[pygame.K_UP] and \
+        nave.rect.x <= (WIDTH - 5 - nave.rect.width) and nave.rect.y >= 5:
+            nave.rect.x += 12.5 ** (1/2)
+            nave.rect.y -= 12.5 ** (1/2)
     
         for event in pygame.event.get():
             if event.type == pygame.QUIT:            
