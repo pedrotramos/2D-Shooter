@@ -150,7 +150,7 @@ def instrucao():
         
         botao('BACK', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED, LIGHTRED, menu)
         botao('PLAY!', WIDTH/2 + 200, HEIGHT/2 + 250, 200, 50, GREEN, LIGHTGREEN, loop)
-                
+        
         pygame.display.update()
         relogio.tick(FPS)
 
@@ -163,8 +163,39 @@ def paused():
                 quit()
             if event.type == pygame.KEYDOWN:
                 pause = False
+                
+        mensagem('PAUSED', WIDTH/2, HEIGHT/2, 130)
+        mensagem('Press any key to continue', WIDTH/2, HEIGHT/2 +100, 50)
+        
+        botao('MENU', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED, LIGHTRED, menu)
+        
         pygame.display.update()
-        relogio.tick(FPS)       
+        relogio.tick(FPS)
+
+def GameOver():
+    over = True
+    x = 0
+    go = pygame.image.load("Assets/SpaceBackground.png").convert()
+    while over:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+                
+        tela.fill(BLACK)
+        rel_x = x % go.get_rect().width
+        tela.blit(go, (rel_x - go.get_rect().width, 0))
+        if rel_x < WIDTH:
+            tela.blit(go, (rel_x, 0))
+        x += 2
+            
+        mensagem('GAME OVER', WIDTH/2, HEIGHT/2, 130)
+        
+        botao('MENU', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED, LIGHTRED, menu)
+        botao('PLAY AGAIN', WIDTH/2 + 200, HEIGHT/2 + 250, 200, 50, GREEN, LIGHTGREEN, loop)
+        
+        pygame.display.update()
+        relogio.tick(FPS)
 
 def desenhando_score(surf, texto, tamanho, x, y):
     font = pygame.font.Font('freesansbold.ttf', tamanho)
@@ -245,6 +276,7 @@ def loop():
         (nave, enemy_group, False, pygame.sprite.collide_circle)
         if hits:
             Game = False
+            GameOver()
         
         tiros = pygame.sprite.groupcollide(enemy_group, bullets_group, True, True)
         for tiro in tiros:
@@ -255,6 +287,7 @@ def loop():
             score += 100          
                     
         tudo.draw(tela)
+#        mensagem('{0}' .format(score), WIDTH/2, 20, 30)
         desenhando_score(tela, str(score), 30, 40, 10)
         pygame.display.flip()
         
@@ -270,7 +303,7 @@ WIDTH = 1200
 HEIGHT = 700
 
 tela = pygame.display.set_mode((WIDTH, HEIGHT), 0, 32)
-pygame.display.set_caption('2D Shooterz')
+pygame.display.set_caption('2D Shooter')
 
 fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
 
@@ -290,5 +323,3 @@ relogio =  pygame.time.Clock()
 FPS = 120
 
 menu()
-
-pygame.display.quit()
