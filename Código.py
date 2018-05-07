@@ -75,7 +75,7 @@ def mensagem(mensagem, x, y, tamanho):
         textSurface = fonte.render(mensagem, True, WHITE)
         return textSurface, textSurface.get_rect()
 
-    texto = pygame.font.Font('freesansbold.ttf', tamanho)
+    texto = pygame.font.SysFont('agencyfb', tamanho)
     TextSurf, TextRect = textos(mensagem, texto)
     TextRect.center = (x, y)
     tela.blit(TextSurf, TextRect)
@@ -97,7 +97,7 @@ def botao(msg, x, y, w, h, cor, cor_mouse, action = None):
     else:
         pygame.draw.rect(tela, cor, (x, y, w, h))
     
-    mensagem(msg, x + (w/2),  y + (h/2), 20)
+    mensagem(msg, x + (w/2),  y + (h/2), 40)
         
 def menu():
     intro = True
@@ -115,7 +115,9 @@ def menu():
             tela.blit(mn, (rel_x, 0))
         x += 2
         
-        mensagem('NOME DO JOGO', WIDTH/2, HEIGHT/2 - 200, 130)
+        mensagem('GUARDIANS', WIDTH/2, HEIGHT/2 - 250, 130)
+        mensagem('OF THE', WIDTH/2, HEIGHT/2 - 173, 30)
+        mensagem('UNIVERSE', WIDTH/2, HEIGHT/2 - 100, 130)
         
         botao('PLAY!', WIDTH/2 - 90, HEIGHT/2, 200, 50, GREEN, LIGHTGREEN, loop)
         botao('INSTRUCTIONS', WIDTH/2 - 90, HEIGHT/2 + 100, 200, 50, BLUE, LIGHTBLUE, instrucao)
@@ -143,9 +145,11 @@ def instrucao():
         
         mensagem('INSTRUCTIONS', WIDTH/2, HEIGHT/2 - 200, 130)
         mensagem('Shoot: Z', WIDTH/2, HEIGHT/2 - 100, 50)
-        mensagem('Move: keyboard arrows', WIDTH/2, HEIGHT/2, 50)
+        mensagem('Move: keyboard arrows', WIDTH/2, HEIGHT/2 - 50, 50)
+        mensagem('Pause: P',  WIDTH/2, HEIGHT/2, 50)
         
-        botao('BACK', WIDTH/2 - 90, HEIGHT/2 + 100, 200, 50, RED, LIGHTRED, menu)
+        botao('BACK', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED, LIGHTRED, menu)
+        botao('PLAY!', WIDTH/2 + 200, HEIGHT/2 + 250, 200, 50, GREEN, LIGHTGREEN, loop)
                 
         pygame.display.update()
         relogio.tick(FPS)
@@ -162,9 +166,8 @@ def paused():
         pygame.display.update()
         relogio.tick(FPS)       
 
-fonte = pygame.font.match_font('arial')
 def desenhando_score(surf, texto, tamanho, x, y):
-    font = pygame.font.Font(fonte, tamanho)
+    font = pygame.font.Font('freesansbold.ttf', tamanho)
     superficie_texto = font.render(texto, True, WHITE)
     rect_texto = superficie_texto.get_rect()
     rect_texto.midtop = (x, y)
