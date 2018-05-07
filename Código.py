@@ -4,9 +4,13 @@ Created on Fri Apr 27 11:17:40 2018
 """
 import pygame
 from random import randrange
+import random
 from os import path
 #Baseado no canal do Youtube KidsCanCode 
 #https://www.youtube.com/channel/UCNaPQ5uLX5iIEHUCLmfAgKg
+
+#Frozen Jam by tgfcoder <https://twitter.com/tgfcoder> 
+#licensed under CC-BY-3 <http://creativecommons.org/licenses/by/3.0/>
 #===========================   Classes   ===========================#
     
 class Nave(pygame.sprite.Sprite):
@@ -23,6 +27,7 @@ class Nave(pygame.sprite.Sprite):
         tiro = Tiros('Assets/tiro1.png', self.rect.centerx, self.rect.top)
         tudo.add(tiro)
         bullets_group.add(tiro)
+        shoot_sound.play()
         
 class Tiros(pygame.sprite.Sprite):
     def __init__(self, arquivo_imagem, pos_x, pos_y):
@@ -32,7 +37,6 @@ class Tiros(pygame.sprite.Sprite):
         self.rect.bottom = pos_y
         self.rect.x = pos_x
         self.vy = -10
-        shoot_sound.play()
         
     def update(self):
         self.rect.y += self.vy
@@ -124,7 +128,6 @@ def menu():
         botao('INSTRUCTIONS', WIDTH/2 - 90, HEIGHT/2 + 100, 200, 50, BLUE, LIGHTBLUE, instrucao)
         botao('QUIT', WIDTH/2 - 90, HEIGHT/2 + 200, 200, 50, RED, LIGHTRED, sair)
         
-        pygame.mixer.music.play(loops = -1)
         pygame.display.update()
         relogio.tick(FPS)
 
@@ -174,20 +177,6 @@ def paused():
         pygame.display.update()
         relogio.tick(FPS)
 
-''' Som '''
-
-snd_dir = path.join(path.dirname (__file__), 'snd')
-pygame.mixer.init()
-
-#som do tiro
-shoot_sound = pygame.mixer.Sound(path.join(snd_dir,))
-
-#som da explosão
-explosion = pygame.mixer.Sound(path.join(snd_dir,))
-
-#som do background
-pygame.mixer.music.load(path.join(snd_dir,))
-
 
 def GameOver():
     over = True
@@ -198,7 +187,15 @@ def GameOver():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-                
+        
+        pressed_keys = pygame.key.get_pressed()
+        
+        if pressed_keys[pygame.K_r]:
+            loop()
+        if pressed_keys[pygame.K_ESCAPE]:
+            sair()
+
+        
         tela.fill(BLACK)
         rel_x = x % go.get_rect().width
         tela.blit(go, (rel_x - go.get_rect().width, 0))
@@ -206,23 +203,17 @@ def GameOver():
             tela.blit(go, (rel_x, 0))
         x += 2
             
-        mensagem('GAME OVER', WIDTH/2, HEIGHT/2, 130)
+        mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 100, 130)
+        mensagem('Pess R to restart', WIDTH/2, HEIGHT/2 + 100, 50)
+        mensagem('Pess ESC to quit game', WIDTH/2, HEIGHT/2 + 50, 50)
         
         botao('MENU', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED, LIGHTRED, menu)
         botao('PLAY AGAIN', WIDTH/2 + 200, HEIGHT/2 + 250, 200, 50, GREEN, LIGHTGREEN, loop)
         
         pygame.display.update()
         relogio.tick(FPS)
-
-def desenhando_score(surf, texto, tamanho, x, y):
-    font = pygame.font.Font('freesansbold.ttf', tamanho)
-    superficie_texto = font.render(texto, True, WHITE)
-    rect_texto = superficie_texto.get_rect()
-    rect_texto.midtop = (x, y)
-    surf.blit(superficie_texto, rect_texto)
     
 def loop():
-    pygame.mixer.music.play(loops = -1)
     score = 0
     y = 0
     Game = True
@@ -231,9 +222,6 @@ def loop():
     
         pressed_keys = pygame.key.get_pressed()
         
-        
-        
-
         if pressed_keys[pygame.K_ESCAPE]:
             Game = False
         
@@ -296,21 +284,22 @@ def loop():
         hits = pygame.sprite.spritecollide\
         (nave, enemy_group, False, pygame.sprite.collide_circle)
         if hits:
+            crash_sound.play()
             Game = False
             GameOver()
         
         tiros = pygame.sprite.groupcollide(enemy_group, bullets_group, True, True)
         for tiro in tiros:
+            random.choice(exp_sounds).play()
             meteor = Inimigos('Assets/meteor.gif', randrange(0, 1200),\
                     randrange(-100, -40), randrange(1, 8), randrange(-3,3))
             tudo.add(meteor)
             enemy_group.add(meteor)        
             score += 100          
-            explosion.play()
+            
             
         tudo.draw(tela)
-#        mensagem('{0}' .format(score), WIDTH/2, 20, 30)
-        desenhando_score(tela, str(score), 30, 40, 10)
+        mensagem('{0}' .format(score), WIDTH/2 + 300, 20, 30)
         pygame.display.flip()
         
 #===========================   Iniciar   ===========================#
@@ -340,8 +329,27 @@ for i in range(8):
     
 tudo.add(enemy_group)
 tudo.add(nave_group)
+#===========================       'Som'         ===========================#
+snd_dir = path.join(path.dirname (__file__), 'snd')
+pygame.mixer.init()
+
+#som do tiro
+shoot_sound = pygame.mixer.Sound(path.join(snd_dir, 'Laser1.wav'))
+
+#sons da explosão
+exp_sounds = []
+for snd in ['Explosion1.wav', 'Explosion2.wav']:
+    exp_sounds.append(pygame.mixer.Sound(path.join(snd_dir, snd)))
+    
+#som da morte
+crash_sound = pygame.mixer.Sound(path.join(snd_dir, 'Crash.wav'))
+
+#som do background
+pygame.mixer.music.load(path.join(snd_dir, 'tgfcoder-FrozenJam-SeamlessLoop.ogg'))
+pygame.mixer.music.set_volume(0.1)
 #===========================   'Funcionamento'   ===========================#
 relogio =  pygame.time.Clock()
 FPS = 120
 
+pygame.mixer.music.play(loops = -1)
 menu()
