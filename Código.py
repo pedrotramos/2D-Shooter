@@ -4,7 +4,7 @@ Created on Fri Apr 27 11:17:40 2018
 """
 import pygame
 from random import randrange
-
+from os import path
 #Baseado no canal do Youtube KidsCanCode 
 #https://www.youtube.com/channel/UCNaPQ5uLX5iIEHUCLmfAgKg
 #===========================   Classes   ===========================#
@@ -32,6 +32,7 @@ class Tiros(pygame.sprite.Sprite):
         self.rect.bottom = pos_y
         self.rect.x = pos_x
         self.vy = -10
+        shoot_sound.play()
         
     def update(self):
         self.rect.y += self.vy
@@ -123,6 +124,7 @@ def menu():
         botao('INSTRUCTIONS', WIDTH/2 - 90, HEIGHT/2 + 100, 200, 50, BLUE, LIGHTBLUE, instrucao)
         botao('QUIT', WIDTH/2 - 90, HEIGHT/2 + 200, 200, 50, RED, LIGHTRED, sair)
         
+        pygame.mixer.music.play(loops = -1)
         pygame.display.update()
         relogio.tick(FPS)
 
@@ -172,6 +174,21 @@ def paused():
         pygame.display.update()
         relogio.tick(FPS)
 
+''' Som '''
+
+snd_dir = path.join(path.dirname (__file__), 'snd')
+pygame.mixer.init()
+
+#som do tiro
+shoot_sound = pygame.mixer.Sound(path.join(snd_dir,))
+
+#som da explosão
+explosion = pygame.mixer.Sound(path.join(snd_dir,))
+
+#som do background
+pygame.mixer.music.load(path.join(snd_dir,))
+
+
 def GameOver():
     over = True
     x = 0
@@ -205,6 +222,7 @@ def desenhando_score(surf, texto, tamanho, x, y):
     surf.blit(superficie_texto, rect_texto)
     
 def loop():
+    pygame.mixer.music.play(loops = -1)
     score = 0
     y = 0
     Game = True
@@ -213,6 +231,9 @@ def loop():
     
         pressed_keys = pygame.key.get_pressed()
         
+        
+        
+
         if pressed_keys[pygame.K_ESCAPE]:
             Game = False
         
@@ -285,7 +306,8 @@ def loop():
             tudo.add(meteor)
             enemy_group.add(meteor)        
             score += 100          
-                    
+            explosion.play()
+            
         tudo.draw(tela)
 #        mensagem('{0}' .format(score), WIDTH/2, 20, 30)
         desenhando_score(tela, str(score), 30, 40, 10)
