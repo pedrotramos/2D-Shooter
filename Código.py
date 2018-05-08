@@ -115,13 +115,14 @@ RED = (150, 0, 0)
 LIGHTRED = (255, 0, 0)
 BLUE = (0, 0, 150)
 LIGHTBLUE = (0, 0, 255)
+YELLOW = (255, 255, 0)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 #===========================   Funções   ===========================#   
-def mensagem(mensagem, x, y, tamanho):
+def mensagem(mensagem, x, y, tamanho, COR):
    
     def textos(mensagem, fonte):
-        textSurface = fonte.render(mensagem, True, WHITE)
+        textSurface = fonte.render(mensagem, True, COR)
         return textSurface, textSurface.get_rect()
 
     texto = pygame.font.SysFont('agencyfb', tamanho)
@@ -146,7 +147,7 @@ def botao(msg, x, y, w, h, cor, cor_mouse, action = None):
     else:
         pygame.draw.rect(tela, cor, (x, y, w, h))
     
-    mensagem(msg, x + (w/2),  y + (h/2), 40)
+    mensagem(msg, x + (w/2),  y + (h/2), 40, WHITE)
         
 def menu():
     intro = True
@@ -165,9 +166,9 @@ def menu():
             tela.blit(mn, (rel_x, 0))
         x += 2
         
-        mensagem('GUARDIANS', WIDTH/2, HEIGHT/2 - 250, 130)
-        mensagem('OF THE', WIDTH/2, HEIGHT/2 - 175, 30)
-        mensagem('UNIVERSE', WIDTH/2, HEIGHT/2 - 100, 130)
+        mensagem('GUARDIANS', WIDTH/2, HEIGHT/2 - 250, 130, YELLOW)
+        mensagem('OF THE', WIDTH/2, HEIGHT/2 - 175, 30, YELLOW)
+        mensagem('UNIVERSE', WIDTH/2, HEIGHT/2 - 100, 130, YELLOW)
         
         botao('PLAY!', WIDTH/2 - 90, HEIGHT/2, 200, 50, GREEN, LIGHTGREEN,
               loop)
@@ -196,10 +197,10 @@ def instrucao():
             tela.blit(inst, (rel_x, 0))
         x -= 2
         
-        mensagem('INSTRUCTIONS', WIDTH/2, HEIGHT/2 - 200, 130)
-        mensagem('Shoot: SPACE', WIDTH/2, HEIGHT/2 - 100, 50)
-        mensagem('Move: Arrow Keys', WIDTH/2, HEIGHT/2 - 50, 50)
-        mensagem('Pause: P',  WIDTH/2, HEIGHT/2, 50)
+        mensagem('INSTRUCTIONS', WIDTH/2, HEIGHT/2 - 200, 130, WHITE)
+        mensagem('Shoot: SPACE', WIDTH/2, HEIGHT/2 - 100, 50, WHITE)
+        mensagem('Move: Arrow Keys', WIDTH/2, HEIGHT/2 - 50, 50, WHITE)
+        mensagem('Pause: P',  WIDTH/2, HEIGHT/2, 50, WHITE)
         
         botao('BACK', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED, LIGHTRED,
               menu)
@@ -219,8 +220,8 @@ def paused():
             if event.type == pygame.KEYDOWN:
                 pause = False
                 
-        mensagem('PAUSED', WIDTH/2, HEIGHT/2, 130)
-        mensagem('Press any key to continue', WIDTH/2, HEIGHT/2 +100, 50)
+        mensagem('PAUSED', WIDTH/2, HEIGHT/2, 130, WHITE)
+        mensagem('Press any key to continue', WIDTH/2, HEIGHT/2 +100, 50, WHITE)
         
         botao('MENU', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED, LIGHTRED,
               menu)
@@ -316,9 +317,11 @@ def loop():
                     tela.blit(go, (rel_x, 0))
                 x += 2
                     
-                mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 100, 130)
-                mensagem('Press R to restart', WIDTH/2, HEIGHT/2 + 100, 50)
-                mensagem('Press ESC to quit game', WIDTH/2, HEIGHT/2 + 50, 50)
+                mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 100, 130, WHITE)
+                mensagem('Press R to restart', WIDTH/2, HEIGHT/2 + 100, 50,
+                         WHITE)
+                mensagem('Press ESC to quit game', WIDTH/2, HEIGHT/2 + 50, 50,
+                         WHITE)
                 
                 botao('MENU', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED,
                       LIGHTRED, menu)
@@ -337,7 +340,7 @@ def loop():
         
         if Game:
             tudo.draw(tela)
-            mensagem('{0}' .format(score), WIDTH/2, 20, 30)
+            mensagem('{0}' .format(score), WIDTH/2, 20, 30, WHITE)
             pygame.display.flip()
         
 #===========================   'Iniciar'   ===========================#
