@@ -283,6 +283,7 @@ def loop():
     y = 0
     Game = True
     Musicas(0)
+    fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
     while Game:
         relogio.tick(FPS)
     
@@ -345,8 +346,6 @@ HEIGHT = 700
 tela = pygame.display.set_mode((WIDTH, HEIGHT), 0, 32)
 pygame.display.set_caption('2D Shooter')
 
-fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
-
 nave = Nave('Assets/MilleniumFalcon.png')
 nave_group.add(nave)
 
@@ -362,7 +361,7 @@ snd_dir = path.join(path.dirname (__file__), 'snd')
 pygame.mixer.init()
 
 #som do tiro
-shoot_sound = pygame.mixer.Sound(path.join(snd_dir, 'Laser1.wav'))
+shoot_sound = pygame.mixer.Sound(path.join(snd_dir, 'Laser.wav'))
 
 #sons da explosão
 exp_sounds = []
