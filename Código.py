@@ -134,100 +134,17 @@ def sair():
     pygame.quit()
     quit()
 
-def botao(msg, x, y, w, h, cor, cor_mouse, action = None):
+def botao(msg, x, y, w, h, cor, cor_mouse):
     mouse = pygame.mouse.get_pos()
-    click = pygame.mouse.get_pressed()
         
     if x + w > mouse[0] > x and\
     y + h > mouse[1] > y:
         pygame.draw.rect(tela, cor_mouse, (x, y, w, h))
-        if click[0] == 1 and action != None:
-            action()
             
     else:
         pygame.draw.rect(tela, cor, (x, y, w, h))
     
     mensagem(msg, x + (w/2),  y + (h/2), 40, WHITE)
-        
-def menu():
-    intro = True
-    x = 0
-    mn = pygame.image.load("Assets/SpaceBackground.png").convert()
-    Musicas(1)
-    while intro:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-                
-        rel_x = x % mn.get_rect().width
-        tela.blit(mn, (rel_x - mn.get_rect().width, 0))
-        if rel_x < WIDTH:
-            tela.blit(mn, (rel_x, 0))
-        x += 2
-        
-        mensagem('GUARDIANS', WIDTH/2, HEIGHT/2 - 250, 130, YELLOW)
-        mensagem('OF THE', WIDTH/2, HEIGHT/2 - 175, 30, YELLOW)
-        mensagem('UNIVERSE', WIDTH/2, HEIGHT/2 - 100, 130, YELLOW)
-        
-        botao('PLAY!', WIDTH/2 - 90, HEIGHT/2, 200, 50, GREEN, LIGHTGREEN,
-              loop)
-        botao('INSTRUCTIONS', WIDTH/2 - 90, HEIGHT/2 + 100, 200, 50, BLUE,
-              LIGHTBLUE, instrucao)
-        botao('QUIT', WIDTH/2 - 90, HEIGHT/2 + 200, 200, 50, RED, LIGHTRED,
-              sair)
-        
-        pygame.display.update()
-        relogio.tick(FPS)
-
-def instrucao():
-    instruction = True
-    x = 0
-    inst = pygame.image.load("Assets/SpaceBackground.png").convert()
-    while instruction:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-                
-        tela.fill(BLACK)
-        rel_x = x % inst.get_rect().width
-        tela.blit(inst, (rel_x - inst.get_rect().width, 0))
-        if rel_x < WIDTH:
-            tela.blit(inst, (rel_x, 0))
-        x -= 2
-        
-        mensagem('INSTRUCTIONS', WIDTH/2, HEIGHT/2 - 200, 130, WHITE)
-        mensagem('Shoot: SPACE', WIDTH/2, HEIGHT/2 - 100, 50, WHITE)
-        mensagem('Move: Arrow Keys', WIDTH/2, HEIGHT/2 - 50, 50, WHITE)
-        mensagem('Pause: P',  WIDTH/2, HEIGHT/2, 50, WHITE)
-        
-        botao('BACK', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED, LIGHTRED,
-              menu)
-        botao('PLAY!', WIDTH/2 + 200, HEIGHT/2 + 250, 200, 50, GREEN,
-              LIGHTGREEN, loop)
-        
-        pygame.display.update()
-        relogio.tick(FPS)
-
-def paused():
-    pause = True
-    while pause:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-            if event.type == pygame.KEYDOWN:
-                pause = False
-                
-        mensagem('PAUSED', WIDTH/2, HEIGHT/2, 130, WHITE)
-        mensagem('Press any key to continue', WIDTH/2, HEIGHT/2 +100, 50, WHITE)
-        
-        botao('MENU', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED, LIGHTRED,
-              menu)
-        
-        pygame.display.update()
-        relogio.tick(FPS)
     
 musics = ['tgfcoder-FrozenJam-SeamlessLoop.ogg', 'SW.ogg', 'DV.ogg']
 
@@ -235,113 +152,250 @@ def Musicas(mus):
     musica = musics[mus]
     pygame.mixer.music.load(path.join(snd_dir,
                                   musica))
-    pygame.mixer.music.set_volume(0.1)
+    pygame.mixer.music.set_volume(0.2)
     pygame.mixer.music.play(loops = -1)
     
-def loop():
-    enemy_group = pygame.sprite.Group()
-    nave_group = pygame.sprite.Group()
-    bullets_group = pygame.sprite.Group()
-    tudo = pygame.sprite.Group()
-        
-    fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
-    
-    nave = Nave('Assets/MilleniumFalcon.png')
-    nave_group.add(nave)
-
-    for i in range(8):
-        meteor = Inimigos('Assets/meteor.gif')
-        tudo.add(meteor)
-        enemy_group.add(meteor)
-        
-    tudo.add(enemy_group)
-    tudo.add(nave_group)
-    score = 0
-    y = 0
-    Game = True
-    Musicas(0)
-    fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
-    while Game:
-        relogio.tick(FPS)
-    
-        pressed_keys = pygame.key.get_pressed()
-        
-        if pressed_keys[pygame.K_ESCAPE]:
-            Game = False
-    
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:            
+def main():
+    loop = True
+    intro = True
+    instruction = False
+    Game = False
+    while loop:
+        x = 0
+        mn = pygame.image.load("Assets/SpaceBackground.png").convert()
+        Musicas(1)
+        while intro:
+            pressed_keys = pygame.key.get_pressed()
+            
+            if pressed_keys[pygame.K_ESCAPE]:
                 Game = False
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    nave.shoot(tudo, bullets_group)
-                elif event.key == pygame.K_p:
-                    paused()
-                
-        """MOVIMENTO DA TELA"""
-        rel_y = y % fundo.get_rect().height
-        tela.blit(fundo, (0, rel_y - fundo.get_rect().height))
-        if rel_y < HEIGHT:
-            tela.blit(fundo, (0, rel_y))
-        y += 10
-        
-        tudo.update()
-        
-        hits = pygame.sprite.spritecollide\
-        (nave, enemy_group, False, pygame.sprite.collide_circle)
-        if hits:
-            crash_sound.play()
-            Game = False
-            Musicas(2)
-            over = True
-            x = 0
-            go = pygame.image.load("Assets/SpaceBackground.png").convert()
-            while over:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        quit()
-                
-                pressed_keys = pygame.key.get_pressed()
-                
-                if pressed_keys[pygame.K_r]:
-                    loop()
-                if pressed_keys[pygame.K_ESCAPE]:
-                    sair()
-        
-                
-                tela.fill(BLACK)
-                rel_x = x % go.get_rect().width
-                tela.blit(go, (rel_x - go.get_rect().width, 0))
-                if rel_x < WIDTH:
-                    tela.blit(go, (rel_x, 0))
-                x += 2
+                intro = False
+                instruction = False
+                loop = False
+            if pressed_keys[pygame.K_RETURN]:
+                Game = True
+                intro = False
+                instruction = False
+            if pressed_keys[pygame.K_i]:
+                Game = False
+                intro = False
+                instruction = True
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
                     
-                mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 100, 130, WHITE)
-                mensagem('Press R to restart', WIDTH/2, HEIGHT/2 + 100, 50,
-                         WHITE)
-                mensagem('Press ESC to quit game', WIDTH/2, HEIGHT/2 + 50, 50,
-                         WHITE)
-                
-                botao('MENU', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED,
-                      LIGHTRED, menu)
-                
-                pygame.display.update()
-                relogio.tick(FPS)
+            rel_x = x % mn.get_rect().width
+            tela.blit(mn, (rel_x - mn.get_rect().width, 0))
+            if rel_x < WIDTH:
+                tela.blit(mn, (rel_x, 0))
+            x += 2
+            
+            mensagem('GUARDIANS', WIDTH/2, HEIGHT/2 - 250, 130, YELLOW)
+            mensagem('OF THE', WIDTH/2, HEIGHT/2 - 175, 30, YELLOW)
+            mensagem('UNIVERSE', WIDTH/2, HEIGHT/2 - 100, 130, YELLOW)
+            
+            mensagem('Press Enter to Play', WIDTH/2, HEIGHT/2 + 20, 50, LIGHTGREEN)
+            mensagem('Press I for Instructions', WIDTH/2, HEIGHT/2 + 120, 50,
+                     LIGHTBLUE)
+            mensagem('Press ESC to Quit', WIDTH/2, HEIGHT/2 + 220, 50, LIGHTRED)
+            
+            
+            
+            pygame.display.update()
+            relogio.tick(FPS)
+    
+        x = 0
+        inst = pygame.image.load("Assets/SpaceBackground.png").convert()
+        while instruction:
+            
+            pressed_keys = pygame.key.get_pressed()
+            
+            if pressed_keys[pygame.K_RETURN]:
+                Game = True
+                intro = False
+                instruction = False
+            if pressed_keys[pygame.K_q]:
+                Game = False
+                intro = True
+                instruction = False
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+                    
+            tela.fill(BLACK)
+            rel_x = x % inst.get_rect().width
+            tela.blit(inst, (rel_x - inst.get_rect().width, 0))
+            if rel_x < WIDTH:
+                tela.blit(inst, (rel_x, 0))
+            x -= 2
+            
+            mensagem('INSTRUCTIONS', WIDTH/2, HEIGHT/2 - 200, 130, WHITE)
+            mensagem('Shoot: SPACE', WIDTH/2, HEIGHT/2 - 100, 50, WHITE)
+            mensagem('Move: Arrow Keys', WIDTH/2, HEIGHT/2 - 50, 50, WHITE)
+            mensagem('Pause: P',  WIDTH/2, HEIGHT/2, 50, WHITE)
+            
+            mensagem('Press Q to go back to the Menu', WIDTH/2,
+                     HEIGHT/2 + 200, 50, LIGHTRED)
+            mensagem('Press Enter to Play', WIDTH/2, HEIGHT/2 + 100, 50, 
+                  LIGHTGREEN)
+            
+            pygame.display.update()
+            relogio.tick(FPS)
         
-        tiros = pygame.sprite.groupcollide(enemy_group, bullets_group, True,
-                                           True)
-        for tiro in tiros:
-            random.choice(exp_sounds).play()
+        enemy_group = pygame.sprite.Group()
+        nave_group = pygame.sprite.Group()
+        bullets_group = pygame.sprite.Group()
+        tudo = pygame.sprite.Group()
+            
+        fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
+        
+        nave = Nave('Assets/MilleniumFalcon.png')
+        nave_group.add(nave)
+    
+        for i in range(8):
             meteor = Inimigos('Assets/meteor.gif')
             tudo.add(meteor)
-            enemy_group.add(meteor)        
-            score += 100  
+            enemy_group.add(meteor)
+            
+        tudo.add(enemy_group)
+        tudo.add(nave_group)
+        score = 0
+        y = 0
+        Musicas(0)
+        fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
+        while Game:
+            relogio.tick(FPS)
         
-        if Game:
-            tudo.draw(tela)
-            mensagem('{0}' .format(score), WIDTH/2, 20, 30, WHITE)
-            pygame.display.flip()
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:            
+                    Game = False
+                    loop = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        nave.shoot(tudo, bullets_group)
+                    elif event.key == pygame.K_p:
+                        pause = True
+                        while pause:
+                            
+                            pressed_keys = pygame.key.get_pressed()
+                        
+                            if pressed_keys[pygame.K_q]:
+                                Game = False
+                                intro = True
+                                instruction = False
+                                pause = False
+                            
+                            for event in pygame.event.get():
+                                if event.type == pygame.QUIT:
+                                    pygame.quit()
+                                    quit()
+                                if event.type == pygame.KEYDOWN:
+                                    if event.key == pygame.K_p:
+                                        pause = False
+                                    
+                            mensagem('PAUSED', WIDTH/2, HEIGHT/2 - 100, 130,
+                                     WHITE)
+                            mensagem('Press any key to continue', WIDTH/2,
+                                     HEIGHT/2, 50, WHITE)
+                            
+                            mensagem('Press Q to go back to the Menu',
+                                     WIDTH/2, HEIGHT/2 + 100, 50, LIGHTRED)
+                            
+                            pygame.display.update()
+                            relogio.tick(FPS)
+                    
+            """MOVIMENTO DA TELA"""
+            rel_y = y % fundo.get_rect().height
+            tela.blit(fundo, (0, rel_y - fundo.get_rect().height))
+            if rel_y < HEIGHT:
+                tela.blit(fundo, (0, rel_y))
+            y += 10
+            
+            tudo.update()
+            
+            hits = pygame.sprite.spritecollide\
+            (nave, enemy_group, False, pygame.sprite.collide_circle)
+            if hits:
+                crash_sound.play()
+                Game = False
+                Musicas(2)
+                over = True
+                x = 0
+                go = pygame.image.load("Assets/SpaceBackground.png").convert()
+                while over:
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            pygame.quit()
+                            quit()
+                    
+                    pressed_keys = pygame.key.get_pressed()
+                    
+                    if pressed_keys[pygame.K_r]:
+                        over = False
+                        Game = True
+                        loop = True
+                        intro = False
+                        instruction = False
+                        
+                        enemy_group = pygame.sprite.Group()
+                        nave_group = pygame.sprite.Group()
+                        bullets_group = pygame.sprite.Group()
+                        tudo = pygame.sprite.Group()
+                            
+                        fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
+                        
+                        nave = Nave('Assets/MilleniumFalcon.png')
+                        nave_group.add(nave)
+                        
+                        for i in range(8):
+                            meteor = Inimigos('Assets/meteor.gif')
+                            tudo.add(meteor)
+                            enemy_group.add(meteor)
+                            
+                        tudo.add(enemy_group)
+                        tudo.add(nave_group)
+                        Musicas(0)
+                        
+                    if pressed_keys[pygame.K_q]:
+                        over = False
+                        intro = True
+                        instruction = False
+                        Game = False
+                        loop = True
+                        
+                    tela.fill(BLACK)
+                    rel_x = x % go.get_rect().width
+                    tela.blit(go, (rel_x - go.get_rect().width, 0))
+                    if rel_x < WIDTH:
+                        tela.blit(go, (rel_x, 0))
+                    x += 2
+                        
+                    mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 100, 130, WHITE)
+                    mensagem('Press R to restart', WIDTH/2, HEIGHT/2 + 10, 50,
+                             LIGHTGREEN)
+                    mensagem('Press Q to go back to the Menu', WIDTH/2,
+                             HEIGHT/2 + 100, 50, LIGHTRED)
+                    
+                    pygame.display.update()
+                    relogio.tick(FPS)
+            
+            tiros = pygame.sprite.groupcollide(enemy_group, bullets_group, True,
+                                               True)
+            for tiro in tiros:
+                random.choice(exp_sounds).play()
+                meteor = Inimigos('Assets/meteor.gif')
+                tudo.add(meteor)
+                enemy_group.add(meteor)        
+                score += 100  
+            
+            if Game:
+                tudo.draw(tela)
+                mensagem('{0}' .format(score), WIDTH/2, 20, 30, YELLOW)
+                pygame.display.flip()
         
 #===========================   'Iniciar'   ===========================#
 pygame.init()
@@ -374,4 +428,4 @@ crash_sound = pygame.mixer.Sound(path.join(snd_dir, 'Crash.wav'))
 relogio =  pygame.time.Clock()
 FPS = 120
 
-menu()
+main()
