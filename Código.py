@@ -152,6 +152,7 @@ def menu():
     intro = True
     x = 0
     mn = pygame.image.load("Assets/SpaceBackground.png").convert()
+    Musicas(1)
     while intro:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -245,9 +246,64 @@ def loop():
         
     tudo.add(enemy_group)
     tudo.add(nave_group)
+=======
+        
+musics = ['tgfcoder-FrozenJam-SeamlessLoop.ogg', 'SW.ogg', 'DV.ogg']
+
+def Musicas(mus):
+    musica = musics[mus]
+    pygame.mixer.music.load(path.join(snd_dir,
+                                  musica))
+    pygame.mixer.music.set_volume(0.1)
+    pygame.mixer.music.play(loops = -1)
+
+
+
+def GameOver():
+    over = True
+    x = 0
+    go = pygame.image.load("Assets/SpaceBackground.png").convert()
+    Musicas(2)
+    while over:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+                over = False
+        pressed_keys = pygame.key.get_pressed()
+        
+        if pressed_keys[pygame.K_r]:
+            loop()
+        if pressed_keys[pygame.K_ESCAPE]:
+            sair()
+            over = False
+            
+        if over:
+            tela.fill(BLACK)
+            rel_x = x % go.get_rect().width
+            tela.blit(go, (rel_x - go.get_rect().width, 0))
+            if rel_x < WIDTH:
+                tela.blit(go, (rel_x, 0))
+            x += 2
+                
+            mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 100, 130)
+            mensagem('Pess R to restart', WIDTH/2, HEIGHT/2 + 100, 50)
+            mensagem('Pess ESC to quit game', WIDTH/2, HEIGHT/2 + 50, 50)
+            
+            botao('MENU', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED, LIGHTRED,
+                  menu)
+            botao('PLAY AGAIN', WIDTH/2 + 200, HEIGHT/2 + 250, 200, 50, GREEN,
+                  LIGHTGREEN, loop)
+            
+            pygame.display.update()
+            relogio.tick(FPS)
+    
+def loop():
     score = 0
     y = 0
     Game = True
+    Musicas(0)
+    fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
     while Game:
         relogio.tick(FPS)
     
@@ -322,15 +378,23 @@ def loop():
             meteor = Inimigos('Assets/meteor.gif')
             tudo.add(meteor)
             enemy_group.add(meteor)        
-            score += 100          
+            score += 100  
             
-            
-        tudo.draw(tela)
-        mensagem('{0}' .format(score), WIDTH/2, 20, 30)
-        pygame.display.flip()
+        hits = pygame.sprite.spritecollide\
+        (nave, enemy_group, False, pygame.sprite.collide_circle)
+        if hits:
+            crash_sound.play()
+            Game = False
+            GameOver()
         
-#===========================   Iniciar   ===========================#
+        if Game:
+            tudo.draw(tela)
+            mensagem('{0}' .format(score), WIDTH/2, 20, 30)
+            pygame.display.flip()
+        
+#===========================   'Iniciar'   ===========================#
 pygame.init()
+pygame.font.init()
 
 WIDTH = 1200
 HEIGHT = 700
@@ -343,7 +407,7 @@ snd_dir = path.join(path.dirname (__file__), 'snd')
 pygame.mixer.init()
 
 #som do tiro
-shoot_sound = pygame.mixer.Sound(path.join(snd_dir, 'Laser1.wav'))
+shoot_sound = pygame.mixer.Sound(path.join(snd_dir, 'Laser.wav'))
 
 #sons da explosão
 exp_sounds = []
@@ -354,12 +418,9 @@ for snd in ['Explosion1.wav', 'Explosion2.wav']:
 crash_sound = pygame.mixer.Sound(path.join(snd_dir, 'Crash.wav'))
 
 #som do background
-pygame.mixer.music.load(path.join(snd_dir,
-                                  'tgfcoder-FrozenJam-SeamlessLoop.ogg'))
-pygame.mixer.music.set_volume(0.1)
+
 #===========================   'Funcionamento'   ===========================#
 relogio =  pygame.time.Clock()
 FPS = 120
 
-pygame.mixer.music.play(loops = -1)
 menu()
