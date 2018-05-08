@@ -228,6 +228,15 @@ def paused():
         pygame.display.update()
         relogio.tick(FPS)
     
+musics = ['tgfcoder-FrozenJam-SeamlessLoop.ogg', 'SW.ogg', 'DV.ogg']
+
+def Musicas(mus):
+    musica = musics[mus]
+    pygame.mixer.music.load(path.join(snd_dir,
+                                  musica))
+    pygame.mixer.music.set_volume(0.1)
+    pygame.mixer.music.play(loops = -1)
+    
 def loop():
     enemy_group = pygame.sprite.Group()
     nave_group = pygame.sprite.Group()
@@ -246,59 +255,6 @@ def loop():
         
     tudo.add(enemy_group)
     tudo.add(nave_group)
-=======
-        
-musics = ['tgfcoder-FrozenJam-SeamlessLoop.ogg', 'SW.ogg', 'DV.ogg']
-
-def Musicas(mus):
-    musica = musics[mus]
-    pygame.mixer.music.load(path.join(snd_dir,
-                                  musica))
-    pygame.mixer.music.set_volume(0.1)
-    pygame.mixer.music.play(loops = -1)
-
-
-
-def GameOver():
-    over = True
-    x = 0
-    go = pygame.image.load("Assets/SpaceBackground.png").convert()
-    Musicas(2)
-    while over:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-                over = False
-        pressed_keys = pygame.key.get_pressed()
-        
-        if pressed_keys[pygame.K_r]:
-            loop()
-        if pressed_keys[pygame.K_ESCAPE]:
-            sair()
-            over = False
-            
-        if over:
-            tela.fill(BLACK)
-            rel_x = x % go.get_rect().width
-            tela.blit(go, (rel_x - go.get_rect().width, 0))
-            if rel_x < WIDTH:
-                tela.blit(go, (rel_x, 0))
-            x += 2
-                
-            mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 100, 130)
-            mensagem('Pess R to restart', WIDTH/2, HEIGHT/2 + 100, 50)
-            mensagem('Pess ESC to quit game', WIDTH/2, HEIGHT/2 + 50, 50)
-            
-            botao('MENU', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED, LIGHTRED,
-                  menu)
-            botao('PLAY AGAIN', WIDTH/2 + 200, HEIGHT/2 + 250, 200, 50, GREEN,
-                  LIGHTGREEN, loop)
-            
-            pygame.display.update()
-            relogio.tick(FPS)
-    
-def loop():
     score = 0
     y = 0
     Game = True
@@ -335,6 +291,7 @@ def loop():
         if hits:
             crash_sound.play()
             Game = False
+            Musicas(2)
             over = True
             x = 0
             go = pygame.image.load("Assets/SpaceBackground.png").convert()
@@ -360,13 +317,11 @@ def loop():
                 x += 2
                     
                 mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 100, 130)
-                mensagem('Pess R to restart', WIDTH/2, HEIGHT/2 + 100, 50)
-                mensagem('Pess ESC to quit game', WIDTH/2, HEIGHT/2 + 50, 50)
+                mensagem('Press R to restart', WIDTH/2, HEIGHT/2 + 100, 50)
+                mensagem('Press ESC to quit game', WIDTH/2, HEIGHT/2 + 50, 50)
                 
-                botao('MENU', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED, LIGHTRED,
-                      menu)
-                botao('PLAY AGAIN', WIDTH/2 + 200, HEIGHT/2 + 250, 200, 50, GREEN,
-                      LIGHTGREEN, loop)
+                botao('MENU', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED,
+                      LIGHTRED, menu)
                 
                 pygame.display.update()
                 relogio.tick(FPS)
@@ -379,13 +334,6 @@ def loop():
             tudo.add(meteor)
             enemy_group.add(meteor)        
             score += 100  
-            
-        hits = pygame.sprite.spritecollide\
-        (nave, enemy_group, False, pygame.sprite.collide_circle)
-        if hits:
-            crash_sound.play()
-            Game = False
-            GameOver()
         
         if Game:
             tudo.draw(tela)
