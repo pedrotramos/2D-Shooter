@@ -152,6 +152,7 @@ def menu():
     intro = True
     x = 0
     mn = pygame.image.load("Assets/SpaceBackground.png").convert()
+    Musicas(1)
     while intro:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -227,7 +228,7 @@ def paused():
         pygame.display.update()
         relogio.tick(FPS)
         
-musics = ['tgfcoder-FrozenJam-SeamlessLoop.ogg']
+musics = ['tgfcoder-FrozenJam-SeamlessLoop.ogg', 'SW.ogg', 'DV.ogg']
 
 def Musicas(mus):
     musica = musics[mus]
@@ -242,6 +243,7 @@ def GameOver():
     over = True
     x = 0
     go = pygame.image.load("Assets/SpaceBackground.png").convert()
+    Musicas(2)
     while over:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -280,6 +282,7 @@ def loop():
     score = 0
     y = 0
     Game = True
+    Musicas(0)
     while Game:
         relogio.tick(FPS)
     
@@ -375,5 +378,4 @@ crash_sound = pygame.mixer.Sound(path.join(snd_dir, 'Crash.wav'))
 relogio =  pygame.time.Clock()
 FPS = 120
 
-Musicas(0)
 menu()
