@@ -15,13 +15,56 @@ from os import path
     
 class Nave(pygame.sprite.Sprite):
     
-    def __init__(self, arquivo_imagem, pos_x, pos_y):
+    def __init__(self, arquivo_imagem):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(arquivo_imagem)
         self.rect = self.image.get_rect()
         self.radius = 48
-        self.rect.y = pos_y
-        self.rect.centerx = pos_x
+        self.rect.centerx = WIDTH / 2
+        self.rect.bottom = HEIGHT - 5
+        self.vx = 0
+        
+    def update(self):
+        self.vx = 0
+        self.vy = 0
+        keystate = pygame.key.get_pressed()
+        """ MOVIMENTO HORIZONTAL E VERTICAL """
+        if keystate[pygame.K_LEFT] and not keystate[pygame.K_UP] and not\
+        keystate[pygame.K_DOWN] and not keystate[pygame.K_RIGHT]:
+            self.vx = -5
+        if keystate[pygame.K_RIGHT] and not keystate[pygame.K_UP] and not \
+        keystate[pygame.K_DOWN] and not keystate[pygame.K_LEFT]:
+            self.vx = 5
+        if keystate[pygame.K_UP] and not keystate[pygame.K_RIGHT] and not \
+        keystate[pygame.K_DOWN] and not keystate[pygame.K_LEFT]:
+            self.vy = -5
+        if keystate[pygame.K_DOWN] and not keystate[pygame.K_UP] and not \
+        keystate[pygame.K_RIGHT] and not keystate[pygame.K_LEFT]:
+            self.vy = 5
+        """ MOVIMENTO DIAGONAL """ 
+        # xˆ2 + xˆ2 = 25 => 2xˆ2 = 25 => xˆ2 = 25/2 => x = 12.5ˆ(1/2)
+        if keystate[pygame.K_LEFT] and keystate[pygame.K_UP]:
+            self.vx = -(12.5 ** (1/2))
+            self.vy = -(12.5 ** (1/2))
+        if keystate[pygame.K_LEFT] and keystate[pygame.K_DOWN]:
+            self.vx = -(12.5 ** (1/2))
+            self.vy = (12.5 ** (1/2))
+        if keystate[pygame.K_RIGHT] and keystate[pygame.K_DOWN]:
+            self.vx = (12.5 ** (1/2))
+            self.vy = (12.5 ** (1/2))
+        if keystate[pygame.K_RIGHT] and keystate[pygame.K_UP]:
+            self.vx = (12.5 ** (1/2))
+            self.vy = -(12.5 ** (1/2))
+        self.rect.x += self.vx
+        self.rect.y += self.vy
+        if self.rect.right > WIDTH - 5:
+            self.rect.right = WIDTH - 5
+        if self.rect.left < 5:
+            self.rect.left = 5
+        if self.rect.bottom > HEIGHT - 5:
+            self.rect.bottom = HEIGHT - 5
+        if self.rect.top < 5:
+            self.rect.top = 5
         
     def shoot(self):
         tiro = Tiros('Assets/tiro1.png', self.rect.centerx, self.rect.top)
@@ -35,7 +78,7 @@ class Tiros(pygame.sprite.Sprite):
         self.image = pygame.image.load(arquivo_imagem)
         self.rect = self.image.get_rect()
         self.rect.bottom = pos_y
-        self.rect.x = pos_x
+        self.rect.centerx = pos_x
         self.vy = -10
         
     def update(self):
@@ -45,25 +88,26 @@ class Tiros(pygame.sprite.Sprite):
             
 class Inimigos(pygame.sprite.Sprite):
     
-    def __init__(self, arquivo_imagem, pos_x, pos_y, vy, vx):
+    def __init__(self, arquivo_imagem):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(arquivo_imagem)
         self.rect = self.image.get_rect()
         self.radius = 43
-        self.rect.y = pos_y
-        self.rect.x = pos_x
-        self.vy = vy
-        self.vx = vx
+        self.rect.x = randrange(0, 1200)
+        self.rect.y = randrange(-150, -100)
+        self.vy =  randrange(1, 8)
+        self.vx =  randrange(-3, 3)
         
     def update(self):
         self.rect.y += self.vy
         self.rect.x += self.vx
-        if self.rect.top > 700 or self.rect.left < 0 or self.rect.right > 1200:
+        if self.rect.top > HEIGHT or self.rect.right < 0 or \
+        self.rect.left > WIDTH:
             self.rect.y = randrange(-100, -40)
             self.rect.x = randrange(0, 1200)
             self.vy = randrange(1, 8)
             self.vx = randrange(-3,3)
- 
+            
 #===========================   Cores     ===========================#
 GREEN = (0, 150, 0)
 LIGHTGREEN = (0, 255, 0)
@@ -121,12 +165,15 @@ def menu():
         x += 2
         
         mensagem('GUARDIANS', WIDTH/2, HEIGHT/2 - 250, 130)
-        mensagem('OF THE', WIDTH/2, HEIGHT/2 - 173, 30)
+        mensagem('OF THE', WIDTH/2, HEIGHT/2 - 175, 30)
         mensagem('UNIVERSE', WIDTH/2, HEIGHT/2 - 100, 130)
         
-        botao('PLAY!', WIDTH/2 - 90, HEIGHT/2, 200, 50, GREEN, LIGHTGREEN, loop)
-        botao('INSTRUCTIONS', WIDTH/2 - 90, HEIGHT/2 + 100, 200, 50, BLUE, LIGHTBLUE, instrucao)
-        botao('QUIT', WIDTH/2 - 90, HEIGHT/2 + 200, 200, 50, RED, LIGHTRED, sair)
+        botao('PLAY!', WIDTH/2 - 90, HEIGHT/2, 200, 50, GREEN, LIGHTGREEN,
+              loop)
+        botao('INSTRUCTIONS', WIDTH/2 - 90, HEIGHT/2 + 100, 200, 50, BLUE,
+              LIGHTBLUE, instrucao)
+        botao('QUIT', WIDTH/2 - 90, HEIGHT/2 + 200, 200, 50, RED, LIGHTRED,
+              sair)
         
         pygame.display.update()
         relogio.tick(FPS)
@@ -149,12 +196,14 @@ def instrucao():
         x -= 2
         
         mensagem('INSTRUCTIONS', WIDTH/2, HEIGHT/2 - 200, 130)
-        mensagem('Shoot: Z', WIDTH/2, HEIGHT/2 - 100, 50)
-        mensagem('Move: keyboard arrows', WIDTH/2, HEIGHT/2 - 50, 50)
+        mensagem('Shoot: SPACE', WIDTH/2, HEIGHT/2 - 100, 50)
+        mensagem('Move: Arrow Keys', WIDTH/2, HEIGHT/2 - 50, 50)
         mensagem('Pause: P',  WIDTH/2, HEIGHT/2, 50)
         
-        botao('BACK', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED, LIGHTRED, menu)
-        botao('PLAY!', WIDTH/2 + 200, HEIGHT/2 + 250, 200, 50, GREEN, LIGHTGREEN, loop)
+        botao('BACK', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED, LIGHTRED,
+              menu)
+        botao('PLAY!', WIDTH/2 + 200, HEIGHT/2 + 250, 200, 50, GREEN,
+              LIGHTGREEN, loop)
         
         pygame.display.update()
         relogio.tick(FPS)
@@ -172,7 +221,8 @@ def paused():
         mensagem('PAUSED', WIDTH/2, HEIGHT/2, 130)
         mensagem('Press any key to continue', WIDTH/2, HEIGHT/2 +100, 50)
         
-        botao('MENU', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED, LIGHTRED, menu)
+        botao('MENU', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED, LIGHTRED,
+              menu)
         
         pygame.display.update()
         relogio.tick(FPS)
@@ -207,8 +257,10 @@ def GameOver():
         mensagem('Pess R to restart', WIDTH/2, HEIGHT/2 + 100, 50)
         mensagem('Pess ESC to quit game', WIDTH/2, HEIGHT/2 + 50, 50)
         
-        botao('MENU', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED, LIGHTRED, menu)
-        botao('PLAY AGAIN', WIDTH/2 + 200, HEIGHT/2 + 250, 200, 50, GREEN, LIGHTGREEN, loop)
+        botao('MENU', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED, LIGHTRED,
+              menu)
+        botao('PLAY AGAIN', WIDTH/2 + 200, HEIGHT/2 + 250, 200, 50, GREEN,
+              LIGHTGREEN, loop)
         
         pygame.display.update()
         relogio.tick(FPS)
@@ -224,50 +276,12 @@ def loop():
         
         if pressed_keys[pygame.K_ESCAPE]:
             Game = False
-        
-            #MOVER NAVE 1
-            """ Movimento Vertical e Horizontal """
-        if pressed_keys[pygame.K_LEFT] and not pressed_keys[pygame.K_UP] and not\
-        pressed_keys[pygame.K_DOWN] and not pressed_keys[pygame.K_RIGHT] and \
-        nave.rect.x >= 5:
-            nave.rect.x -= 5
-        if pressed_keys[pygame.K_UP] and not pressed_keys[pygame.K_LEFT] and not\
-        pressed_keys[pygame.K_DOWN] and not pressed_keys[pygame.K_RIGHT] and \
-        nave.rect.y >= 5:
-            nave.rect.y -= 5
-        if pressed_keys[pygame.K_RIGHT] and not pressed_keys[pygame.K_UP] and not\
-        pressed_keys[pygame.K_DOWN] and not pressed_keys[pygame.K_LEFT] and \
-        nave.rect.x <= (WIDTH - 5 - nave.rect.width):
-            nave.rect.x += 5
-        if pressed_keys[pygame.K_DOWN] and not pressed_keys[pygame.K_UP] and not\
-        pressed_keys[pygame.K_RIGHT] and not pressed_keys[pygame.K_LEFT] and\
-        nave.rect.y <= (HEIGHT - 5 - nave.rect.height):
-            nave.rect.y += 5
-        """ Movimento Diagonal """
-        # xˆ2 + xˆ2 = 25 => 2xˆ2 = 25 => xˆ2 = 25/2 => x = 12.5ˆ(1/2) 
-        if pressed_keys[pygame.K_LEFT] and pressed_keys[pygame.K_UP] and \
-        nave.rect.x >= 5 and nave.rect.y >= 5:
-            nave.rect.x -= 12.5 ** (1/2)
-            nave.rect.y -= 12.5 ** (1/2)
-        if pressed_keys[pygame.K_LEFT] and pressed_keys[pygame.K_DOWN] and \
-        nave.rect.x >= 5 and nave.rect.y <= (HEIGHT - 5 - nave.rect.height):
-            nave.rect.x -= 12.5 ** (1/2)
-            nave.rect.y += 12.5 ** (1/2)
-        if pressed_keys[pygame.K_RIGHT] and pressed_keys[pygame.K_DOWN] and \
-        nave.rect.x <= (WIDTH - 5 - nave.rect.width) and nave.rect.y <=\
-        (HEIGHT - 5 - nave.rect.height):
-            nave.rect.x += 12.5 ** (1/2)
-            nave.rect.y += 12.5 ** (1/2)
-        if pressed_keys[pygame.K_RIGHT] and pressed_keys[pygame.K_UP] and \
-        nave.rect.x <= (WIDTH - 5 - nave.rect.width) and nave.rect.y >= 5:
-            nave.rect.x += 12.5 ** (1/2)
-            nave.rect.y -= 12.5 ** (1/2)
     
         for event in pygame.event.get():
             if event.type == pygame.QUIT:            
                 Game = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_z:
+                if event.key == pygame.K_SPACE:
                     nave.shoot()
                 elif event.key == pygame.K_p:
                     paused()
@@ -288,18 +302,18 @@ def loop():
             Game = False
             GameOver()
         
-        tiros = pygame.sprite.groupcollide(enemy_group, bullets_group, True, True)
+        tiros = pygame.sprite.groupcollide(enemy_group, bullets_group, True,
+                                           True)
         for tiro in tiros:
             random.choice(exp_sounds).play()
-            meteor = Inimigos('Assets/meteor.gif', randrange(0, 1200),\
-                    randrange(-100, -40), randrange(1, 8), randrange(-3,3))
+            meteor = Inimigos('Assets/meteor.gif')
             tudo.add(meteor)
             enemy_group.add(meteor)        
             score += 100          
             
             
         tudo.draw(tela)
-        mensagem('{0}' .format(score), WIDTH/2 + 300, 20, 30)
+        mensagem('{0}' .format(score), WIDTH/2, 20, 30)
         pygame.display.flip()
         
 #===========================   Iniciar   ===========================#
@@ -318,12 +332,11 @@ pygame.display.set_caption('2D Shooter')
 
 fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
 
-nave = Nave('Assets/MilleniumFalcon.png', WIDTH/2, HEIGHT - 100)
+nave = Nave('Assets/MilleniumFalcon.png')
 nave_group.add(nave)
 
 for i in range(8):
-    meteor = Inimigos('Assets/meteor.gif', randrange(0, 1200),\
-                randrange(-100, -40), randrange(1, 8), randrange(-3,3))
+    meteor = Inimigos('Assets/meteor.gif')
     tudo.add(meteor)
     enemy_group.add(meteor)
     
@@ -345,7 +358,8 @@ for snd in ['Explosion1.wav', 'Explosion2.wav']:
 crash_sound = pygame.mixer.Sound(path.join(snd_dir, 'Crash.wav'))
 
 #som do background
-pygame.mixer.music.load(path.join(snd_dir, 'tgfcoder-FrozenJam-SeamlessLoop.ogg'))
+pygame.mixer.music.load(path.join(snd_dir,
+                                  'tgfcoder-FrozenJam-SeamlessLoop.ogg'))
 pygame.mixer.music.set_volume(0.1)
 #===========================   'Funcionamento'   ===========================#
 relogio =  pygame.time.Clock()
