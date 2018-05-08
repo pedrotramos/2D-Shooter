@@ -66,7 +66,7 @@ class Nave(pygame.sprite.Sprite):
         if self.rect.top < 5:
             self.rect.top = 5
         
-    def shoot(self):
+    def shoot(self, tudo, bullets_group):
         tiro = Tiros('Assets/tiro1.png', self.rect.centerx, self.rect.top)
         tudo.add(tiro)
         bullets_group.add(tiro)
@@ -226,46 +226,25 @@ def paused():
         
         pygame.display.update()
         relogio.tick(FPS)
-
-
-def GameOver():
-    over = True
-    x = 0
-    go = pygame.image.load("Assets/SpaceBackground.png").convert()
-    while over:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-        
-        pressed_keys = pygame.key.get_pressed()
-        
-        if pressed_keys[pygame.K_r]:
-            loop()
-        if pressed_keys[pygame.K_ESCAPE]:
-            sair()
-
-        
-        tela.fill(BLACK)
-        rel_x = x % go.get_rect().width
-        tela.blit(go, (rel_x - go.get_rect().width, 0))
-        if rel_x < WIDTH:
-            tela.blit(go, (rel_x, 0))
-        x += 2
-            
-        mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 100, 130)
-        mensagem('Pess R to restart', WIDTH/2, HEIGHT/2 + 100, 50)
-        mensagem('Pess ESC to quit game', WIDTH/2, HEIGHT/2 + 50, 50)
-        
-        botao('MENU', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED, LIGHTRED,
-              menu)
-        botao('PLAY AGAIN', WIDTH/2 + 200, HEIGHT/2 + 250, 200, 50, GREEN,
-              LIGHTGREEN, loop)
-        
-        pygame.display.update()
-        relogio.tick(FPS)
     
 def loop():
+    enemy_group = pygame.sprite.Group()
+    nave_group = pygame.sprite.Group()
+    bullets_group = pygame.sprite.Group()
+    tudo = pygame.sprite.Group()
+        
+    fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
+    
+    nave = Nave('Assets/MilleniumFalcon.png')
+    nave_group.add(nave)
+
+    for i in range(8):
+        meteor = Inimigos('Assets/meteor.gif')
+        tudo.add(meteor)
+        enemy_group.add(meteor)
+        
+    tudo.add(enemy_group)
+    tudo.add(nave_group)
     score = 0
     y = 0
     Game = True
@@ -282,7 +261,7 @@ def loop():
                 Game = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
-                    nave.shoot()
+                    nave.shoot(tudo, bullets_group)
                 elif event.key == pygame.K_p:
                     paused()
                 
@@ -300,7 +279,41 @@ def loop():
         if hits:
             crash_sound.play()
             Game = False
-            GameOver()
+            over = True
+            x = 0
+            go = pygame.image.load("Assets/SpaceBackground.png").convert()
+            while over:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        pygame.quit()
+                        quit()
+                
+                pressed_keys = pygame.key.get_pressed()
+                
+                if pressed_keys[pygame.K_r]:
+                    loop()
+                if pressed_keys[pygame.K_ESCAPE]:
+                    sair()
+        
+                
+                tela.fill(BLACK)
+                rel_x = x % go.get_rect().width
+                tela.blit(go, (rel_x - go.get_rect().width, 0))
+                if rel_x < WIDTH:
+                    tela.blit(go, (rel_x, 0))
+                x += 2
+                    
+                mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 100, 130)
+                mensagem('Pess R to restart', WIDTH/2, HEIGHT/2 + 100, 50)
+                mensagem('Pess ESC to quit game', WIDTH/2, HEIGHT/2 + 50, 50)
+                
+                botao('MENU', WIDTH/2 - 400, HEIGHT/2 + 250, 200, 50, RED, LIGHTRED,
+                      menu)
+                botao('PLAY AGAIN', WIDTH/2 + 200, HEIGHT/2 + 250, 200, 50, GREEN,
+                      LIGHTGREEN, loop)
+                
+                pygame.display.update()
+                relogio.tick(FPS)
         
         tiros = pygame.sprite.groupcollide(enemy_group, bullets_group, True,
                                            True)
@@ -319,29 +332,12 @@ def loop():
 #===========================   Iniciar   ===========================#
 pygame.init()
 
-enemy_group = pygame.sprite.Group()
-nave_group = pygame.sprite.Group()
-bullets_group = pygame.sprite.Group()
-tudo = pygame.sprite.Group()
-
 WIDTH = 1200
 HEIGHT = 700
 
 tela = pygame.display.set_mode((WIDTH, HEIGHT), 0, 32)
 pygame.display.set_caption('2D Shooter')
 
-fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
-
-nave = Nave('Assets/MilleniumFalcon.png')
-nave_group.add(nave)
-
-for i in range(8):
-    meteor = Inimigos('Assets/meteor.gif')
-    tudo.add(meteor)
-    enemy_group.add(meteor)
-    
-tudo.add(enemy_group)
-tudo.add(nave_group)
 #===========================       'Som'         ===========================#
 snd_dir = path.join(path.dirname (__file__), 'snd')
 pygame.mixer.init()
