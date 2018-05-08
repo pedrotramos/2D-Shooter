@@ -226,6 +226,16 @@ def paused():
         
         pygame.display.update()
         relogio.tick(FPS)
+        
+musics = ['tgfcoder-FrozenJam-SeamlessLoop.ogg']
+
+def Musicas(mus):
+    musica = musics[mus]
+    pygame.mixer.music.load(path.join(snd_dir,
+                                  musica))
+    pygame.mixer.music.set_volume(0.1)
+    pygame.mixer.music.play(loops = -1)
+
 
 
 def GameOver():
@@ -360,12 +370,10 @@ for snd in ['Explosion1.wav', 'Explosion2.wav']:
 crash_sound = pygame.mixer.Sound(path.join(snd_dir, 'Crash.wav'))
 
 #som do background
-pygame.mixer.music.load(path.join(snd_dir,
-                                  'tgfcoder-FrozenJam-SeamlessLoop.ogg'))
-pygame.mixer.music.set_volume(0.1)
+
 #===========================   'Funcionamento'   ===========================#
 relogio =  pygame.time.Clock()
 FPS = 120
 
-pygame.mixer.music.play(loops = -1)
+Musicas(0)
 menu()
