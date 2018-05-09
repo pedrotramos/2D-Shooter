@@ -372,6 +372,7 @@ def main():
                             loop = True
                             intro = False
                             instruction = False
+                            conta_vidas = 3
                             
                             enemy_group = pygame.sprite.Group()
                             nave_group = pygame.sprite.Group()
