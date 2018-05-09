@@ -108,6 +108,15 @@ class Inimigos(pygame.sprite.Sprite):
             self.vy = randrange(1, 8)
             self.vx = randrange(-3,3)
             
+class Vida(pygame.sprite.Sprite):
+    
+    def __init__(self, arquivo_imagem, dist_margem_direita):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load(arquivo_imagem)
+        self.rect = self.image.get_rect()
+        self.rect.top = 10
+        self.rect.right = WIDTH - dist_margem_direita
+    
 #===========================   Cores     ===========================#
 GREEN = (0, 150, 0)
 LIGHTGREEN = (0, 255, 0)
@@ -197,10 +206,12 @@ def main():
             mensagem('OF THE', WIDTH/2, HEIGHT/2 - 175, 30, YELLOW)
             mensagem('UNIVERSE', WIDTH/2, HEIGHT/2 - 100, 130, YELLOW)
             
-            mensagem('Press Enter to Play', WIDTH/2, HEIGHT/2 + 20, 50, LIGHTGREEN)
+            mensagem('Press Enter to Play', WIDTH/2, HEIGHT/2 + 20, 50,
+                     LIGHTGREEN)
             mensagem('Press I for Instructions', WIDTH/2, HEIGHT/2 + 120, 50,
                      LIGHTBLUE)
-            mensagem('Press ESC to Quit', WIDTH/2, HEIGHT/2 + 220, 50, LIGHTRED)
+            mensagem('Press ESC to Quit', WIDTH/2, HEIGHT/2 + 220, 50,
+                     LIGHTRED)
             
             
             
@@ -251,6 +262,7 @@ def main():
         nave_group = pygame.sprite.Group()
         bullets_group = pygame.sprite.Group()
         tudo = pygame.sprite.Group()
+        vidas = pygame.sprite.Group()
             
         fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
         
@@ -260,6 +272,12 @@ def main():
         
         nave = Nave(random.choice(lista_naves))
         nave_group.add(nave)
+        
+        vida1 = Vida('Assets/Lives.png', 10)
+        vida2 = Vida('Assets/Lives.png', vida1.rect.width + 20)
+        vida3 = Vida('Assets/Lives.png', 2 * vida1.rect.width + 30)
+        
+        vidas.add(vida1, vida2, vida3)
     
         for i in range(8):
             meteor = Inimigos('Assets/meteor.gif')
@@ -268,10 +286,12 @@ def main():
             
         tudo.add(enemy_group)
         tudo.add(nave_group)
+        tudo.add(vidas)
         score = 0
         y = 0
         Musicas(0)
         fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
+        conta_vidas = 3
         while Game:
             relogio.tick(FPS)
         
@@ -326,68 +346,86 @@ def main():
             (nave, enemy_group, False, pygame.sprite.collide_circle)
             if hits:
                 crash_sound.play()
-                Game = False
-                Musicas(2)
-                over = True
-                x = 0
-                go = pygame.image.load("Assets/SpaceBackground.png").convert()
-                while over:
-                    for event in pygame.event.get():
-                        if event.type == pygame.QUIT:
-                            pygame.quit()
-                            quit()
-                    
-                    pressed_keys = pygame.key.get_pressed()
-                    
-                    if pressed_keys[pygame.K_r]:
-                        over = False
-                        Game = True
-                        loop = True
-                        intro = False
-                        instruction = False
+                conta_vidas -= 1
+                if conta_vidas == 2:
+                    vida3.kill()
+                elif conta_vidas == 1:
+                    vida2.kill()
+                else:
+                    vida1.kill()
+                    Game = False
+                    Musicas(2)
+                    over = True
+                    x = 0
+                    go = pygame.image.load("Assets/SpaceBackground.png").convert()
+                    while over:
+                        for event in pygame.event.get():
+                            if event.type == pygame.QUIT:
+                                pygame.quit()
+                                quit()
                         
-                        enemy_group = pygame.sprite.Group()
-                        nave_group = pygame.sprite.Group()
-                        bullets_group = pygame.sprite.Group()
-                        tudo = pygame.sprite.Group()
+                        pressed_keys = pygame.key.get_pressed()
+                        
+                        if pressed_keys[pygame.K_r]:
+                            over = False
+                            Game = True
+                            loop = True
+                            intro = False
+                            instruction = False
                             
-                        fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
-                        
-                        nave = Nave(random.choice(lista_naves))
-                        nave_group.add(nave)
-                        
-                        for i in range(8):
-                            meteor = Inimigos('Assets/meteor.gif')
-                            tudo.add(meteor)
-                            enemy_group.add(meteor)
+                            enemy_group = pygame.sprite.Group()
+                            nave_group = pygame.sprite.Group()
+                            bullets_group = pygame.sprite.Group()
+                            tudo = pygame.sprite.Group()
+                                
+                            fundo = pygame.image.load\
+                            ("Assets/SpaceBackground.png").convert()
                             
-                        tudo.add(enemy_group)
-                        tudo.add(nave_group)
-                        Musicas(0)
-                        score = 0
+                            nave = Nave(random.choice(lista_naves))
+                            nave_group.add(nave)
+                            
+                            vida1 = Vida('Assets/Lives.png', 10)
+                            vida2 = Vida('Assets/Lives.png',
+                                         vida1.rect.width + 20)
+                            vida3 = Vida('Assets/Lives.png',
+                                         2 * vida1.rect.width + 30)
+                            
+                            vidas.add(vida1, vida2, vida3)
+                            
+                            for i in range(8):
+                                meteor = Inimigos('Assets/meteor.gif')
+                                tudo.add(meteor)
+                                enemy_group.add(meteor)
+                                
+                            tudo.add(enemy_group)
+                            tudo.add(nave_group)
+                            tudo.add(vidas)
+                            Musicas(0)
+                            score = 0
+                            
+                        if pressed_keys[pygame.K_q]:
+                            over = False
+                            intro = True
+                            instruction = False
+                            Game = False
+                            loop = True
+                            
+                        tela.fill(BLACK)
+                        rel_x = x % go.get_rect().width
+                        tela.blit(go, (rel_x - go.get_rect().width, 0))
+                        if rel_x < WIDTH:
+                            tela.blit(go, (rel_x, 0))
+                        x += 2
+                            
+                        mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 100, 130,
+                                 WHITE)
+                        mensagem('Press R to restart', WIDTH/2, HEIGHT/2 + 10,
+                                 50, LIGHTGREEN)
+                        mensagem('Press Q to go back to the Menu', WIDTH/2,
+                                 HEIGHT/2 + 100, 50, LIGHTRED)
                         
-                    if pressed_keys[pygame.K_q]:
-                        over = False
-                        intro = True
-                        instruction = False
-                        Game = False
-                        loop = True
-                        
-                    tela.fill(BLACK)
-                    rel_x = x % go.get_rect().width
-                    tela.blit(go, (rel_x - go.get_rect().width, 0))
-                    if rel_x < WIDTH:
-                        tela.blit(go, (rel_x, 0))
-                    x += 2
-                        
-                    mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 100, 130, WHITE)
-                    mensagem('Press R to restart', WIDTH/2, HEIGHT/2 + 10, 50,
-                             LIGHTGREEN)
-                    mensagem('Press Q to go back to the Menu', WIDTH/2,
-                             HEIGHT/2 + 100, 50, LIGHTRED)
-                    
-                    pygame.display.update()
-                    relogio.tick(FPS)
+                        pygame.display.update()
+                        relogio.tick(FPS)
             
             tiros = pygame.sprite.groupcollide(enemy_group, bullets_group, True,
                                                True)
