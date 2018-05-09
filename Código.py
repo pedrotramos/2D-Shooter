@@ -155,7 +155,8 @@ def botao(msg, x, y, w, h, cor, cor_mouse):
     
     mensagem(msg, x + (w/2),  y + (h/2), 40, WHITE)
     
-musics = ['tgfcoder-FrozenJam-SeamlessLoop.ogg', 'SW.ogg', 'DV.ogg']
+musics = ['tgfcoder-FrozenJam-SeamlessLoop.ogg', 'SW.ogg', 'DV.ogg',
+          'Cosmic Storm.ogg']
 
 def Musicas(mus):
     musica = musics[mus]
@@ -344,6 +345,8 @@ def main():
             
             hits = pygame.sprite.spritecollide\
             (nave, enemy_group, False, pygame.sprite.collide_circle)
+            hit = pygame.sprite.groupcollide\
+            (enemy_group, nave_group, True, False, pygame.sprite.collide_circle)
             if hits:
                 crash_sound.play()
                 conta_vidas -= 1
@@ -357,6 +360,7 @@ def main():
                     Musicas(2)
                     over = True
                     x = 0
+            
                     go = pygame.image.load("Assets/SpaceBackground.png").convert()
                     while over:
                         for event in pygame.event.get():
