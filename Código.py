@@ -172,6 +172,7 @@ def main():
                 intro = False
                 instruction = False
                 loop = False
+                sair()
             if pressed_keys[pygame.K_RETURN]:
                 Game = True
                 intro = False
@@ -253,7 +254,11 @@ def main():
             
         fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
         
-        nave = Nave('Assets/MilleniumFalcon.png')
+        lista_naves = ['Assets/MilleniumFalcon.png', 'Assets/Galaga.png',
+                       'Assets/X-Wing.png', 'Assets/SpaceShuttle.png',
+                       'Assets/USSEnterprise.png']
+        
+        nave = Nave(random.choice(lista_naves))
         nave_group.add(nave)
     
         for i in range(8):
@@ -294,7 +299,7 @@ def main():
                                     pygame.quit()
                                     quit()
                                 if event.type == pygame.KEYDOWN:
-                                    if event.key == pygame.K_p:
+                                    if event.key != pygame.K_q:
                                         pause = False
                                     
                             mensagem('PAUSED', WIDTH/2, HEIGHT/2 - 100, 130,
@@ -348,7 +353,7 @@ def main():
                             
                         fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
                         
-                        nave = Nave('Assets/MilleniumFalcon.png')
+                        nave = Nave(random.choice(lista_naves))
                         nave_group.add(nave)
                         
                         for i in range(8):
@@ -359,6 +364,7 @@ def main():
                         tudo.add(enemy_group)
                         tudo.add(nave_group)
                         Musicas(0)
+                        score = 0
                         
                     if pressed_keys[pygame.K_q]:
                         over = False
