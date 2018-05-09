@@ -239,7 +239,6 @@ def main():
                     pygame.quit()
                     quit()
                     
-            tela.fill(BLACK)
             rel_x = x % inst.get_rect().width
             tela.blit(inst, (rel_x - inst.get_rect().width, 0))
             if rel_x < WIDTH:
@@ -290,7 +289,7 @@ def main():
         tudo.add(vidas)
         score = 0
         y = 0
-        Musicas(0)
+        Musicas(3)
         fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
         conta_vidas = 3
         while Game:
@@ -345,7 +344,7 @@ def main():
             
             hits = pygame.sprite.spritecollide\
             (nave, enemy_group, False, pygame.sprite.collide_circle)
-            hit = pygame.sprite.groupcollide\
+            pygame.sprite.groupcollide\
             (enemy_group, nave_group, True, False, pygame.sprite.collide_circle)
             if hits:
                 crash_sound.play()
@@ -415,7 +414,6 @@ def main():
                             Game = False
                             loop = True
                             
-                        tela.fill(BLACK)
                         rel_x = x % go.get_rect().width
                         tela.blit(go, (rel_x - go.get_rect().width, 0))
                         if rel_x < WIDTH:
