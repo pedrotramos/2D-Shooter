@@ -90,23 +90,39 @@ class Inimigos(pygame.sprite.Sprite):
     
     def __init__(self, arquivo_imagem):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(arquivo_imagem)
+        self.image_orig = pygame.image.load(arquivo_imagem).convert()
+        self.image = self.image_orig.copy()
         self.rect = self.image.get_rect()
         self.radius = 43
         self.rect.x = randrange(0, 1200)
         self.rect.y = randrange(-150, -100)
         self.vy =  randrange(1, 8)
         self.vx =  randrange(-3, 3)
+        self.rot = 0
+        self.rot_speed = randrange(-8, 8)
+        self.last_update = pygame.time.get_ticks()
         
     def update(self):
         self.rect.y += self.vy
         self.rect.x += self.vx
+        self.rotacao()
         if self.rect.top > HEIGHT or self.rect.right < 0 or \
         self.rect.left > WIDTH:
             self.rect.y = randrange(-100, -40)
             self.rect.x = randrange(0, 1200)
             self.vy = randrange(1, 8)
             self.vx = randrange(-3,3)
+            
+    def rotacao(self):
+        tempo = pygame.time.get_ticks()
+        if tempo - self.last_update > 50:
+            self.last_update = tempo
+            self.rot = (self.rot + self.rot_speed) % 360
+            new_image = pygame.transform.rotate(self.image_orig, self.rot)
+            old_center = self.rect.center
+            self.image = new_image
+            self.rect = self.image.get_rect()
+            self.rect.center = old_center
             
 class Vida(pygame.sprite.Sprite):
     
