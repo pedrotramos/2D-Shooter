@@ -115,7 +115,7 @@ class Inimigos(pygame.sprite.Sprite):
             
     def rotacao(self):
         tempo = pygame.time.get_ticks()
-        if tempo - self.last_update > 50:
+        if tempo - self.last_update > 10:
             self.last_update = tempo
             self.rot = (self.rot + self.rot_speed) % 360
             new_image = pygame.transform.rotate(self.image_orig, self.rot)
@@ -171,8 +171,8 @@ def botao(msg, x, y, w, h, cor, cor_mouse):
     
     mensagem(msg, x + (w/2),  y + (h/2), 40, WHITE)
     
-musics = ['tgfcoder-FrozenJam-SeamlessLoop.ogg', 'SW.ogg', 'DV.ogg',
-          'Cosmic Storm.ogg']
+musics = ['tgfcoder-FrozenJam-SeamlessLoop.ogg', 'Cosmic Storm.ogg',
+          'SW.ogg', 'DV.ogg']
 
 def Musicas(mus):
     musica = musics[mus]
@@ -189,7 +189,7 @@ def main():
     while loop:
         x = 0
         mn = pygame.image.load("Assets/SpaceBackground.png").convert()
-        Musicas(1)
+        Musicas(2)
         while intro:
             pressed_keys = pygame.key.get_pressed()
             
@@ -303,9 +303,10 @@ def main():
         tudo.add(enemy_group)
         tudo.add(nave_group)
         tudo.add(vidas)
+        
         score = 0
         y = 0
-        Musicas(3)
+        Musicas(randrange(0,2))
         fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
         conta_vidas = 3
         while Game:
@@ -372,7 +373,7 @@ def main():
                 else:
                     vida1.kill()
                     Game = False
-                    Musicas(2)
+                    Musicas(3)
                     over = True
                     x = 0
             
@@ -420,7 +421,7 @@ def main():
                             tudo.add(enemy_group)
                             tudo.add(nave_group)
                             tudo.add(vidas)
-                            Musicas(0)
+                            Musicas(randrange(0,2))
                             score = 0
                             
                         if pressed_keys[pygame.K_q]:
