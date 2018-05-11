@@ -86,14 +86,14 @@ class Tiros(pygame.sprite.Sprite):
         if self.rect.bottom < 0:
             self.kill()
             
-class Inimigos(pygame.sprite.Sprite):
+class Meteoros(pygame.sprite.Sprite):
     
     def __init__(self, arquivo_imagem):
         pygame.sprite.Sprite.__init__(self)
         self.image_orig = pygame.image.load(arquivo_imagem).convert()
         self.image = self.image_orig.copy()
         self.rect = self.image.get_rect()
-        self.radius = 43
+        self.radius = int(self.rect.width / 2)
         self.rect.x = randrange(0, 1200)
         self.rect.y = randrange(-150, -100)
         self.vy =  randrange(1, 8)
@@ -143,6 +143,32 @@ LIGHTBLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
+
+#===========================       'Som'         ===========================#
+snd_dir = path.join(path.dirname (__file__), 'snd')
+pygame.mixer.init()
+
+#som do tiro
+shoot_sound = pygame.mixer.Sound(path.join(snd_dir, 'Laser.wav'))
+
+#sons da explosão
+exp_sounds = []
+for snd in ['Explosion1.wav', 'Explosion2.wav']:
+    exp_sounds.append(pygame.mixer.Sound(path.join(snd_dir, snd)))
+    
+#som da morte
+crash_sound = pygame.mixer.Sound(path.join(snd_dir, 'Crash.wav'))
+
+musics = ['tgfcoder-FrozenJam-SeamlessLoop.ogg', 'Cosmic Storm.ogg',
+          'SW.ogg', 'DV.ogg']
+
+def Musicas(mus):
+    musica = musics[mus]
+    pygame.mixer.music.load(path.join(snd_dir,
+                                  musica))
+    pygame.mixer.music.set_volume(0.2)
+    pygame.mixer.music.play(loops = -1)
+
 #===========================   Funções   ===========================#   
 def mensagem(mensagem, x, y, tamanho, COR):
    
@@ -170,17 +196,7 @@ def botao(msg, x, y, w, h, cor, cor_mouse):
         pygame.draw.rect(tela, cor, (x, y, w, h))
     
     mensagem(msg, x + (w/2),  y + (h/2), 40, WHITE)
-    
-musics = ['tgfcoder-FrozenJam-SeamlessLoop.ogg', 'Cosmic Storm.ogg',
-          'SW.ogg', 'DV.ogg']
-
-def Musicas(mus):
-    musica = musics[mus]
-    pygame.mixer.music.load(path.join(snd_dir,
-                                  musica))
-    pygame.mixer.music.set_volume(0.2)
-    pygame.mixer.music.play(loops = -1)
-    
+        
 def main():
     loop = True
     intro = True
@@ -283,8 +299,7 @@ def main():
         fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
         
         lista_naves = ['Assets/MilleniumFalcon.png', 'Assets/Galaga.png',
-                       'Assets/X-Wing.png', 'Assets/SpaceShuttle.png',
-                       'Assets/USSEnterprise.png']
+                       'Assets/X-Wing.png']
         
         nave = Nave(random.choice(lista_naves))
         nave_group.add(nave)
@@ -294,9 +309,12 @@ def main():
         vida3 = Vida('Assets/Lives.png', 2 * vida1.rect.width + 30)
         
         vidas.add(vida1, vida2, vida3)
+        
+        lista_meteoros = ['Assets/asteroid.gif', 'Assets/meteor2_s.gif',
+                          'Assets/fire_meteor_xs.gif']
     
         for i in range(8):
-            meteor = Inimigos('Assets/meteor.gif')
+            meteor = Meteoros(random.choice(lista_meteoros))
             tudo.add(meteor)
             enemy_group.add(meteor)
             
@@ -414,7 +432,7 @@ def main():
                             vidas.add(vida1, vida2, vida3)
                             
                             for i in range(8):
-                                meteor = Inimigos('Assets/meteor.gif')
+                                meteor = Meteoros(random.choice(lista_meteoros))
                                 tudo.add(meteor)
                                 enemy_group.add(meteor)
                                 
@@ -448,13 +466,14 @@ def main():
                         relogio.tick(FPS)
             
             tiros = pygame.sprite.groupcollide(enemy_group, bullets_group, True,
-                                               True)
+                                               True,
+                                               pygame.sprite.collide_circle)
             for tiro in tiros:
                 random.choice(exp_sounds).play()
-                meteor = Inimigos('Assets/meteor.gif')
+                meteor = Meteoros(random.choice(lista_meteoros))
                 tudo.add(meteor)
                 enemy_group.add(meteor)        
-                score += 100  
+                score += 100 - tiro.radius
             
             if Game:
                 tudo.draw(tela)
@@ -465,28 +484,12 @@ def main():
 pygame.init()
 pygame.font.init()
 
-WIDTH = 1200
-HEIGHT = 700
+WIDTH = 1000
+HEIGHT = 600
 
 tela = pygame.display.set_mode((WIDTH, HEIGHT), 0, 32)
 pygame.display.set_caption('2D Shooter')
 
-#===========================       'Som'         ===========================#
-snd_dir = path.join(path.dirname (__file__), 'snd')
-pygame.mixer.init()
-
-#som do tiro
-shoot_sound = pygame.mixer.Sound(path.join(snd_dir, 'Laser.wav'))
-
-#sons da explosão
-exp_sounds = []
-for snd in ['Explosion1.wav', 'Explosion2.wav']:
-    exp_sounds.append(pygame.mixer.Sound(path.join(snd_dir, snd)))
-    
-#som da morte
-crash_sound = pygame.mixer.Sound(path.join(snd_dir, 'Crash.wav'))
-
-#som do background
 
 #===========================   'Funcionamento'   ===========================#
 relogio =  pygame.time.Clock()
