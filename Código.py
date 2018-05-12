@@ -6,6 +6,7 @@ import pygame
 from random import randrange
 import random
 from os import path
+import time
 #Baseado no canal do Youtube KidsCanCode 
 #https://www.youtube.com/channel/UCNaPQ5uLX5iIEHUCLmfAgKg
 
@@ -126,12 +127,12 @@ class Meteoros(pygame.sprite.Sprite):
             
 class Vida(pygame.sprite.Sprite):
     
-    def __init__(self, arquivo_imagem, dist_margem_direita):
+    def __init__(self, arquivo_imagem, dist_margem_esquerda):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(arquivo_imagem)
         self.rect = self.image.get_rect()
         self.rect.top = 10
-        self.rect.right = WIDTH - dist_margem_direita
+        self.rect.left = dist_margem_esquerda
     
 #===========================   Cores     ===========================#
 GREEN = (0, 150, 0)
@@ -169,7 +170,29 @@ def Musicas(mus):
     pygame.mixer.music.set_volume(0.2)
     pygame.mixer.music.play(loops = -1)
 
-#===========================   Funções   ===========================#   
+#===========================   Funções   ===========================#  
+def cronometro(value):
+    valueD = (((value/365)/24)/60)
+    Days = int (valueD)
+
+    valueH = (valueD-Days)*365
+    Hours = int(valueH)
+
+    valueM = (valueH - Hours)*24
+    Minutes = int(valueM)
+
+    valueS = (valueM - Minutes)*60
+    Seconds = int(valueS)
+
+    if Days >= 1:
+        return '{0}:{1}:{2}:{3}'.format(Days, Hours, Minutes, Seconds)
+    elif Hours >= 1:
+        return '{0}:{1}:{2}'.format(Hours, Minutes, Seconds)
+    elif Minutes >= 1:
+        return '{0}:{1}'.format(Minutes, Seconds)
+    else:
+        return '{0}'.format(Seconds)
+
 def mensagem(mensagem, x, y, tamanho, COR):
    
     def textos(mensagem, fonte):
@@ -219,6 +242,8 @@ def main():
                 Game = True
                 intro = False
                 instruction = False
+                start = time.time()
+                tempo_pause = 0
             if pressed_keys[pygame.K_i]:
                 Game = False
                 intro = False
@@ -261,6 +286,8 @@ def main():
                 Game = True
                 intro = False
                 instruction = False
+                start = time.time()
+                tempo_pause = 0
             if pressed_keys[pygame.K_q]:
                 Game = False
                 intro = True
@@ -329,6 +356,8 @@ def main():
         conta_vidas = 3
         while Game:
             relogio.tick(FPS)
+            agora = time.time()
+            tempo = cronometro(agora - start - tempo_pause)
         
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:            
@@ -339,6 +368,7 @@ def main():
                         nave.shoot(tudo, bullets_group)
                     elif event.key == pygame.K_p:
                         pause = True
+                        inicio_pause = time.time()
                         while pause:
                             
                             pressed_keys = pygame.key.get_pressed()
@@ -355,7 +385,11 @@ def main():
                                     quit()
                                 if event.type == pygame.KEYDOWN:
                                     if event.key != pygame.K_q:
+                                        fim_pause = time.time()
+                                        tempo_pause = tempo_pause + fim_pause\
+                                        - inicio_pause
                                         pause = False
+                                        
                                     
                             mensagem('PAUSED', WIDTH/2, HEIGHT/2 - 100, 130,
                                      WHITE)
@@ -411,6 +445,8 @@ def main():
                             intro = False
                             instruction = False
                             conta_vidas = 3
+                            start = time.time()
+                            tempo_pause = 0
                             
                             enemy_group = pygame.sprite.Group()
                             nave_group = pygame.sprite.Group()
@@ -478,6 +514,7 @@ def main():
             if Game:
                 tudo.draw(tela)
                 mensagem('{0}' .format(score), WIDTH/2, 20, 30, YELLOW)
+                mensagem('{0}' .format(tempo), WIDTH - 60, 20, 30, YELLOW)
                 pygame.display.flip()
         
 #===========================   'Iniciar'   ===========================#
