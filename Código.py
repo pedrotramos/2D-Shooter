@@ -185,13 +185,13 @@ def cronometro(value):
     Seconds = int(valueS)
 
     if Days >= 1:
-        return '{0}:{1}:{2}:{3}'.format(Days, Hours, Minutes, Seconds)
+        return '{0}:{1}:{2}:{3}'.format(Days, Hours, Minutes, Seconds), Seconds
     elif Hours >= 1:
-        return '{0}:{1}:{2}'.format(Hours, Minutes, Seconds)
+        return '{0}:{1}:{2}'.format(Hours, Minutes, Seconds), Seconds
     elif Minutes >= 1:
-        return '{0}:{1}'.format(Minutes, Seconds)
+        return '{0}:{1}'.format(Minutes, Seconds), Seconds
     else:
-        return '{0}'.format(Seconds)
+        return '{0}'.format(Seconds), Seconds
 
 def mensagem(mensagem, x, y, tamanho, COR):
    
@@ -349,6 +349,7 @@ def main():
         tudo.add(nave_group)
         tudo.add(vidas)
         
+        score_tiros = 0
         score = 0
         y = 0
         Musicas(randrange(0,2))
@@ -357,7 +358,8 @@ def main():
         while Game:
             relogio.tick(FPS)
             agora = time.time()
-            tempo = cronometro(agora - start - tempo_pause)
+            tempo = cronometro(agora - start - tempo_pause)[0]
+            
         
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:            
@@ -477,6 +479,7 @@ def main():
                             tudo.add(vidas)
                             Musicas(randrange(0,2))
                             score = 0
+                            score_tiros = 0
                             
                         if pressed_keys[pygame.K_q]:
                             over = False
@@ -501,21 +504,30 @@ def main():
                         pygame.display.update()
                         relogio.tick(FPS)
             
-            tiros = pygame.sprite.groupcollide(enemy_group, bullets_group, True,
-                                               True,
-                                               pygame.sprite.collide_circle)
-            for tiro in tiros:
-                random.choice(exp_sounds).play()
-                meteor = Meteoros(random.choice(lista_meteoros))
-                tudo.add(meteor)
-                enemy_group.add(meteor)        
-                score += 100 - tiro.radius
             
             if Game:
+                tiros = pygame.sprite.groupcollide(enemy_group, bullets_group, True,
+                                               True,
+                                               pygame.sprite.collide_circle)
+                for tiro in tiros:
+                    random.choice(exp_sounds).play()
+                    meteor = Meteoros(random.choice(lista_meteoros))
+                    tudo.add(meteor)
+                    enemy_group.add(meteor)        
+                    score_tiros += 100 - tiro.radius
                 tudo.draw(tela)
-                mensagem('{0}' .format(score), WIDTH/2, 20, 30, YELLOW)
+                if score >= 0:
+                    mensagem('{0}'.format(score), WIDTH/2, 20, 30, YELLOW)
+                else:
+                    mensagem('0', WIDTH/2, 20, 30, YELLOW)
                 mensagem('{0}' .format(tempo), WIDTH - 60, 20, 30, YELLOW)
                 pygame.display.flip()
+                
+                segundos_passados = cronometro(agora - start - tempo_pause)[1]
+                    
+                score_tempo = segundos_passados * 10
+                
+                score = score_tempo + score_tiros
         
 #===========================   'Iniciar'   ===========================#
 pygame.init()
