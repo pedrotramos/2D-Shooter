@@ -260,15 +260,15 @@ def main():
                 tela.blit(mn, (rel_x, 0))
             x += 2
             
-            mensagem('GUARDIANS', WIDTH/2, HEIGHT/2 - 250, 130, YELLOW)
-            mensagem('OF THE', WIDTH/2, HEIGHT/2 - 175, 30, YELLOW)
-            mensagem('UNIVERSE', WIDTH/2, HEIGHT/2 - 100, 130, YELLOW)
+            mensagem('GUARDIANS', WIDTH/2, HEIGHT/2 - 200, 130, YELLOW)
+            mensagem('OF THE', WIDTH/2, HEIGHT/2 - 125, 30, YELLOW)
+            mensagem('UNIVERSE', WIDTH/2, HEIGHT/2 - 50, 130, YELLOW)
             
-            mensagem('Press Enter to Play', WIDTH/2, HEIGHT/2 + 20, 50,
+            mensagem('Press Enter to Play', WIDTH/2, HEIGHT/2 + 50, 50,
                      LIGHTGREEN)
             mensagem('Press I for Instructions', WIDTH/2, HEIGHT/2 + 120, 50,
                      LIGHTBLUE)
-            mensagem('Press ESC to Quit', WIDTH/2, HEIGHT/2 + 220, 50,
+            mensagem('Press ESC to Quit', WIDTH/2, HEIGHT/2 + 190, 50,
                      LIGHTRED)
             
             
@@ -310,7 +310,7 @@ def main():
             mensagem('Pause: P',  WIDTH/2, HEIGHT/2, 50, WHITE)
             
             mensagem('Press Q to go back to the Menu', WIDTH/2,
-                     HEIGHT/2 + 200, 50, LIGHTRED)
+                     HEIGHT/2 + 170, 50, LIGHTRED)
             mensagem('Press Enter to Play', WIDTH/2, HEIGHT/2 + 100, 50, 
                   LIGHTGREEN)
             
