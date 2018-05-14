@@ -127,12 +127,12 @@ class Meteoros(pygame.sprite.Sprite):
             
 class Vida(pygame.sprite.Sprite):
     
-    def __init__(self, arquivo_imagem, dist_margem_esquerda):
+    def __init__(self, arquivo_imagem, dist_margem_direita):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(arquivo_imagem)
         self.rect = self.image.get_rect()
         self.rect.top = 10
-        self.rect.left = dist_margem_esquerda
+        self.rect.right = dist_margem_direita
     
 #===========================   Cores     ===========================#
 GREEN = (0, 150, 0)
@@ -331,9 +331,9 @@ def main():
         nave = Nave(random.choice(lista_naves))
         nave_group.add(nave)
         
-        vida1 = Vida('Assets/Lives.png', 10)
-        vida2 = Vida('Assets/Lives.png', vida1.rect.width + 20)
-        vida3 = Vida('Assets/Lives.png', 2 * vida1.rect.width + 30)
+        vida1 = Vida('Assets/Lives.png', WIDTH - 10)
+        vida2 = Vida('Assets/Lives.png', - vida1.rect.width + WIDTH - 20)
+        vida3 = Vida('Assets/Lives.png', -2 * vida1.rect.width + WIDTH - 30)
         
         vidas.add(vida1, vida2, vida3)
         
@@ -461,11 +461,11 @@ def main():
                             nave = Nave(random.choice(lista_naves))
                             nave_group.add(nave)
                             
-                            vida1 = Vida('Assets/Lives.png', 10)
+                            vida1 = Vida('Assets/Lives.png', WIDTH - 10)
                             vida2 = Vida('Assets/Lives.png',
-                                         vida1.rect.width + 20)
+                                         -vida1.rect.width + WIDTH - 20)
                             vida3 = Vida('Assets/Lives.png',
-                                         2 * vida1.rect.width + 30)
+                                         -2 * vida1.rect.width + WIDTH - 30)
                             
                             vidas.add(vida1, vida2, vida3)
                             
@@ -520,7 +520,6 @@ def main():
                     mensagem('{0}'.format(score), WIDTH/2, 20, 30, YELLOW)
                 else:
                     mensagem('0', WIDTH/2, 20, 30, YELLOW)
-                mensagem('{0}' .format(tempo), WIDTH - 60, 20, 30, YELLOW)
                 pygame.display.flip()
                 
                 segundos_passados = cronometro(agora - start - tempo_pause)[1]
