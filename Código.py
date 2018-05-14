@@ -24,11 +24,16 @@ class Nave(pygame.sprite.Sprite):
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = HEIGHT - 5
         self.vx = 0
+        self.type = 'gun'
+        self.power = 1
         
     def update(self):
         self.vx = 0
         self.vy = 0
         keystate = pygame.key.get_pressed()
+        if self.power>=2 and pygame.time.get_ticks() - self.power_time > 3000:
+            self.power -= 1
+            self.power_time = pygame.time.get_ticks()
         """ MOVIMENTO HORIZONTAL E VERTICAL """
         if keystate[pygame.K_LEFT] and not keystate[pygame.K_UP] and not\
         keystate[pygame.K_DOWN] and not keystate[pygame.K_RIGHT]:
@@ -66,12 +71,37 @@ class Nave(pygame.sprite.Sprite):
             self.rect.bottom = HEIGHT - 5
         if self.rect.top < 5:
             self.rect.top = 5
+            
+    def powerup(self):
+        self.power += 1
+        self.power_time = pygame.time.get_ticks()
         
     def shoot(self, tudo, bullets_group):
-        tiro = Tiros('Assets/tiro1.png', self.rect.centerx, self.rect.top)
-        tudo.add(tiro)
-        bullets_group.add(tiro)
-        shoot_sound.play()
+        if self.power == 1:
+            tiro = Tiros('Assets/tiro1.png', self.rect.centerx, self.rect.top)
+            tudo.add(tiro)
+            bullets_group.add(tiro)
+            shoot_sound.play()
+        if self.power == 2:
+            tiro1 = Tiros('Assets/tiro1.png', self.rect.left, self.rect.centery)
+            tiro2 = Tiros('Assets/tiro1.png', self.rect.right, self.rect.centery)
+            tudo.add(tiro1)
+            tudo.add(tiro2)
+            bullets_group.add(tiro1)
+            bullets_group.add(tiro2)
+            shoot_sound.play()
+        if self.power >= 3:
+            tiro1 = Tiros('Assets/tiro1.png', self.rect.left, self.rect.centery)
+            tiro2 = Tiros('Assets/tiro1.png', self.rect.right, self.rect.centery)
+            tiro3 = Tiros('Assets/tiro1.png', self.rect.centerx, self.rect.top)
+            tudo.add(tiro1)
+            tudo.add(tiro2)
+            tudo.add(tiro3)
+            bullets_group.add(tiro1)
+            bullets_group.add(tiro2)
+            bullets_group.add(tiro3)
+            shoot_sound.play()
+        
         
 class Tiros(pygame.sprite.Sprite):
     def __init__(self, arquivo_imagem, pos_x, pos_y):
@@ -124,6 +154,21 @@ class Meteoros(pygame.sprite.Sprite):
             self.image = new_image
             self.rect = self.image.get_rect()
             self.rect.center = old_center
+            
+class Pow(pygame.sprite.Sprite):
+    def __init__(self, center):
+        pygame.sprite.Sprite.__init__(self)
+        self.type = random.choice(['gun', 'life'])
+        self.image = powerups_images[self.type]
+        self.image.set_colorkey(BLACK)
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+        self.speedy = 2
+        
+    def update(self):
+        self.rect.y += self.speedy
+        if self.rect.top > HEIGHT:
+            self.kill()
             
 class Vida(pygame.sprite.Sprite):
     
@@ -320,6 +365,7 @@ def main():
         enemy_group = pygame.sprite.Group()
         nave_group = pygame.sprite.Group()
         bullets_group = pygame.sprite.Group()
+        powerups_group = pygame.sprite.Group()
         tudo = pygame.sprite.Group()
         vidas = pygame.sprite.Group()
             
@@ -514,6 +560,18 @@ def main():
                     tudo.add(meteor)
                     enemy_group.add(meteor)        
                     score_tiros += 100 - tiro.radius
+                    if random.random() > 0.8:
+                        pow = Pow(tiro.rect.center)
+                        tudo.add(pow)
+                        powerups_group.add(pow)
+                
+                hits = pygame.sprite.groupcollide(nave_group, powerups_group, False, True)
+                for hit in hits:
+                    #if hit.type == 'life':
+                        
+                    if hit.type == 'gun':
+                        nave.powerup()
+                                            
                 tudo.draw(tela)
                 if score >= 0:
                     mensagem('{0}'.format(score), WIDTH/2, 20, 30, YELLOW)
@@ -536,6 +594,10 @@ HEIGHT = 600
 
 tela = pygame.display.set_mode((WIDTH, HEIGHT), 0, 32)
 pygame.display.set_caption('2D Shooter')
+
+powerups_images = {}
+powerups_images['life'] = pygame.image.load("Assets/lives.png").convert()
+powerups_images['gun'] = pygame.image.load("Assets/mis.png").convert()
 
 
 #===========================   'Funcionamento'   ===========================#
