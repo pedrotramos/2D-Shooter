@@ -227,7 +227,7 @@ def main():
     Game = False
     while loop:
         x = 0
-        mn = pygame.image.load("Assets/SpaceBackground.png").convert()
+        mn = pygame.image.load("Assets/StarBackground.jpg").convert()
         Musicas(2)
         while intro:
             pressed_keys = pygame.key.get_pressed()
@@ -277,7 +277,7 @@ def main():
             relogio.tick(FPS)
     
         x = 0
-        inst = pygame.image.load("Assets/SpaceBackground.png").convert()
+        inst = pygame.image.load("Assets/StarBackground.jpg").convert()
         while instruction:
             
             pressed_keys = pygame.key.get_pressed()
@@ -323,7 +323,7 @@ def main():
         tudo = pygame.sprite.Group()
         vidas = pygame.sprite.Group()
             
-        fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
+        fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
         
         lista_naves = ['Assets/MilleniumFalcon.png', 'Assets/Galaga.png',
                        'Assets/X-Wing.png']
@@ -353,12 +353,11 @@ def main():
         score = 0
         y = 0
         Musicas(randrange(0,2))
-        fundo = pygame.image.load("Assets/SpaceBackground.png").convert()
+        fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
         conta_vidas = 3
         while Game:
             relogio.tick(FPS)
             agora = time.time()
-            tempo = cronometro(agora - start - tempo_pause)[0]
             
         
             for event in pygame.event.get():
@@ -431,7 +430,7 @@ def main():
                     over = True
                     x = 0
             
-                    go = pygame.image.load("Assets/SpaceBackground.png").convert()
+                    go = pygame.image.load("Assets/StarBackground.jpg").convert()
                     while over:
                         for event in pygame.event.get():
                             if event.type == pygame.QUIT:
@@ -456,7 +455,7 @@ def main():
                             tudo = pygame.sprite.Group()
                                 
                             fundo = pygame.image.load\
-                            ("Assets/SpaceBackground.png").convert()
+                            ("Assets/StarBackground.jpg").convert()
                             
                             nave = Nave(random.choice(lista_naves))
                             nave_group.add(nave)
