@@ -7,7 +7,6 @@ from random import randrange
 import random
 from os import path
 import time
-from threading import Timer
 #Baseado no canal do Youtube KidsCanCode 
 #https://www.youtube.com/channel/UCNaPQ5uLX5iIEHUCLmfAgKg
 
@@ -213,7 +212,7 @@ class atirador(pygame.sprite.Sprite):
             self.radius = 56
             self.rect.y = randrange(-150, -100)
             self.rect.x = randrange(0, 1200)
-            self.vy = randrange(1,5)
+            self.vy = randrange(4,5)
             self.vx = randrange(-8,8)
             
         def update(self):
@@ -245,7 +244,7 @@ class Enemybullets(pygame.sprite.Sprite):
         
     def update(self):
         self.rect.y += self.vy
-        if self.rect.top > 1000:
+        if self.rect.top > 600:
             self.kill()
 #===========================   Cores     ===========================#
 GREEN = (0, 150, 0)
@@ -285,25 +284,18 @@ def Musicas(mus):
 #===========================   Funções   ===========================#  
 def cronometro(value):
     valueD = (((value/365)/24)/60)
-    Days = int (valueD)
 
-    valueH = (valueD-Days)*365
-    Hours = int(valueH)
+    valueH = (valueD)*365
 
-    valueM = (valueH - Hours)*24
-    Minutes = int(valueM)
+    valueM = (valueH)*24
 
-    valueS = (valueM - Minutes)*60
+    valueS = (valueM)*60
     Seconds = int(valueS)
+    
+    valueMS = (valueS - valueS//1)*1000
+    Miliseconds = int(valueMS)
 
-    if Days >= 1:
-        return '{0}:{1}:{2}:{3}'.format(Days, Hours, Minutes, Seconds), Seconds
-    elif Hours >= 1:
-        return '{0}:{1}:{2}'.format(Hours, Minutes, Seconds), Seconds
-    elif Minutes >= 1:
-        return '{0}:{1}'.format(Minutes, Seconds), Seconds
-    else:
-        return '{0}'.format(Seconds), Seconds
+    return Seconds, Miliseconds
 
 def mensagem(mensagem, x, y, tamanho, COR):
    
@@ -436,11 +428,15 @@ def main():
         powerups_group = pygame.sprite.Group()
         tudo = pygame.sprite.Group()
         vidas = pygame.sprite.Group()
+        estrela = pygame.sprite.Group()
             
         fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
         
         lista_naves = ['Assets/MilleniumFalcon.png', 'Assets/Galaga.png',
                        'Assets/X-Wing.png']
+        
+        mob = atirador('Assets/starfish.png')
+        estrela.add(mob)
         
         nave = Nave(random.choice(lista_naves))
         nave_group.add(nave)
@@ -634,6 +630,7 @@ def main():
                         mob = atirador('Assets/starfish.png')
                         tudo.add(mob)
                         enemy_group.add(mob)
+                        estrela.add(mob)
                         mob.enemy_shoot(tudo, enemy_bullets)
                         expl = Explosion(tiro.rect.center, 'lg')
                         tudo.add(expl)
@@ -643,8 +640,10 @@ def main():
                         pow = Pow(tiro.rect.center)
                         tudo.add(pow)
                         powerups_group.add(pow)
-                    
-                
+                        
+                for mob in estrela:
+                    if randrange(1, 100) == 5:
+                        mob.enemy_shoot(tudo, enemy_bullets)
                 
                 hits = pygame.sprite.groupcollide(nave_group, powerups_group, False, True)
                 for hit in hits:
@@ -660,7 +659,7 @@ def main():
                     mensagem('0', WIDTH/2, 20, 30, YELLOW)
                 pygame.display.flip()
                 
-                segundos_passados = cronometro(agora - start - tempo_pause)[1]
+                segundos_passados = cronometro(agora - start - tempo_pause)[0]
                     
                 score_tempo = segundos_passados * 10
                 
