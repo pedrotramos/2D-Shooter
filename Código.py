@@ -7,6 +7,7 @@ from random import randrange
 import random
 from os import path
 import time
+from threading import Timer
 #Baseado no canal do Youtube KidsCanCode 
 #https://www.youtube.com/channel/UCNaPQ5uLX5iIEHUCLmfAgKg
 
@@ -178,7 +179,50 @@ class Vida(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.top = 10
         self.rect.right = dist_margem_direita
+        
+class atirador(pygame.sprite.Sprite):
     
+        def __init__(self, arquivo_imagem):
+            pygame.sprite.Sprite.__init__(self)
+            self.image = pygame.image.load(arquivo_imagem)
+            self.rect = self.image.get_rect()
+            self.radius = 56
+            self.rect.y = randrange(-150, -100)
+            self.rect.x = randrange(0, 1200)
+            self.vy = randrange(1,5)
+            self.vx = randrange(-8,8)
+            
+        def update(self):
+            self.rect.y += self.vy
+            self.rect.x += self.vx
+            if self.rect.right > WIDTH - 5:
+                self.rect.right = WIDTH - 5
+                self.vx = -self.vx
+            if self.rect.left < 5:
+                self.rect.left = 5
+                self.vx = -self.vx
+            if self.rect.bottom > 200:
+                self.rect.bottom = 200
+                
+        def enemy_shoot(self, tudo, enemy_bullets):
+            tiro = Enemybullets('Assets/tiro1.png', self.rect.centerx, self.rect.bottom)
+            tudo.add(tiro)
+            enemy_bullets.add(tiro)
+
+
+class Enemybullets(pygame.sprite.Sprite):
+    def __init__(self, arquivo_imagem, pos_x, pos_y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load(arquivo_imagem)
+        self.rect = self.image.get_rect()
+        self.rect.bottom = pos_y
+        self.rect.centerx = pos_x
+        self.vy = 5
+        
+    def update(self):
+        self.rect.y += self.vy
+        if self.rect.top > 1000:
+            self.kill()
 #===========================   Cores     ===========================#
 GREEN = (0, 150, 0)
 LIGHTGREEN = (0, 255, 0)
@@ -189,7 +233,6 @@ LIGHTBLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-
 #===========================       'Som'         ===========================#
 snd_dir = path.join(path.dirname (__file__), 'snd')
 pygame.mixer.init()
@@ -365,6 +408,7 @@ def main():
         enemy_group = pygame.sprite.Group()
         nave_group = pygame.sprite.Group()
         bullets_group = pygame.sprite.Group()
+        enemy_bullets = pygame.sprite.Group()
         powerups_group = pygame.sprite.Group()
         tudo = pygame.sprite.Group()
         vidas = pygame.sprite.Group()
@@ -386,7 +430,7 @@ def main():
         lista_meteoros = ['Assets/asteroid.gif', 'Assets/meteor2_s.gif',
                           'Assets/fire_meteor_xs.gif']
     
-        for i in range(8):
+        for i in range(4):
             meteor = Meteoros(random.choice(lista_meteoros))
             tudo.add(meteor)
             enemy_group.add(meteor)
@@ -514,7 +558,7 @@ def main():
                             
                             vidas.add(vida1, vida2, vida3)
                             
-                            for i in range(8):
+                            for i in range(4):
                                 meteor = Meteoros(random.choice(lista_meteoros))
                                 tudo.add(meteor)
                                 enemy_group.add(meteor)
@@ -555,15 +599,24 @@ def main():
                                                True,
                                                pygame.sprite.collide_circle)
                 for tiro in tiros:
-                    random.choice(exp_sounds).play()
-                    meteor = Meteoros(random.choice(lista_meteoros))
-                    tudo.add(meteor)
-                    enemy_group.add(meteor)        
+                    if score < 100:
+                        random.choice(exp_sounds).play()
+                        meteor = Meteoros(random.choice(lista_meteoros))
+                        tudo.add(meteor)
+                        enemy_group.add(meteor)        
+                    if score >= 100:
+                        mob = atirador('Assets/starfish.png')
+                        tudo.add(mob)
+                        enemy_group.add(mob)
+                        mob.enemy_shoot(tudo, enemy_bullets)
+                    
                     score_tiros += 100 - tiro.radius
                     if random.random() > 0.8:
                         pow = Pow(tiro.rect.center)
                         tudo.add(pow)
                         powerups_group.add(pow)
+                    
+                
                 
                 hits = pygame.sprite.groupcollide(nave_group, powerups_group, False, True)
                 for hit in hits:
