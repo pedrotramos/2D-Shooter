@@ -155,6 +155,30 @@ class Meteoros(pygame.sprite.Sprite):
             self.image = new_image
             self.rect = self.image.get_rect()
             self.rect.center = old_center
+
+class Explosion(pygame.sprite.Sprite):
+    def __init__(self, center, size):
+        pygame.sprite.Sprite.__init__(self)
+        self.size = size
+        self.image = explosion[self.size][0]
+        self.rect = self.image.get_rect()
+        self.rect.center = center
+        self.frame = 0
+        self.last_update = pygame.time.get_ticks()
+        self.frame_rate = 50
+
+    def update(self):
+        now = pygame.time.get_ticks()
+        if now - self.last_update > self.frame_rate:
+            self.last_update = now
+            self.frame += 1
+            if self.frame == len(explosion[self.size]):
+                self.kill()
+            else:
+                center = self.rect.center
+                self.image = explosion[self.size][self.frame]
+                self.rect = self.image.get_rect()
+                self.rect.center = center
             
 class Pow(pygame.sprite.Sprite):
     def __init__(self, center):
@@ -603,12 +627,16 @@ def main():
                         random.choice(exp_sounds).play()
                         meteor = Meteoros(random.choice(lista_meteoros))
                         tudo.add(meteor)
-                        enemy_group.add(meteor)        
+                        enemy_group.add(meteor)
+                        expl = Explosion(tiro.rect.center, 'sm')
+                        tudo.add(expl)
                     if score >= 100:
                         mob = atirador('Assets/starfish.png')
                         tudo.add(mob)
                         enemy_group.add(mob)
                         mob.enemy_shoot(tudo, enemy_bullets)
+                        expl = Explosion(tiro.rect.center, 'lg')
+                        tudo.add(expl)
                     
                     score_tiros += 100 - tiro.radius
                     if random.random() > 0.8:
@@ -652,6 +680,17 @@ powerups_images = {}
 powerups_images['life'] = pygame.image.load("Assets/lives.png").convert()
 powerups_images['gun'] = pygame.image.load("Assets/mis.png").convert()
 
+explosion ={}
+explosion['lg'] = []
+explosion['sm'] = []
+for i in range(9):
+    explo = 'Assets/regularExplosion0{}.png'.format(i)
+    img = pygame.image.load(explo).convert()
+    img.set_colorkey(BLACK)
+    img_lg = pygame.transform.scale(img, (100, 100))
+    explosion['lg'].append(img_lg)
+    img_sm = pygame.transform.scale(img, (75, 75))
+    explosion['sm'].append(img_sm)
 
 #===========================   'Funcionamento'   ===========================#
 relogio =  pygame.time.Clock()
