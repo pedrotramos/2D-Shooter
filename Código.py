@@ -224,11 +224,13 @@ class atirador(pygame.sprite.Sprite):
             if self.rect.left < 5:
                 self.rect.left = 5
                 self.vx = -self.vx
-            if self.rect.bottom > 200:
-                self.rect.bottom = 200
+            if self.rect.bottom > 150:
+                self.rect.bottom = 150
                 
         def enemy_shoot(self, tudo, enemy_bullets):
-            tiro = Enemybullets('Assets/tiro1.png', self.rect.centerx, self.rect.bottom)
+            tiro = Enemybullets('Assets/tiro_inimigo.png',
+                                self.rect.centerx + 60,
+                                self.rect.bottom -100)
             tudo.add(tiro)
             enemy_bullets.add(tiro)
 
@@ -435,9 +437,6 @@ def main():
         lista_naves = ['Assets/MilleniumFalcon.png', 'Assets/Galaga.png',
                        'Assets/X-Wing.png']
         
-        mob = atirador('Assets/starfish.png')
-        estrela.add(mob)
-        
         nave = Nave(random.choice(lista_naves))
         nave_group.add(nave)
         
@@ -524,9 +523,11 @@ def main():
             
             hits = pygame.sprite.spritecollide\
             (nave, enemy_group, False, pygame.sprite.collide_circle)
+            pipoco = pygame.sprite.groupcollide\
+            (enemy_bullets, nave_group, True, False, pygame.sprite.collide_circle)
             pygame.sprite.groupcollide\
             (enemy_group, nave_group, True, False, pygame.sprite.collide_circle)
-            if hits:
+            if hits or pipoco:
                 crash_sound.play()
                 conta_vidas -= 1
                 if conta_vidas == 2:
