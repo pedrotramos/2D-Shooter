@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
 """
 Created on Fri Apr 27 11:17:40 2018
+
+Baseado no canal do Youtube KidsCanCode 
+https://www.youtube.com/channel/UCNaPQ5uLX5iIEHUCLmfAgKg
+
+Frozen Jam by tgfcoder <https://twitter.com/tgfcoder> 
+licensed under CC-BY-3 <http://creativecommons.org/licenses/by/3.0/>
 """
 import pygame
 from random import randrange
 import random
 from os import path
 import time
-#Baseado no canal do Youtube KidsCanCode 
-#https://www.youtube.com/channel/UCNaPQ5uLX5iIEHUCLmfAgKg
 
-#Frozen Jam by tgfcoder <https://twitter.com/tgfcoder> 
-#licensed under CC-BY-3 <http://creativecommons.org/licenses/by/3.0/>
-#===========================   Classes   ===========================#
-    
+#==============================     Classes     ==============================#
 class Nave(pygame.sprite.Sprite):
     
     def __init__(self, arquivo_imagem):
@@ -61,6 +62,7 @@ class Nave(pygame.sprite.Sprite):
         if keystate[pygame.K_RIGHT] and keystate[pygame.K_UP]:
             self.vx = (12.5 ** (1/2))
             self.vy = -(12.5 ** (1/2))
+        '''Impedindo a saida da tela'''
         self.rect.x += self.vx
         self.rect.y += self.vy
         if self.rect.right > WIDTH - 5:
@@ -102,7 +104,6 @@ class Nave(pygame.sprite.Sprite):
             bullets_group.add(tiro3)
             shoot_sound.play()
         
-        
 class Tiros(pygame.sprite.Sprite):
     def __init__(self, arquivo_imagem, pos_x, pos_y):
         pygame.sprite.Sprite.__init__(self)
@@ -125,7 +126,7 @@ class Meteoros(pygame.sprite.Sprite):
         self.image = self.image_orig.copy()
         self.rect = self.image.get_rect()
         self.radius = int(self.rect.width / 2)
-        self.rect.x = randrange(0, 1200)
+        self.rect.x = randrange(0, 1000)
         self.rect.y = randrange(-150, -100)
         self.vy =  randrange(1, 8)
         self.vx =  randrange(-3, 3)
@@ -140,7 +141,7 @@ class Meteoros(pygame.sprite.Sprite):
         if self.rect.top > HEIGHT or self.rect.right < 0 or \
         self.rect.left > WIDTH:
             self.rect.y = randrange(-100, -40)
-            self.rect.x = randrange(0, 1200)
+            self.rect.x = randrange(0, 1000)
             self.vy = randrange(1, 8)
             self.vx = randrange(-3,3)
             
@@ -203,7 +204,7 @@ class Vida(pygame.sprite.Sprite):
         self.rect.top = 10
         self.rect.right = dist_margem_direita
         
-class atirador(pygame.sprite.Sprite):
+class Atirador(pygame.sprite.Sprite):
     
         def __init__(self, arquivo_imagem):
             pygame.sprite.Sprite.__init__(self)
@@ -211,7 +212,7 @@ class atirador(pygame.sprite.Sprite):
             self.rect = self.image.get_rect()
             self.radius = 56
             self.rect.y = randrange(-150, -100)
-            self.rect.x = randrange(0, 1200)
+            self.rect.x = randrange(0, 1000)
             self.vy = randrange(4,5)
             self.vx = randrange(-8,8)
             
@@ -230,25 +231,38 @@ class atirador(pygame.sprite.Sprite):
         def enemy_shoot(self, tudo, enemy_bullets):
             tiro = Enemybullets('Assets/tiro_inimigo.png',
                                 self.rect.centerx + 60,
-                                self.rect.bottom -100)
+                                self.rect.bottom -100, 0)
+            tiro1 = Enemybullets('Assets/tiro_inimigo_direita.png',
+                                self.rect.centerx + 60,
+                                self.rect.bottom -100, 5)
+            tiro2 = Enemybullets('Assets/tiro_inimigo_esquerda.png',
+                                self.rect.centerx + 60,
+                                self.rect.bottom -100, -5)
             tudo.add(tiro)
+            tudo.add(tiro1)
+            tudo.add(tiro2)
             enemy_bullets.add(tiro)
-
+            enemy_bullets.add(tiro1)
+            enemy_bullets.add(tiro2)
+            enemy_shoot_sound.play()
 
 class Enemybullets(pygame.sprite.Sprite):
-    def __init__(self, arquivo_imagem, pos_x, pos_y):
+    def __init__(self, arquivo_imagem, pos_x, pos_y, vx):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(arquivo_imagem)
         self.rect = self.image.get_rect()
         self.rect.bottom = pos_y
         self.rect.centerx = pos_x
         self.vy = 5
+        self.vx = vx
         
     def update(self):
         self.rect.y += self.vy
+        self.rect.x += self.vx
         if self.rect.top > 600:
             self.kill()
-#===========================   Cores     ===========================#
+            
+#===============================     Cores     ===============================#
 GREEN = (0, 150, 0)
 LIGHTGREEN = (0, 255, 0)
 RED = (150, 0, 0)
@@ -258,12 +272,16 @@ LIGHTBLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-#===========================       'Som'         ===========================#
+
+#================================     Som     ================================#
 snd_dir = path.join(path.dirname (__file__), 'snd')
 pygame.mixer.init()
 
-#som do tiro
+#som do tiro do player
 shoot_sound = pygame.mixer.Sound(path.join(snd_dir, 'Laser.wav'))
+
+#som do tiro do inimigo
+enemy_shoot_sound = pygame.mixer.Sound(path.join(snd_dir, 'EnemyLaser.wav'))
 
 #sons da explosão
 exp_sounds = []
@@ -283,7 +301,7 @@ def Musicas(mus):
     pygame.mixer.music.set_volume(0.2)
     pygame.mixer.music.play(loops = -1)
 
-#===========================   Funções   ===========================#  
+#==============================     Funções     ==============================#  
 def cronometro(value):
     valueD = (((value/365)/24)/60)
 
@@ -430,7 +448,7 @@ def main():
         powerups_group = pygame.sprite.Group()
         tudo = pygame.sprite.Group()
         vidas = pygame.sprite.Group()
-        estrela = pygame.sprite.Group()
+        mobs = pygame.sprite.Group()
             
         fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
         
@@ -464,11 +482,11 @@ def main():
         Musicas(randrange(0,2))
         fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
         conta_vidas = 3
+        
         while Game:
             relogio.tick(FPS)
             agora = time.time()
             
-        
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:            
                     Game = False
@@ -500,7 +518,6 @@ def main():
                                         - inicio_pause
                                         pause = False
                                         
-                                    
                             mensagem('PAUSED', WIDTH/2, HEIGHT/2 - 100, 130,
                                      WHITE)
                             mensagem('Press any key to continue', WIDTH/2,
@@ -519,14 +536,18 @@ def main():
                 tela.blit(fundo, (0, rel_y))
             y += 10
             
-            tudo.update()
-            
+            '''Meteoro bate na Nave'''
             hits = pygame.sprite.spritecollide\
             (nave, enemy_group, False, pygame.sprite.collide_circle)
+            '''Tiro inimigo acerta a nave'''
             pipoco = pygame.sprite.groupcollide\
-            (enemy_bullets, nave_group, True, False, pygame.sprite.collide_circle)
+            (enemy_bullets, nave_group, True,
+            False, pygame.sprite.collide_circle)
+            '''Meteoro some ao bater na nave'''
             pygame.sprite.groupcollide\
-            (enemy_group, nave_group, True, False, pygame.sprite.collide_circle)
+            (enemy_group, nave_group, True,
+            False, pygame.sprite.collide_circle)
+            
             if hits or pipoco:
                 crash_sound.play()
                 conta_vidas -= 1
@@ -616,9 +637,11 @@ def main():
             
             
             if Game:
-                tiros = pygame.sprite.groupcollide(enemy_group, bullets_group, True,
-                                               True,
-                                               pygame.sprite.collide_circle)
+                '''Tiro da Nave acerta nos inimigos'''
+                tiros = pygame.sprite.groupcollide\
+                (enemy_group, bullets_group, True,
+                 True, pygame.sprite.collide_circle)
+                
                 for tiro in tiros:
                     if score < 100:
                         random.choice(exp_sounds).play()
@@ -628,11 +651,10 @@ def main():
                         expl = Explosion(tiro.rect.center, 'sm')
                         tudo.add(expl)
                     if score >= 100:
-                        mob = atirador('Assets/starfish.png')
+                        mob = Atirador('Assets/starfish.png')
                         tudo.add(mob)
                         enemy_group.add(mob)
-                        estrela.add(mob)
-                        mob.enemy_shoot(tudo, enemy_bullets)
+                        mobs.add(mob)
                         expl = Explosion(tiro.rect.center, 'lg')
                         tudo.add(expl)
                     
@@ -641,32 +663,33 @@ def main():
                         pow = Pow(tiro.rect.center)
                         tudo.add(pow)
                         powerups_group.add(pow)
-                        
-                for mob in estrela:
-                    if randrange(1, 100) == 5:
-                        mob.enemy_shoot(tudo, enemy_bullets)
                 
-                hits = pygame.sprite.groupcollide(nave_group, powerups_group, False, True)
+                if score >= 100:
+                    for mob in mobs:
+                        if randrange(1, 250) == 5:
+                            mob.enemy_shoot(tudo, enemy_bullets)
+                
+                hits = pygame.sprite.groupcollide\
+                (nave_group, powerups_group, False, True)
                 for hit in hits:
                     #if hit.type == 'life':
                         
                     if hit.type == 'gun':
                         nave.powerup()
-                                            
-                tudo.draw(tela)
+                
                 if score >= 0:
                     mensagem('{0}'.format(score), WIDTH/2, 20, 30, YELLOW)
                 else:
                     mensagem('0', WIDTH/2, 20, 30, YELLOW)
-                pygame.display.flip()
-                
                 segundos_passados = cronometro(agora - start - tempo_pause)[0]
-                    
                 score_tempo = segundos_passados * 10
-                
                 score = score_tempo + score_tiros
-        
-#===========================   'Iniciar'   ===========================#
+                
+                tudo.update()
+                tudo.draw(tela)
+                pygame.display.update()
+                
+#==============================     Iniciar     ==============================#
 pygame.init()
 pygame.font.init()
 
@@ -692,7 +715,7 @@ for i in range(9):
     img_sm = pygame.transform.scale(img, (75, 75))
     explosion['sm'].append(img_sm)
 
-#===========================   'Funcionamento'   ===========================#
+#===========================     Funcionamento     ===========================#
 relogio =  pygame.time.Clock()
 FPS = 120
 
