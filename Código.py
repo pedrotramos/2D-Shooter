@@ -21,7 +21,7 @@ class Nave(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(arquivo_imagem)
         self.rect = self.image.get_rect()
-        self.radius = 48
+        self.radius = (self.rect.width / 2) - 2
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = HEIGHT - 5
         self.vx = 0
@@ -229,14 +229,14 @@ class Atirador(pygame.sprite.Sprite):
                 
         def enemy_shoot(self, tudo, enemy_bullets):
             tiro = Enemybullets('Assets/tiro_inimigo.png',
-                                self.rect.centerx + 60,
-                                self.rect.bottom -100, 0)
+                                self.rect.centerx,
+                                self.rect.bottom, 0)
             tiro1 = Enemybullets('Assets/tiro_inimigo_direita.png',
-                                self.rect.centerx + 60,
-                                self.rect.bottom -100, 3)
+                                self.rect.centerx,
+                                self.rect.bottom, 3)
             tiro2 = Enemybullets('Assets/tiro_inimigo_esquerda.png',
-                                self.rect.centerx + 60,
-                                self.rect.bottom -100, -3)
+                                self.rect.centerx,
+                                self.rect.bottom, -3)
             tudo.add(tiro)
             tudo.add(tiro1)
             tudo.add(tiro2)
@@ -250,7 +250,7 @@ class Enemybullets(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(arquivo_imagem)
         self.rect = self.image.get_rect()
-        self.rect.bottom = pos_y
+        self.rect.centery = pos_y
         self.rect.centerx = pos_x
         self.vy = 3
         self.vx = vx
@@ -651,7 +651,7 @@ def main():
                         expl = Explosion(tiro.rect.center, 'sm')
                         tudo.add(expl)
                     if score >= 100:
-                        mob = Atirador('Assets/starfish.png')
+                        mob = Atirador('Assets/enemy_atirador.png')
                         tudo.add(mob)
                         enemy_group.add(mob)
                         mobs.add(mob)
@@ -666,7 +666,7 @@ def main():
                 
                 if score >= 100:
                     for mob in mobs:
-                        if randrange(1, 250) == 5:
+                        if randrange(1, 200) == 5:
                             mob.enemy_shoot(tudo, enemy_bullets)
                 
                 hits = pygame.sprite.groupcollide\
