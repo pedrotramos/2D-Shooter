@@ -183,9 +183,8 @@ class Explosion(pygame.sprite.Sprite):
 class Pow(pygame.sprite.Sprite):
     def __init__(self, center):
         pygame.sprite.Sprite.__init__(self)
-        self.type = random.choice(['gun', 'life'])
+        self.type = random.choice(['gun', 'shield'])
         self.image = powerups_images[self.type]
-        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.center = center
         self.speedy = 2
@@ -673,7 +672,7 @@ def main():
                 hits = pygame.sprite.groupcollide\
                 (nave_group, powerups_group, False, True)
                 for hit in hits:
-                    #if hit.type == 'life':
+                    #if hit.type == 'shield':
                         
                     if hit.type == 'gun':
                         nave.powerup()
@@ -701,8 +700,8 @@ tela = pygame.display.set_mode((WIDTH, HEIGHT), 0, 32)
 pygame.display.set_caption('2D Shooter')
 
 powerups_images = {}
-powerups_images['life'] = pygame.image.load("Assets/lives.png").convert()
-powerups_images['gun'] = pygame.image.load("Assets/mis.png").convert()
+powerups_images['shield'] = pygame.image.load("Assets/Shield.gif").convert()
+powerups_images['gun'] = pygame.image.load("Assets/mis.gif").convert()
 
 explosion ={}
 explosion['lg'] = []
