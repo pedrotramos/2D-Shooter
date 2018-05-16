@@ -539,7 +539,7 @@ def main():
             hits = pygame.sprite.spritecollide\
             (nave, enemy_group, False, pygame.sprite.collide_circle)
             '''Tiro inimigo acerta a nave'''
-            pipoco = pygame.sprite.groupcollide\
+            pipocos = pygame.sprite.groupcollide\
             (enemy_bullets, nave_group, True,
             False, pygame.sprite.collide_circle)
             '''Meteoro some ao bater na nave'''
@@ -547,93 +547,126 @@ def main():
             (enemy_group, nave_group, True,
             False, pygame.sprite.collide_circle)
             
-            if hits or pipoco:
+            if hits or pipocos:
                 crash_sound.play()
                 conta_vidas -= 1
+                if conta_vidas > 0:
+                    for hit in hits:
+                        expl = Explosion(hit.rect.center, 'sm')
+                        tudo.add(expl)
+                    for pipoco in pipocos:
+                        expl = Explosion(pipoco.rect.center, 'sm')
+                        tudo.add(expl)
+                else:
+                    for hit in hits:
+                        death_expl = Explosion(nave.rect.center, 'lg')
+                        tudo.add(death_expl)
+                    for pipoco in pipocos:
+                        death_expl = Explosion(nave.rect.center, 'lg')
+                        tudo.add(death_expl)
                 if conta_vidas == 2:
+                    for hit in hits:
+                        expl = Explosion(hit.rect.center, 'sm')
+                        tudo.add(expl)
+                    for pipoco in pipocos:
+                        expl = Explosion(pipoco.rect.center, 'sm')
+                        tudo.add(expl)
                     vida3.kill()
                 elif conta_vidas == 1:
+                    for hit in hits:
+                        expl = Explosion(hit.rect.center, 'sm')
+                        tudo.add(expl)
+                    for pipoco in pipocos:
+                        expl = Explosion(pipoco.rect.center, 'sm')
+                        tudo.add(expl)
                     vida2.kill()
-                else:
-                    vida1.kill()
-                    Game = False
-                    Musicas(3)
-                    over = True
-                    x = 0
-            
-                    go = pygame.image.load("Assets/StarBackground.jpg").convert()
-                    while over:
-                        for event in pygame.event.get():
-                            if event.type == pygame.QUIT:
-                                pygame.quit()
-                                quit()
-                        
-                        pressed_keys = pygame.key.get_pressed()
-                        
-                        if pressed_keys[pygame.K_r]:
-                            over = False
-                            Game = True
-                            loop = True
-                            intro = False
-                            instruction = False
-                            conta_vidas = 3
-                            start = time.time()
-                            tempo_pause = 0
+                elif conta_vidas == 0:
+                    for hit in hits:
+                        death_expl = Explosion(nave.rect.center, 'lg')
+                        tudo.add(death_expl)
+                    for pipoco in pipocos:
+                        death_expl = Explosion(nave.rect.center, 'lg')
+                        tudo.add(death_expl)
+                    if death_expl.kill():
+                        vida1.kill()
+                        Game = False
+                        Musicas(3)
+                        over = True
+                        x = 0
+                
+                        go = pygame.image.load("Assets/StarBackground.jpg").convert()
+                        while over:
+                            for event in pygame.event.get():
+                                if event.type == pygame.QUIT:
+                                    pygame.quit()
+                                    quit()
                             
-                            enemy_group = pygame.sprite.Group()
-                            nave_group = pygame.sprite.Group()
-                            bullets_group = pygame.sprite.Group()
-                            mobs = pygame.sprite.Group()
-                            tudo = pygame.sprite.Group()
+                            pressed_keys = pygame.key.get_pressed()
+                            
+                            if pressed_keys[pygame.K_r]:
+                                over = False
+                                Game = True
+                                loop = True
+                                intro = False
+                                instruction = False
+                                conta_vidas = 3
+                                start = time.time()
+                                tempo_pause = 0
                                 
-                            fundo = pygame.image.load\
-                            ("Assets/StarBackground.jpg").convert()
-                            
-                            nave = Nave(random.choice(lista_naves))
-                            nave_group.add(nave)
-                            
-                            vida1 = Vida('Assets/Lives.png', WIDTH - 10)
-                            vida2 = Vida('Assets/Lives.png',
-                                         -vida1.rect.width + WIDTH - 20)
-                            vida3 = Vida('Assets/Lives.png',
-                                         -2 * vida1.rect.width + WIDTH - 30)
-                            
-                            vidas.add(vida1, vida2, vida3)
-                            
-                            for i in range(4):
-                                meteor = Meteoros(random.choice(lista_meteoros))
-                                tudo.add(meteor)
-                                enemy_group.add(meteor)
+                                enemy_group = pygame.sprite.Group()
+                                nave_group = pygame.sprite.Group()
+                                bullets_group = pygame.sprite.Group()
+                                mobs = pygame.sprite.Group()
+                                tudo = pygame.sprite.Group()
+                                    
+                                fundo = pygame.image.load\
+                                ("Assets/StarBackground.jpg").convert()
                                 
-                            tudo.add(enemy_group)
-                            tudo.add(nave_group)
-                            tudo.add(vidas)
-                            Musicas(randrange(0,2))
-                            score = 0
-                            score_tiros = 0
+                                nave = Nave(random.choice(lista_naves))
+                                nave_group.add(nave)
+                                
+                                vida1 = Vida('Assets/Lives.png', WIDTH - 10)
+                                vida2 = Vida('Assets/Lives.png',
+                                             -vida1.rect.width + WIDTH - 20)
+                                vida3 = Vida('Assets/Lives.png',
+                                             -2 * vida1.rect.width + WIDTH - 30)
+                                
+                                vidas.add(vida1, vida2, vida3)
+                                
+                                for i in range(4):
+                                    meteor = Meteoros(random.choice(lista_meteoros))
+                                    tudo.add(meteor)
+                                    enemy_group.add(meteor)
+                                    
+                                tudo.add(enemy_group)
+                                tudo.add(nave_group)
+                                tudo.add(vidas)
+                                Musicas(randrange(0,2))
+                                score = 0
+                                score_tiros = 0
+                                
+                            if pressed_keys[pygame.K_q]:
+                                over = False
+                                intro = True
+                                instruction = False
+                                Game = False
+                                loop = True
+                                
+                            rel_x = x % go.get_rect().width
+                            tela.blit(go, (rel_x - go.get_rect().width, 0))
+                            if rel_x < WIDTH:
+                                tela.blit(go, (rel_x, 0))
+                            x += 2
+                                
+                            mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 100, 130,
+                                     WHITE)
+                            mensagem('Press R to restart', WIDTH/2, HEIGHT/2 + 10,
+                                     50, LIGHTGREEN)
+                            mensagem('Press Q to go back to the Menu', WIDTH/2,
+                                     HEIGHT/2 + 100, 50, LIGHTRED)
                             
-                        if pressed_keys[pygame.K_q]:
-                            over = False
-                            intro = True
-                            instruction = False
-                            Game = False
-                            loop = True
-                            
-                        rel_x = x % go.get_rect().width
-                        tela.blit(go, (rel_x - go.get_rect().width, 0))
-                        if rel_x < WIDTH:
-                            tela.blit(go, (rel_x, 0))
-                        x += 2
-                            
-                        mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 100, 130,
-                                 WHITE)
-                        mensagem('Press R to restart', WIDTH/2, HEIGHT/2 + 10,
-                                 50, LIGHTGREEN)
-                        mensagem('Press Q to go back to the Menu', WIDTH/2,
-                                 HEIGHT/2 + 100, 50, LIGHTRED)
-                        
-                        pygame.display.update()
-                        relogio.tick(FPS)
+                            pygame.display.update()
+                            relogio.tick(FPS)
             
             
             if Game:
