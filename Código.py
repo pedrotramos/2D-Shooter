@@ -213,8 +213,8 @@ class Atirador(pygame.sprite.Sprite):
             self.radius = 56
             self.rect.y = randrange(-150, -100)
             self.rect.x = randrange(0, 1000)
-            self.vy = randrange(4,5)
-            self.vx = randrange(-8,8)
+            self.vy = 4
+            self.vx = randrange(-5,5,2)
             
         def update(self):
             self.rect.y += self.vy
@@ -234,10 +234,10 @@ class Atirador(pygame.sprite.Sprite):
                                 self.rect.bottom -100, 0)
             tiro1 = Enemybullets('Assets/tiro_inimigo_direita.png',
                                 self.rect.centerx + 60,
-                                self.rect.bottom -100, 5)
+                                self.rect.bottom -100, 3)
             tiro2 = Enemybullets('Assets/tiro_inimigo_esquerda.png',
                                 self.rect.centerx + 60,
-                                self.rect.bottom -100, -5)
+                                self.rect.bottom -100, -3)
             tudo.add(tiro)
             tudo.add(tiro1)
             tudo.add(tiro2)
@@ -253,7 +253,7 @@ class Enemybullets(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.bottom = pos_y
         self.rect.centerx = pos_x
-        self.vy = 5
+        self.vy = 3
         self.vx = vx
         
     def update(self):
@@ -584,6 +584,7 @@ def main():
                             enemy_group = pygame.sprite.Group()
                             nave_group = pygame.sprite.Group()
                             bullets_group = pygame.sprite.Group()
+                            mobs = pygame.sprite.Group()
                             tudo = pygame.sprite.Group()
                                 
                             fundo = pygame.image.load\
