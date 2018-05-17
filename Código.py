@@ -616,6 +616,7 @@ def main():
                             enemy_group = pygame.sprite.Group()
                             nave_group = pygame.sprite.Group()
                             bullets_group = pygame.sprite.Group()
+                            enemy_bullets = pygame.sprite.Group()
                             mobs = pygame.sprite.Group()
                             tudo = pygame.sprite.Group()
                             
@@ -684,6 +685,7 @@ def main():
                         expl = Explosion(tiro.rect.center, 'sm')
                         tudo.add(expl)
                     if score >= 100:
+                        random.choice(exp_sounds).play()
                         mob = Atirador('Assets/enemy_atirador.png')
                         tudo.add(mob)
                         enemy_group.add(mob)
