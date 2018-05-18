@@ -26,11 +26,13 @@ class Nave(pygame.sprite.Sprite):
         self.rect.bottom = HEIGHT - 5
         self.vx = 0
         self.power = 1
-        self.type = 'gun'
+        self.power_time = pygame.time.get_ticks()
         self.shield = 100
         self.lives = 3
         self.hidden = False
         self.hide_timer = pygame.time.get_ticks()
+        self.shoot_delay = 250
+        self.last_shot = pygame.time.get_ticks()
         
     def update(self):
         self.vx = 0
@@ -79,7 +81,7 @@ class Nave(pygame.sprite.Sprite):
             self.rect.top = 5
         
         if self.lives > 1:
-            if self.hidden and pygame.time.get_ticks() - self.hide_timer > 1000:
+            if self.hidden and pygame.time.get_ticks() - self.hide_timer > 2000:
                 self.hidden = False
             
     def powerup(self):
@@ -91,6 +93,9 @@ class Nave(pygame.sprite.Sprite):
         self.hide_timer = pygame.time.get_ticks()
         
     def shoot(self, tudo, bullets_group):
+        now = pygame.time.get_ticks()
+        if now - self.last_shot > self.shoot_delay:
+            self.last_shot = now
         if self.power == 1:
             tiro = Tiros('Assets/tiro1.png', self.rect.centerx, self.rect.top)
             tudo.add(tiro)
@@ -555,7 +560,7 @@ def main():
             tela.blit(fundo, (0, rel_y - fundo.get_rect().height))
             if rel_y < HEIGHT:
                 tela.blit(fundo, (0, rel_y))
-            y += 10
+            y += 5
             
             '''Meteoro bate na Nave'''
             hits = pygame.sprite.spritecollide\
@@ -699,8 +704,8 @@ def main():
                         if randrange(1, 250) == 5:
                             mob.enemy_shoot(tudo, enemy_bullets)
                 
-                hits = pygame.sprite.groupcollide\
-                (nave_group, powerups_group, False, True)
+                hits = pygame.sprite.spritecollide\
+                (nave, powerups_group, True)
                 for hit in hits:
                     if hit.type == 'shield':
                         nave.shield += 20
@@ -709,7 +714,7 @@ def main():
                         
                     if hit.type == 'gun':
                         nave.powerup()
-                
+                        
                 if score >= 0:
                     mensagem('{0}'.format(score), WIDTH/2, 20, 30, YELLOW)
                 else:
