@@ -25,8 +25,12 @@ class Nave(pygame.sprite.Sprite):
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = HEIGHT - 5
         self.vx = 0
-        self.type = 'gun'
         self.power = 1
+        self.type = 'gun'
+        self.shield = 100
+        self.lives = 3
+        self.hidden = False
+        self.hide_timer = pygame.time.get_ticks()
         
     def update(self):
         self.vx = 0
@@ -73,10 +77,18 @@ class Nave(pygame.sprite.Sprite):
             self.rect.bottom = HEIGHT - 5
         if self.rect.top < 5:
             self.rect.top = 5
+        
+        if self.lives > 1:
+            if self.hidden and pygame.time.get_ticks() - self.hide_timer > 1000:
+                self.hidden = False
             
     def powerup(self):
         self.power += 1
         self.power_time = pygame.time.get_ticks()
+        
+    def hide(self):
+        self.hidden = True
+        self.hide_timer = pygame.time.get_ticks()
         
     def shoot(self, tudo, bullets_group):
         if self.power == 1:
@@ -193,15 +205,6 @@ class Pow(pygame.sprite.Sprite):
         self.rect.y += self.speedy
         if self.rect.top > HEIGHT:
             self.kill()
-            
-class Vida(pygame.sprite.Sprite):
-    
-    def __init__(self, arquivo_imagem, dist_margem_direita):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(arquivo_imagem)
-        self.rect = self.image.get_rect()
-        self.rect.top = 10
-        self.rect.right = dist_margem_direita
         
 class Atirador(pygame.sprite.Sprite):
     
@@ -301,6 +304,35 @@ def Musicas(mus):
     pygame.mixer.music.play(loops = -1)
 
 #==============================     Funções     ==============================#  
+def novo_meteoro(lista_meteoros, tudo, enemy_group):
+    meteor = Meteoros(random.choice(lista_meteoros))
+    tudo.add(meteor)
+    enemy_group.add(meteor)
+    
+def novo_atirador(tudo, enemy_group, mobs):
+    mob = Atirador('Assets/enemy_atirador.png')
+    tudo.add(mob)
+    enemy_group.add(mob)
+    mobs.add(mob)
+    
+def shield(surf, x, y, pct):
+    if pct < 0:
+        pct = 0
+    BAR_LENGTH = 200
+    BAR_HEIGHT = 20
+    fill = (pct / 100) * BAR_LENGTH
+    outline_rect = pygame.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
+    fill_rect = pygame.Rect(x, y, fill, BAR_HEIGHT)
+    pygame.draw.rect(surf, GREEN, fill_rect)
+    pygame.draw.rect(surf, WHITE, outline_rect, 2)
+    
+def draw_lives(surf, x, y, lives, img):
+    for i in range(lives):
+        img_rect = img.get_rect()
+        img_rect.x = x + 30 * i
+        img_rect.y = y
+        surf.blit(img, img_rect)
+    
 def cronometro(value):
     valueD = (((value/365)/24)/60)
 
@@ -394,8 +426,6 @@ def main():
             mensagem('Press ESC to Quit', WIDTH/2, HEIGHT/2 + 190, 50,
                      LIGHTRED)
             
-            
-            
             pygame.display.update()
             relogio.tick(FPS)
     
@@ -456,20 +486,13 @@ def main():
         
         nave = Nave(random.choice(lista_naves))
         nave_group.add(nave)
-        
-        vida1 = Vida('Assets/Lives.png', WIDTH - 10)
-        vida2 = Vida('Assets/Lives.png', - vida1.rect.width + WIDTH - 20)
-        vida3 = Vida('Assets/Lives.png', -2 * vida1.rect.width + WIDTH - 30)
-        
-        vidas.add(vida1, vida2, vida3)
+
         
         lista_meteoros = ['Assets/asteroid.gif', 'Assets/meteor2_s.gif',
                           'Assets/fire_meteor_xs.gif']
     
         for i in range(4):
-            meteor = Meteoros(random.choice(lista_meteoros))
-            tudo.add(meteor)
-            enemy_group.add(meteor)
+            novo_meteoro(lista_meteoros, tudo, enemy_group)
             
         tudo.add(enemy_group)
         tudo.add(nave_group)
@@ -480,7 +503,6 @@ def main():
         y = 0
         Musicas(randrange(0,2))
         fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
-        conta_vidas = 3
         
         while Game:
             relogio.tick(FPS)
@@ -547,152 +569,125 @@ def main():
             (enemy_group, nave_group, True,
             False, pygame.sprite.collide_circle)
             
-            if hits or pipocos:
+            for hit in hits:
                 crash_sound.play()
-                conta_vidas -= 1
-                if conta_vidas > 0:
-                    for hit in hits:
-                        expl = Explosion(hit.rect.center, 'sm')
-                        tudo.add(expl)
-                    for pipoco in pipocos:
-                        expl = Explosion(pipoco.rect.center, 'sm')
-                        tudo.add(expl)
-                else:
-                    for hit in hits:
-                        death_expl = Explosion(nave.rect.center, 'lg')
-                        tudo.add(death_expl)
-                    for pipoco in pipocos:
-                        death_expl = Explosion(nave.rect.center, 'lg')
-                        tudo.add(death_expl)
-                if conta_vidas == 2:
-                    for hit in hits:
-                        expl = Explosion(hit.rect.center, 'sm')
-                        tudo.add(expl)
-                    for pipoco in pipocos:
-                        expl = Explosion(pipoco.rect.center, 'sm')
-                        tudo.add(expl)
-                    vida3.kill()
-                elif conta_vidas == 1:
-                    for hit in hits:
-                        expl = Explosion(hit.rect.center, 'sm')
-                        tudo.add(expl)
-                    for pipoco in pipocos:
-                        expl = Explosion(pipoco.rect.center, 'sm')
-                        tudo.add(expl)
-                    vida2.kill()
-                elif conta_vidas == 0:
-                    for hit in hits:
-                        death_expl = Explosion(nave.rect.center, 'lg')
-                        tudo.add(death_expl)
-                    for pipoco in pipocos:
-                        death_expl = Explosion(nave.rect.center, 'lg')
-                        tudo.add(death_expl)
-                        
-                    vida1.kill()
-                    Game = False
-                    Musicas(3)
-                    over = True
-                    x = 0
+                nave.shield -= hit.radius * 1.5
+                novo_meteoro(lista_meteoros, tudo, enemy_group)
+                expl = Explosion(hit.rect.center, 'sm')
+                tudo.add(expl)
                 
-                    go = pygame.image.load("Assets/StarBackground.jpg").convert()
-                    while over:
-                        for event in pygame.event.get():
-                            if event.type == pygame.QUIT:
-                                pygame.quit()
-                                quit()
-                            
-                        pressed_keys = pygame.key.get_pressed()
-                            
-                        if pressed_keys[pygame.K_r]:
-                            over = False
-                            Game = True
-                            loop = True
-                            intro = False
-                            instruction = False
-                            conta_vidas = 3
-                            start = time.time()
-                            tempo_pause = 0
-                                
-                            enemy_group = pygame.sprite.Group()
-                            nave_group = pygame.sprite.Group()
-                            bullets_group = pygame.sprite.Group()
-                            enemy_bullets = pygame.sprite.Group()
-                            mobs = pygame.sprite.Group()
-                            tudo = pygame.sprite.Group()
-                            
-                            fundo = pygame.image.load\
-                            ("Assets/StarBackground.jpg").convert()
-                            
-                            nave = Nave(random.choice(lista_naves))
-                            nave_group.add(nave)
-                            
-                            vida1 = Vida('Assets/Lives.png', WIDTH - 10)
-                            vida2 = Vida('Assets/Lives.png',
-                                         -vida1.rect.width + WIDTH - 20)
-                            vida3 = Vida('Assets/Lives.png',
-                                         -2 * vida1.rect.width + WIDTH - 30)
-                            
-                            vidas.add(vida1, vida2, vida3)
-                            
-                            for i in range(4):
-                                meteor = Meteoros(random.choice(lista_meteoros))
-                                tudo.add(meteor)
-                                enemy_group.add(meteor)
-                                
-                            tudo.add(enemy_group)
-                            tudo.add(nave_group)
-                            tudo.add(vidas)
-                            Musicas(randrange(0,2))
-                            score = 0
-                            score_tiros = 0
-                            
-                        if pressed_keys[pygame.K_q]:
-                            over = False
-                            intro = True
-                            instruction = False
-                            Game = False
-                            loop = True
-                              
-                        rel_x = x % go.get_rect().width
-                        tela.blit(go, (rel_x - go.get_rect().width, 0))
-                        if rel_x < WIDTH:
-                            tela.blit(go, (rel_x, 0))
-                        x += 2
+                if nave.shield <= 0:
+                    death_explosion = Explosion(nave.rect.center, 'nave')
+                    tudo.add(death_explosion)
+                    nave.hide()
+                    nave.lives -= 1
+                    nave.shield = 100
+                    
+            for pipoco in pipocos:
+                crash_sound.play()
+                nave.shield -= 50
+                expl = Explosion(pipoco.rect.center, 'sm')
+                tudo.add(expl)
+                
+                if nave.shield <= 0:
+                    death_explosion = Explosion(nave.rect.center, 'nave')
+                    tudo.add(death_explosion)
+                    nave.hide()
+                    nave.lives -= 1
+                    nave.shield = 100
+                    
+            if nave.lives == 0:
+                nave.kill()
+            if nave.lives == 0 and not death_explosion.alive():
+                Game = False
+                Musicas(3)
+                over = True
+                x = 0
+                
+                go = pygame.image.load("Assets/StarBackground.jpg").convert()
+                while over:
+                    for event in pygame.event.get():
+                        if event.type == pygame.QUIT:
+                            pygame.quit()
+                            quit()
                         
-                        mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 100, 130,
-                                 WHITE)
-                        mensagem('Press R to restart', WIDTH/2, HEIGHT/2 + 10,
+                    pressed_keys = pygame.key.get_pressed()
+                    
+                    if pressed_keys[pygame.K_r]:
+                        over = False
+                        Game = True
+                        loop = True
+                        intro = False
+                        instruction = False
+                        start = time.time()
+                        tempo_pause = 0
+                        
+                        enemy_group = pygame.sprite.Group()
+                        nave_group = pygame.sprite.Group()
+                        bullets_group = pygame.sprite.Group()
+                        enemy_bullets = pygame.sprite.Group()
+                        mobs = pygame.sprite.Group()
+                        tudo = pygame.sprite.Group()
+                        fundo = pygame.image.load\
+                        ("Assets/StarBackground.jpg").convert()
+
+                        nave = Nave(random.choice(lista_naves))
+                        nave_group.add(nave)
+
+                        for i in range(4):
+                            novo_meteoro(lista_meteoros, tudo, enemy_group)
+
+                        tudo.add(enemy_group)
+                        tudo.add(nave_group)
+                        tudo.add(vidas)
+                        Musicas(randrange(0,2))
+                        score = 0
+                        score_tiros = 0
+
+                    if pressed_keys[pygame.K_q]:
+                        over = False
+                        intro = True
+                        instruction = False
+                        Game = False
+                        loop = True
+
+                    rel_x = x % go.get_rect().width
+                    tela.blit(go, (rel_x - go.get_rect().width, 0))
+                    if rel_x < WIDTH:
+                        tela.blit(go, (rel_x, 0))
+                    x += 2
+
+                    mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 100, 130, WHITE)
+                    mensagem('Press R to restart', WIDTH/2, HEIGHT/2 + 10,
                                  50, LIGHTGREEN)
-                        mensagem('Press Q to go back to the Menu', WIDTH/2,
+                    mensagem('Press Q to go back to the Menu', WIDTH/2,
                                  HEIGHT/2 + 100, 50, LIGHTRED)
-                            
-                        pygame.display.update()
-                        relogio.tick(FPS)
-            
-            
+
+                    pygame.display.update()
+                    relogio.tick(FPS)
+
             if Game:
+                '''desenhando escudo'''
+                shield(tela, 5, 5, nave.shield)
+                '''desenhando vidas'''
+                draw_lives(tela, WIDTH - 100, 5, nave.lives, vida)
                 '''Tiro da Nave acerta nos inimigos'''
                 tiros = pygame.sprite.groupcollide\
                 (enemy_group, bullets_group, True,
-                 True, pygame.sprite.collide_circle)
-                
+                True, pygame.sprite.collide_circle)
+
                 for tiro in tiros:
                     if score < 100:
+                        novo_meteoro(lista_meteoros, tudo, enemy_group)
                         random.choice(exp_sounds).play()
-                        meteor = Meteoros(random.choice(lista_meteoros))
-                        tudo.add(meteor)
-                        enemy_group.add(meteor)
                         expl = Explosion(tiro.rect.center, 'sm')
                         tudo.add(expl)
                     if score >= 100:
+                        novo_atirador(tudo, enemy_group, mobs)
                         random.choice(exp_sounds).play()
-                        mob = Atirador('Assets/enemy_atirador.png')
-                        tudo.add(mob)
-                        enemy_group.add(mob)
-                        mobs.add(mob)
                         expl = Explosion(tiro.rect.center, 'lg')
                         tudo.add(expl)
-                    
+
                     score_tiros += 100 - tiro.radius
                     if random.random() > 0.8:
                         pow = Pow(tiro.rect.center)
@@ -701,13 +696,16 @@ def main():
                 
                 if score >= 100:
                     for mob in mobs:
-                        if randrange(1, 200) == 5:
+                        if randrange(1, 250) == 5:
                             mob.enemy_shoot(tudo, enemy_bullets)
                 
                 hits = pygame.sprite.groupcollide\
                 (nave_group, powerups_group, False, True)
                 for hit in hits:
-                    #if hit.type == 'shield':
+                    if hit.type == 'shield':
+                        nave.shield += 20
+                        if nave.shield >= 100:
+                            nave.shield = 100
                         
                     if hit.type == 'gun':
                         nave.powerup()
@@ -741,6 +739,7 @@ powerups_images['gun'] = pygame.image.load("Assets/mis.gif").convert()
 explosion ={}
 explosion['lg'] = []
 explosion['sm'] = []
+explosion['nave'] = []
 for i in range(9):
     explo = 'Assets/regularExplosion0{}.png'.format(i)
     img = pygame.image.load(explo).convert()
@@ -749,6 +748,10 @@ for i in range(9):
     explosion['lg'].append(img_lg)
     img_sm = pygame.transform.scale(img, (75, 75))
     explosion['sm'].append(img_sm)
+    img_nave = pygame.transform.scale(img, (150, 150))
+    explosion['nave'].append(img_nave)
+    
+vida = pygame.image.load('Assets/Lives.png').convert()
 
 #===========================     Funcionamento     ===========================#
 relogio =  pygame.time.Clock()
