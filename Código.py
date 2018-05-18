@@ -7,6 +7,11 @@ https://www.youtube.com/channel/UCNaPQ5uLX5iIEHUCLmfAgKg
 
 Frozen Jam by tgfcoder <https://twitter.com/tgfcoder> 
 licensed under CC-BY-3 <http://creativecommons.org/licenses/by/3.0/>
+
+Cosmic Storm by A Himitsu https://soundcloud.com/a-himitsu
+Creative Commons — Attribution 3.0 Unported— CC BY 3.0 
+http://creativecommons.org/licenses/b...
+Music promoted by Audio Library https://youtu.be/U4wXUdhNxZk
 """
 import pygame
 from random import randrange
@@ -33,6 +38,7 @@ class Nave(pygame.sprite.Sprite):
         self.hide_timer = pygame.time.get_ticks()
         self.shoot_delay = 250
         self.last_shot = pygame.time.get_ticks()
+        
         
     def update(self):
         self.vx = 0
@@ -323,7 +329,7 @@ def novo_atirador(tudo, enemy_group, mobs):
 def shield(surf, x, y, pct):
     if pct < 0:
         pct = 0
-    BAR_LENGTH = 200
+    BAR_LENGTH = 100
     BAR_HEIGHT = 20
     fill = (pct / 100) * BAR_LENGTH
     outline_rect = pygame.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
@@ -334,7 +340,7 @@ def shield(surf, x, y, pct):
 def draw_lives(surf, x, y, lives, img):
     for i in range(lives):
         img_rect = img.get_rect()
-        img_rect.x = x + 30 * i
+        img_rect.x = x + 35 * i
         img_rect.y = y
         surf.blit(img, img_rect)
     
@@ -581,7 +587,7 @@ def main():
                 expl = Explosion(hit.rect.center, 'sm')
                 tudo.add(expl)
                 
-                if nave.shield <= 0:
+                if nave.shield < 1:
                     death_explosion = Explosion(nave.rect.center, 'nave')
                     tudo.add(death_explosion)
                     nave.hide()
@@ -594,7 +600,7 @@ def main():
                 expl = Explosion(pipoco.rect.center, 'sm')
                 tudo.add(expl)
                 
-                if nave.shield <= 0:
+                if nave.shield < 1:
                     death_explosion = Explosion(nave.rect.center, 'nave')
                     tudo.add(death_explosion)
                     nave.hide()
@@ -673,35 +679,35 @@ def main():
 
             if Game:
                 '''desenhando escudo'''
-                shield(tela, 5, 5, nave.shield)
+                shield(tela, 10, 50, nave.shield)
                 '''desenhando vidas'''
-                draw_lives(tela, WIDTH - 100, 5, nave.lives, vida)
+                draw_lives(tela, 10, 10, nave.lives, vida)
                 '''Tiro da Nave acerta nos inimigos'''
                 tiros = pygame.sprite.groupcollide\
                 (enemy_group, bullets_group, True,
                 True, pygame.sprite.collide_circle)
 
                 for tiro in tiros:
-                    if score < 100:
+                    if score < 2000:
                         novo_meteoro(lista_meteoros, tudo, enemy_group)
                         random.choice(exp_sounds).play()
                         expl = Explosion(tiro.rect.center, 'sm')
                         tudo.add(expl)
-                    if score >= 100:
+                    if score >= 2000:
                         novo_atirador(tudo, enemy_group, mobs)
                         random.choice(exp_sounds).play()
                         expl = Explosion(tiro.rect.center, 'lg')
                         tudo.add(expl)
 
                     score_tiros += 100 - tiro.radius
-                    if random.random() > 0.8:
+                    if random.random() > 0.9:
                         pow = Pow(tiro.rect.center)
                         tudo.add(pow)
                         powerups_group.add(pow)
                 
-                if score >= 100:
+                if score >= 2000:
                     for mob in mobs:
-                        if randrange(1, 250) == 5:
+                        if randrange(1, 300) == 5:
                             mob.enemy_shoot(tudo, enemy_bullets)
                 
                 hits = pygame.sprite.spritecollide\
