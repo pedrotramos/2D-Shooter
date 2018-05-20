@@ -343,6 +343,12 @@ def draw_lives(surf, x, y, lives, img):
         img_rect.x = x + 35 * i
         img_rect.y = y
         surf.blit(img, img_rect)
+        
+def draw_ship_options(surf, x, y, img):
+    img_rect = img.get_rect()
+    img_rect.centerx = x
+    img_rect.centery = y
+    surf.blit(img, img_rect)
     
 def cronometro(value):
     valueD = (((value/365)/24)/60)
@@ -396,29 +402,30 @@ def main():
         mn = pygame.image.load("Assets/StarBackground.jpg").convert()
         Musicas(2)
         while intro:
+
             pressed_keys = pygame.key.get_pressed()
             
             if pressed_keys[pygame.K_ESCAPE]:
                 Game = False
+                escolha_nave = False
                 intro = False
                 instruction = False
                 loop = False
                 sair()
             if pressed_keys[pygame.K_RETURN]:
-                Game = True
+                Game = False
+                escolha_nave = True
                 intro = False
                 instruction = False
-                start = time.time()
-                tempo_pause = 0
             if pressed_keys[pygame.K_i]:
                 Game = False
+                escolha_nave = False
                 intro = False
                 instruction = True
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    quit()
+                    sair()
                     
             rel_x = x % mn.get_rect().width
             tela.blit(mn, (rel_x - mn.get_rect().width, 0))
@@ -439,19 +446,19 @@ def main():
             
             pygame.display.update()
             relogio.tick(FPS)
-    
+            
         x = 0
         inst = pygame.image.load("Assets/StarBackground.jpg").convert()
+        
         while instruction:
             
             pressed_keys = pygame.key.get_pressed()
             
             if pressed_keys[pygame.K_RETURN]:
-                Game = True
+                Game = False
+                escolha_nave = True
                 intro = False
                 instruction = False
-                start = time.time()
-                tempo_pause = 0
             if pressed_keys[pygame.K_q]:
                 Game = False
                 intro = True
@@ -459,8 +466,7 @@ def main():
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    pygame.quit()
-                    quit()
+                    sair()
                     
             rel_x = x % inst.get_rect().width
             tela.blit(inst, (rel_x - inst.get_rect().width, 0))
@@ -480,41 +486,170 @@ def main():
             
             pygame.display.update()
             relogio.tick(FPS)
-        
-        enemy_group = pygame.sprite.Group()
-        nave_group = pygame.sprite.Group()
-        bullets_group = pygame.sprite.Group()
-        enemy_bullets = pygame.sprite.Group()
-        powerups_group = pygame.sprite.Group()
-        tudo = pygame.sprite.Group()
-        vidas = pygame.sprite.Group()
-        mobs = pygame.sprite.Group()
             
-        fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
-        
-        lista_naves = ['Assets/MilleniumFalcon.png', 'Assets/Galaga.png',
-                       'Assets/X-Wing.png']
-        
-        nave = Nave(random.choice(lista_naves))
-        nave_group.add(nave)
-
-        
-        lista_meteoros = ['Assets/asteroid.gif', 'Assets/meteor2_s.gif',
-                          'Assets/fire_meteor_xs.gif']
-    
-        for i in range(4):
-            novo_meteoro(lista_meteoros, tudo, enemy_group)
-            
-        tudo.add(enemy_group)
-        tudo.add(nave_group)
-        tudo.add(vidas)
-        
-        score_tiros = 0
-        score = 0
         y = 0
-        Musicas(randrange(0,2))
-        fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
-        
+        img_escolha = pygame.image.load("Assets/StarBackground.jpg").convert()    
+            
+        while escolha_nave:
+            
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    sair()
+                    
+            ship1 = 'Assets/MilleniumFalcon.png'
+            
+            img1 = pygame.image.load(ship1)
+            img1 = pygame.transform.scale(img1, (200, 200))
+            
+            ship2 = 'Assets/X-Wing.png'
+            
+            img2 = pygame.image.load(ship2)
+            img2 = pygame.transform.scale(img2, (200, 200))
+            
+            ship3 = 'Assets/Galaga.png'
+            
+            img3 = pygame.image.load(ship3)
+            img3 = pygame.transform.scale(img3, (200, 200))
+            
+            draw_ship_options(tela, WIDTH/2 - 250, HEIGHT/2, img1)
+            draw_ship_options(tela, WIDTH/2, HEIGHT/2, img2)
+            draw_ship_options(tela, WIDTH/2 + 250, HEIGHT/2, img3)
+            
+            pressed_keys = pygame.key.get_pressed()
+            
+            nave_group = pygame.sprite.Group()
+            
+            if pressed_keys[pygame.K_1]:
+                nave = Nave(ship1)
+                nave_group.add(nave)
+                escolha_nave = False
+                intro = False
+                Game = True
+                instruction = False
+                over = False
+                start = time.time()
+                tempo_pause = 0
+                enemy_group = pygame.sprite.Group()
+                bullets_group = pygame.sprite.Group()
+                enemy_bullets = pygame.sprite.Group()
+                powerups_group = pygame.sprite.Group()
+                tudo = pygame.sprite.Group()
+                vidas = pygame.sprite.Group()
+                mobs = pygame.sprite.Group()
+                    
+                fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
+           
+                lista_meteoros = ['Assets/asteroid.gif', 'Assets/meteor2_s.gif',
+                                  'Assets/fire_meteor_xs.gif']
+            
+                for i in range(4):
+                    novo_meteoro(lista_meteoros, tudo, enemy_group)
+                    
+                tudo.add(enemy_group)
+                tudo.add(nave_group)
+                tudo.add(vidas)
+                
+                score_tiros = 0
+                score = 0
+                y = 0
+                Musicas(randrange(0,2))
+                fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
+            elif pressed_keys[pygame.K_2]:
+                nave = Nave(ship2)
+                nave_group.add(nave)
+                escolha_nave = False
+                intro = False
+                Game = True
+                instruction = False
+                over = False
+                start = time.time()
+                tempo_pause = 0
+                enemy_group = pygame.sprite.Group()
+                bullets_group = pygame.sprite.Group()
+                enemy_bullets = pygame.sprite.Group()
+                powerups_group = pygame.sprite.Group()
+                tudo = pygame.sprite.Group()
+                vidas = pygame.sprite.Group()
+                mobs = pygame.sprite.Group()
+                    
+                fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
+           
+                lista_meteoros = ['Assets/asteroid.gif', 'Assets/meteor2_s.gif',
+                                  'Assets/fire_meteor_xs.gif']
+            
+                for i in range(4):
+                    novo_meteoro(lista_meteoros, tudo, enemy_group)
+                    
+                tudo.add(enemy_group)
+                tudo.add(nave_group)
+                tudo.add(vidas)
+                
+                score_tiros = 0
+                score = 0
+                y = 0
+                Musicas(randrange(0,2))
+                fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
+            elif pressed_keys[pygame.K_3]:
+                nave = Nave(ship3)
+                nave_group.add(nave)
+                escolha_nave = False
+                intro = False
+                Game = True
+                instruction = False
+                over = False
+                start = time.time()
+                tempo_pause = 0
+                enemy_group = pygame.sprite.Group()
+                bullets_group = pygame.sprite.Group()
+                enemy_bullets = pygame.sprite.Group()
+                powerups_group = pygame.sprite.Group()
+                tudo = pygame.sprite.Group()
+                vidas = pygame.sprite.Group()
+                mobs = pygame.sprite.Group()
+                    
+                fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
+           
+                lista_meteoros = ['Assets/asteroid.gif', 'Assets/meteor2_s.gif',
+                                  'Assets/fire_meteor_xs.gif']
+            
+                for i in range(4):
+                    novo_meteoro(lista_meteoros, tudo, enemy_group)
+                    
+                tudo.add(enemy_group)
+                tudo.add(nave_group)
+                tudo.add(vidas)
+                
+                score_tiros = 0
+                score = 0
+                y = 0
+                Musicas(randrange(0,2))
+                fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
+            elif pressed_keys[pygame.K_q]:
+                escolha_nave = False
+                Game = False
+                instruction = False
+                over = False
+                intro = True
+            
+            
+            mensagem('PICK YOUR SHIP', WIDTH/2, 50, 100, YELLOW)
+            
+            mensagem('1', WIDTH/2 - 250, HEIGHT/2 - 120, 30, YELLOW)
+            mensagem('2', WIDTH/2, HEIGHT/2 - 120, 30, YELLOW)
+            mensagem('3', WIDTH/2 + 250, HEIGHT/2 - 120, 30, YELLOW)
+            
+            mensagem('Press Q to go back to the Menu', WIDTH/2, HEIGHT/2 + 150,
+                     50, LIGHTRED)
+            
+            rel_y = y % img_escolha.get_rect().height
+            tela.blit(img_escolha, (0, rel_y - img_escolha.get_rect().height))
+            if rel_y < HEIGHT:
+                tela.blit(img_escolha, (0, rel_y))
+            y += 2
+            
+            pygame.display.update()
+            relogio.tick(FPS)
+                
         while Game:
             relogio.tick(FPS)
             agora = time.time()
@@ -541,8 +676,7 @@ def main():
                             
                             for event in pygame.event.get():
                                 if event.type == pygame.QUIT:
-                                    pygame.quit()
-                                    quit()
+                                    sair()
                                 if event.type == pygame.KEYDOWN:
                                     if event.key != pygame.K_q:
                                         fim_pause = time.time()
@@ -587,12 +721,23 @@ def main():
                 expl = Explosion(hit.rect.center, 'sm')
                 tudo.add(expl)
                 
-                if nave.shield < 1:
+                if nave.shield < 1 and nave.lives > 1:
                     death_explosion = Explosion(nave.rect.center, 'nave')
                     tudo.add(death_explosion)
                     nave.hide()
                     nave.lives -= 1
                     nave.shield = 100
+                    nave.rect.centerx = WIDTH/2
+                    nave.rect.bottom = HEIGHT - 10
+                    
+                elif nave.shield < 1 and nave.lives == 1:
+                    death_explosion = Explosion(nave.rect.center, 'nave')
+                    tudo.add(death_explosion)
+                    nave.hide()
+                    nave.lives -= 1
+                    nave.shield = 0
+                    nave.rect.centerx = WIDTH/2
+                    nave.rect.bottom = HEIGHT - 10
                     
             for pipoco in pipocos:
                 crash_sound.play()
@@ -619,8 +764,7 @@ def main():
                 while over:
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
-                            pygame.quit()
-                            quit()
+                            sair()
                         
                     pressed_keys = pygame.key.get_pressed()
                     
@@ -632,6 +776,8 @@ def main():
                         instruction = False
                         start = time.time()
                         tempo_pause = 0
+                        nave.lives = 3
+                        nave.shield = 100
                         
                         enemy_group = pygame.sprite.Group()
                         nave_group = pygame.sprite.Group()
@@ -642,7 +788,6 @@ def main():
                         fundo = pygame.image.load\
                         ("Assets/StarBackground.jpg").convert()
 
-                        nave = Nave(random.choice(lista_naves))
                         nave_group.add(nave)
 
                         for i in range(4):
