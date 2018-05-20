@@ -30,6 +30,8 @@ class Nave(pygame.sprite.Sprite):
         self.rect.centerx = WIDTH / 2
         self.rect.bottom = HEIGHT - 5
         self.vx = 0
+        self.vy = 0
+        self.speed = 5
         self.power = 1
         self.power_time = pygame.time.get_ticks()
         self.shield = 100
@@ -50,30 +52,30 @@ class Nave(pygame.sprite.Sprite):
         """ MOVIMENTO HORIZONTAL E VERTICAL """
         if keystate[pygame.K_LEFT] and not keystate[pygame.K_UP] and not\
         keystate[pygame.K_DOWN] and not keystate[pygame.K_RIGHT]:
-            self.vx = -5
+            self.vx = -self.speed
         if keystate[pygame.K_RIGHT] and not keystate[pygame.K_UP] and not \
         keystate[pygame.K_DOWN] and not keystate[pygame.K_LEFT]:
-            self.vx = 5
+            self.vx = self.speed
         if keystate[pygame.K_UP] and not keystate[pygame.K_RIGHT] and not \
         keystate[pygame.K_DOWN] and not keystate[pygame.K_LEFT]:
-            self.vy = -5
+            self.vy = -self.speed
         if keystate[pygame.K_DOWN] and not keystate[pygame.K_UP] and not \
         keystate[pygame.K_RIGHT] and not keystate[pygame.K_LEFT]:
-            self.vy = 5
+            self.vy = self.speed
         """ MOVIMENTO DIAGONAL """ 
         # xˆ2 + xˆ2 = 25 => 2xˆ2 = 25 => xˆ2 = 25/2 => x = 12.5ˆ(1/2)
         if keystate[pygame.K_LEFT] and keystate[pygame.K_UP]:
-            self.vx = -(12.5 ** (1/2))
-            self.vy = -(12.5 ** (1/2))
+            self.vx = -(((self.speed ** 2) / 2) ** (1/2))
+            self.vy = -(((self.speed ** 2) / 2) ** (1/2))
         if keystate[pygame.K_LEFT] and keystate[pygame.K_DOWN]:
-            self.vx = -(12.5 ** (1/2))
-            self.vy = (12.5 ** (1/2))
+            self.vx = -(((self.speed ** 2) / 2) ** (1/2))
+            self.vy = ((self.speed ** 2) / 2) ** (1/2)
         if keystate[pygame.K_RIGHT] and keystate[pygame.K_DOWN]:
-            self.vx = (12.5 ** (1/2))
-            self.vy = (12.5 ** (1/2))
+            self.vx = ((self.speed ** 2) / 2) ** (1/2)
+            self.vy = ((self.speed ** 2) / 2) ** (1/2)
         if keystate[pygame.K_RIGHT] and keystate[pygame.K_UP]:
-            self.vx = (12.5 ** (1/2))
-            self.vy = -(12.5 ** (1/2))
+            self.vx = ((self.speed ** 2) / 2) ** (1/2)
+            self.vy = -(((self.speed ** 2) / 2) ** (1/2))
         '''Impedindo a saida da tela'''
         self.rect.x += self.vx
         self.rect.y += self.vy
@@ -98,27 +100,27 @@ class Nave(pygame.sprite.Sprite):
         self.hidden = True
         self.hide_timer = pygame.time.get_ticks()
         
-    def shoot(self, tudo, bullets_group):
+    def shoot(self, img_tiros, tudo, bullets_group):
         now = pygame.time.get_ticks()
         if now - self.last_shot > self.shoot_delay:
             self.last_shot = now
         if self.power == 1:
-            tiro = Tiros('Assets/tiro1.png', self.rect.centerx, self.rect.top)
+            tiro = Tiros(img_tiros, self.rect.centerx, self.rect.top)
             tudo.add(tiro)
             bullets_group.add(tiro)
             shoot_sound.play()
         if self.power == 2:
-            tiro1 = Tiros('Assets/tiro1.png', self.rect.left, self.rect.centery)
-            tiro2 = Tiros('Assets/tiro1.png', self.rect.right, self.rect.centery)
+            tiro1 = Tiros(img_tiros, self.rect.left, self.rect.centery)
+            tiro2 = Tiros(img_tiros, self.rect.right, self.rect.centery)
             tudo.add(tiro1)
             tudo.add(tiro2)
             bullets_group.add(tiro1)
             bullets_group.add(tiro2)
             shoot_sound.play()
         if self.power >= 3:
-            tiro1 = Tiros('Assets/tiro1.png', self.rect.left, self.rect.centery)
-            tiro2 = Tiros('Assets/tiro1.png', self.rect.right, self.rect.centery)
-            tiro3 = Tiros('Assets/tiro1.png', self.rect.centerx, self.rect.top)
+            tiro1 = Tiros(img_tiros, self.rect.left, self.rect.centery)
+            tiro2 = Tiros(img_tiros, self.rect.right, self.rect.centery)
+            tiro3 = Tiros(img_tiros, self.rect.centerx, self.rect.top)
             tudo.add(tiro1)
             tudo.add(tiro2)
             tudo.add(tiro3)
@@ -552,6 +554,8 @@ def main():
                 tudo = pygame.sprite.Group()
                 vidas = pygame.sprite.Group()
                 mobs = pygame.sprite.Group()
+                                
+                img_tiros = 'Assets/tiro3.png'
                     
                 fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
            
@@ -588,7 +592,9 @@ def main():
                 tudo = pygame.sprite.Group()
                 vidas = pygame.sprite.Group()
                 mobs = pygame.sprite.Group()
-                    
+                
+                img_tiros = 'Assets/tiro1.png'
+                                    
                 fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
            
                 lista_meteoros = ['Assets/asteroid.gif', 'Assets/meteor2_s.gif',
@@ -624,6 +630,8 @@ def main():
                 tudo = pygame.sprite.Group()
                 vidas = pygame.sprite.Group()
                 mobs = pygame.sprite.Group()
+                
+                img_tiros = 'Assets/tiro2.png'
                     
                 fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
            
@@ -660,7 +668,7 @@ def main():
                     loop = False
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
-                        nave.shoot(tudo, bullets_group)
+                        nave.shoot(img_tiros, tudo, bullets_group)
                     elif event.key == pygame.K_p:
                         pause = True
                         inicio_pause = time.time()
@@ -886,7 +894,7 @@ WIDTH = 1000
 HEIGHT = 600
 
 tela = pygame.display.set_mode((WIDTH, HEIGHT), 0, 32)
-pygame.display.set_caption('2D Shooter')
+pygame.display.set_caption('GOTU')
 
 powerups_images = {}
 powerups_images['shield'] = pygame.image.load("Assets/Shield.gif").convert()
