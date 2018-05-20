@@ -496,24 +496,40 @@ def main():
                 if event.type == pygame.QUIT:
                     sair()
                     
+            rel_y = y % img_escolha.get_rect().height
+            tela.blit(img_escolha, (0, rel_y - img_escolha.get_rect().height))
+            if rel_y < HEIGHT:
+                tela.blit(img_escolha, (0, rel_y))
+            y += 2
+                    
             ship1 = 'Assets/MilleniumFalcon.png'
             
             img1 = pygame.image.load(ship1)
-            img1 = pygame.transform.scale(img1, (200, 200))
+            image1 = pygame.transform.scale(img1, (150, 206))
             
             ship2 = 'Assets/X-Wing.png'
             
             img2 = pygame.image.load(ship2)
-            img2 = pygame.transform.scale(img2, (200, 200))
+            image2 = pygame.transform.scale(img2, (150, 154))
             
             ship3 = 'Assets/Galaga.png'
             
             img3 = pygame.image.load(ship3)
-            img3 = pygame.transform.scale(img3, (200, 200))
+            image3 = pygame.transform.scale(img3, (150, 180))
+        
+            mensagem('PICK YOUR SHIP', WIDTH/2, 50, 100, YELLOW)    
+            draw_ship_options(tela, WIDTH/2 - 250, HEIGHT/2, image1)
+            mensagem('Press 1', WIDTH/2 -250, HEIGHT/2 - 150, 30, WHITE)
+            draw_ship_options(tela, WIDTH/2, HEIGHT/2, image2)
+            mensagem('Press 2', WIDTH/2, HEIGHT/2 - 150, 30, WHITE)
+            draw_ship_options(tela, WIDTH/2 + 250, HEIGHT/2, image3)
+            mensagem('Press 3', WIDTH/2 + 250, HEIGHT/2 - 150, 30, WHITE)
             
-            draw_ship_options(tela, WIDTH/2 - 250, HEIGHT/2, img1)
-            draw_ship_options(tela, WIDTH/2, HEIGHT/2, img2)
-            draw_ship_options(tela, WIDTH/2 + 250, HEIGHT/2, img3)
+            mensagem('Press Q to go back to the Menu', WIDTH/2, HEIGHT/2 + 250,
+                     50, LIGHTRED)
+            
+            relogio.tick(FPS)
+            pygame.display.update()
             
             pressed_keys = pygame.key.get_pressed()
             
@@ -554,6 +570,7 @@ def main():
                 y = 0
                 Musicas(randrange(0,2))
                 fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
+                
             elif pressed_keys[pygame.K_2]:
                 nave = Nave(ship2)
                 nave_group.add(nave)
@@ -589,6 +606,7 @@ def main():
                 y = 0
                 Musicas(randrange(0,2))
                 fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
+                
             elif pressed_keys[pygame.K_3]:
                 nave = Nave(ship3)
                 nave_group.add(nave)
@@ -624,31 +642,13 @@ def main():
                 y = 0
                 Musicas(randrange(0,2))
                 fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
+                
             elif pressed_keys[pygame.K_q]:
                 escolha_nave = False
                 Game = False
                 instruction = False
                 over = False
                 intro = True
-            
-            
-            mensagem('PICK YOUR SHIP', WIDTH/2, 50, 100, YELLOW)
-            
-            mensagem('1', WIDTH/2 - 250, HEIGHT/2 - 120, 30, YELLOW)
-            mensagem('2', WIDTH/2, HEIGHT/2 - 120, 30, YELLOW)
-            mensagem('3', WIDTH/2 + 250, HEIGHT/2 - 120, 30, YELLOW)
-            
-            mensagem('Press Q to go back to the Menu', WIDTH/2, HEIGHT/2 + 150,
-                     50, LIGHTRED)
-            
-            rel_y = y % img_escolha.get_rect().height
-            tela.blit(img_escolha, (0, rel_y - img_escolha.get_rect().height))
-            if rel_y < HEIGHT:
-                tela.blit(img_escolha, (0, rel_y))
-            y += 2
-            
-            pygame.display.update()
-            relogio.tick(FPS)
                 
         while Game:
             relogio.tick(FPS)
