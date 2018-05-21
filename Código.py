@@ -22,7 +22,7 @@ import time
 #==============================     Classes     ==============================#
 class Nave(pygame.sprite.Sprite):
     
-    def __init__(self, arquivo_imagem):
+    def __init__(self, arquivo_imagem, speed, shield):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(arquivo_imagem)
         self.rect = self.image.get_rect()
@@ -31,10 +31,10 @@ class Nave(pygame.sprite.Sprite):
         self.rect.bottom = HEIGHT - 5
         self.vx = 0
         self.vy = 0
-        self.speed = 5
+        self.speed = speed
         self.power = 1
         self.power_time = pygame.time.get_ticks()
-        self.shield = 100
+        self.shield = shield
         self.lives = 3
         self.hidden = False
         self.hide_timer = pygame.time.get_ticks()
@@ -328,12 +328,12 @@ def novo_atirador(tudo, enemy_group, mobs):
     enemy_group.add(mob)
     mobs.add(mob)
     
-def shield(surf, x, y, pct):
+def shield(surf, x, y, pct, maximo):
     if pct < 0:
         pct = 0
     BAR_LENGTH = 100
     BAR_HEIGHT = 20
-    fill = (pct / 100) * BAR_LENGTH
+    fill = (pct / maximo) * BAR_LENGTH
     outline_rect = pygame.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
     fill_rect = pygame.Rect(x, y, fill, BAR_HEIGHT)
     pygame.draw.rect(surf, GREEN, fill_rect)
@@ -522,11 +522,15 @@ def main():
             mensagem('PICK YOUR SHIP', WIDTH/2, 50, 100, YELLOW)    
             draw_ship_options(tela, WIDTH/2 - 250, HEIGHT/2, image1)
             mensagem('Press 1', WIDTH/2 -250, HEIGHT/2 - 150, 30, WHITE)
+            mensagem('Slow', WIDTH/2 -250, HEIGHT/2 + 125, 30, WHITE)
+            mensagem('Heavy Shield', WIDTH/2 -250, HEIGHT/2 + 150, 30, WHITE)
             draw_ship_options(tela, WIDTH/2, HEIGHT/2, image2)
             mensagem('Press 2', WIDTH/2, HEIGHT/2 - 150, 30, WHITE)
+            mensagem('Fast', WIDTH/2, HEIGHT/2 + 125, 30, WHITE)
+            mensagem('Light Shield', WIDTH/2, HEIGHT/2 + 150, 30, WHITE)
             draw_ship_options(tela, WIDTH/2 + 250, HEIGHT/2, image3)
             mensagem('Press 3', WIDTH/2 + 250, HEIGHT/2 - 150, 30, WHITE)
-            
+            mensagem('All-rounder', WIDTH/2 +250, HEIGHT/2 + 137.5, 30, WHITE)
             mensagem('Press Q to go back to the Menu', WIDTH/2, HEIGHT/2 + 250,
                      50, LIGHTRED)
             
@@ -538,7 +542,8 @@ def main():
             nave_group = pygame.sprite.Group()
             
             if pressed_keys[pygame.K_1]:
-                nave = Nave(ship1)
+                pct_shield = 125
+                nave = Nave(ship1, 4, pct_shield)
                 nave_group.add(nave)
                 escolha_nave = False
                 intro = False
@@ -576,7 +581,8 @@ def main():
                 fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
                 
             elif pressed_keys[pygame.K_2]:
-                nave = Nave(ship2)
+                pct_shield = 75
+                nave = Nave(ship2, 7.5, pct_shield)
                 nave_group.add(nave)
                 escolha_nave = False
                 intro = False
@@ -614,7 +620,8 @@ def main():
                 fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
                 
             elif pressed_keys[pygame.K_3]:
-                nave = Nave(ship3)
+                pct_shield = 100
+                nave = Nave(ship3, 5, pct_shield)
                 nave_group.add(nave)
                 escolha_nave = False
                 intro = False
@@ -734,7 +741,7 @@ def main():
                     tudo.add(death_explosion)
                     nave.hide()
                     nave.lives -= 1
-                    nave.shield = 100
+                    nave.shield = pct_shield
                     nave.rect.centerx = WIDTH/2
                     nave.rect.bottom = HEIGHT - 10
                     
@@ -785,7 +792,7 @@ def main():
                         start = time.time()
                         tempo_pause = 0
                         nave.lives = 3
-                        nave.shield = 100
+                        nave.shield = pct_shield
                         
                         enemy_group = pygame.sprite.Group()
                         nave_group = pygame.sprite.Group()
@@ -832,7 +839,7 @@ def main():
 
             if Game:
                 '''desenhando escudo'''
-                shield(tela, 10, 50, nave.shield)
+                shield(tela, 10, 50, nave.shield, pct_shield)
                 '''desenhando vidas'''
                 draw_lives(tela, 10, 10, nave.lives, vida)
                 '''Tiro da Nave acerta nos inimigos'''
@@ -868,8 +875,8 @@ def main():
                 for hit in hits:
                     if hit.type == 'shield':
                         nave.shield += 20
-                        if nave.shield >= 100:
-                            nave.shield = 100
+                        if nave.shield >= pct_shield:
+                            nave.shield = pct_shield
                         
                     if hit.type == 'gun':
                         nave.powerup()
