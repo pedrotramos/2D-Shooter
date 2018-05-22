@@ -305,6 +305,11 @@ exp_sounds = []
 for snd in ['Explosion1.wav', 'Explosion2.wav']:
     exp_sounds.append(pygame.mixer.Sound(path.join(snd_dir, snd)))
     
+#sons dos powerups 
+pow_sounds = []
+for snd in ['Pickup_Coin.wav', 'Pickup_Coin2.wav' ]:
+    pow_sounds.append(pygame.mixer.Sound(path.join(snd_dir, snd)))
+    
 #som da morte
 crash_sound = pygame.mixer.Sound(path.join(snd_dir, 'Crash.wav'))
 
@@ -858,10 +863,12 @@ def main():
                 for hit in hits:
                     if hit.type == 'shield':
                         nave.shield += 20
+                        pow_sounds[0].play()
                         if nave.shield >= pct_shield:
                             nave.shield = pct_shield
                         
                     if hit.type == 'gun':
+                        pow_sounds[1].play()
                         nave.powerup()
                         
                 if score >= 0:
