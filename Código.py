@@ -91,6 +91,7 @@ class Nave(pygame.sprite.Sprite):
         if self.lives > 1:
             if self.hidden and pygame.time.get_ticks() - self.hide_timer > 2000:
                 self.hidden = False
+                
             
     def powerup(self):
         self.power += 1
@@ -99,6 +100,7 @@ class Nave(pygame.sprite.Sprite):
     def hide(self):
         self.hidden = True
         self.hide_timer = pygame.time.get_ticks()
+        self.rect.center = (WIDTH / 2, HEIGHT + 200)
         
     def shoot(self, img_tiros, tudo, bullets_group):
         now = pygame.time.get_ticks()
@@ -582,7 +584,7 @@ def main():
                 
             elif pressed_keys[pygame.K_2]:
                 pct_shield = 75
-                nave = Nave(ship2, 7.5, pct_shield)
+                nave = Nave(ship2, 6, pct_shield)
                 nave_group.add(nave)
                 escolha_nave = False
                 intro = False
@@ -736,23 +738,12 @@ def main():
                 expl = Explosion(hit.rect.center, 'sm')
                 tudo.add(expl)
                 
-                if nave.shield < 1 and nave.lives > 1:
+                if nave.shield < 1:
                     death_explosion = Explosion(nave.rect.center, 'nave')
                     tudo.add(death_explosion)
                     nave.hide()
                     nave.lives -= 1
                     nave.shield = pct_shield
-                    nave.rect.centerx = WIDTH/2
-                    nave.rect.bottom = HEIGHT - 10
-                    
-                elif nave.shield < 1 and nave.lives == 1:
-                    death_explosion = Explosion(nave.rect.center, 'nave')
-                    tudo.add(death_explosion)
-                    nave.hide()
-                    nave.lives -= 1
-                    nave.shield = 0
-                    nave.rect.centerx = WIDTH/2
-                    nave.rect.bottom = HEIGHT - 10
                     
             for pipoco in pipocos:
                 crash_sound.play()
@@ -854,11 +845,19 @@ def main():
                         expl = Explosion(tiro.rect.center, 'sm')
                         tudo.add(expl)
                     if score >= 2000:
-                        novo_atirador(tudo, enemy_group, mobs)
-                        random.choice(exp_sounds).play()
-                        expl = Explosion(tiro.rect.center, 'lg')
-                        tudo.add(expl)
-
+                        inimigos = [1, 2]
+                        escolha = random.choice(inimigos)
+                        if escolha == 1:
+                            novo_atirador(tudo, enemy_group, mobs)
+                            random.choice(exp_sounds).play()
+                            expl = Explosion(tiro.rect.center, 'lg')
+                            tudo.add(expl)
+                        if escolha == 2:
+                            novo_meteoro(lista_meteoros, tudo, enemy_group)
+                            random.choice(exp_sounds).play()
+                            expl = Explosion(tiro.rect.center, 'sm')
+                            tudo.add(expl)
+                        
                     score_tiros += 100 - tiro.radius
                     if random.random() > 0.9:
                         pow = Pow(tiro.rect.center)
