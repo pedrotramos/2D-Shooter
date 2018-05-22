@@ -223,26 +223,40 @@ class Stalker(pygame.sprite.Sprite):
     
     def __init__(self, arquivo_imagem, alvo):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(arquivo_imagem)
+        self.image_orig = pygame.image.load(arquivo_imagem).convert()
+        self.image = self.image_orig.copy()
         self.rect = self.image.get_rect()
         self.radius = int(self.rect.width / 2)
         self.rect.centery = randrange(-150, -100)
         self.rect.centerx = randrange(0, 1000)
-        self.vy = 5
+        self.vy = 3
         self.alvo = alvo
+        self.rot = 0
+        self.rot_speed = randrange(-8, 8)
+        self.last_update = pygame.time.get_ticks()
         
     def update(self):
         if self.rect.centerx > self.alvo.rect.centerx:
-            self.vx = -1.5
+            self.vx = -2.5
         elif self.rect.centerx < self.alvo.rect.centerx:
-            self.vx = 1.5
+            self.vx = 2.5
         else:
             self.vx = 0
         self.rect.centerx += self.vx
         self.rect.centery += self.vy
-        
-            
-       
+        self.rotacao()
+    
+    def rotacao(self):
+        tempo = pygame.time.get_ticks()
+        if tempo - self.last_update > 10:
+            self.last_update = tempo
+            self.rot = (self.rot + self.rot_speed) % 360
+            new_image = pygame.transform.rotate(self.image_orig, self.rot)
+            old_center = self.rect.center
+            self.image = new_image
+            self.rect = self.image.get_rect()
+            self.rect.center = old_center
+
 class Atirador(pygame.sprite.Sprite):
     
     def __init__(self, arquivo_imagem):
@@ -326,6 +340,11 @@ enemy_shoot_sound = pygame.mixer.Sound(path.join(snd_dir, 'EnemyLaser.wav'))
 exp_sounds = []
 for snd in ['Explosion1.wav', 'Explosion2.wav']:
     exp_sounds.append(pygame.mixer.Sound(path.join(snd_dir, snd)))
+    
+#sons dos powerups
+pow_sounds = []
+for snd in ['Pickup_Coin.wav', 'Pickup_Coin2.wav' ]:
+    pow_sounds.append(pygame.mixer.Sound(path.join(snd_dir, snd)))
     
 #som da morte
 crash_sound = pygame.mixer.Sound(path.join(snd_dir, 'Crash.wav'))
@@ -913,7 +932,7 @@ def main():
                 
                 if score >= 2000:
                     for mob in mobs:
-                        if randrange(1, 300) == 5:
+                        if randrange(1, 200) == 5:
                             mob.enemy_shoot(tudo, enemy_bullets)
                 
                 hits = pygame.sprite.spritecollide\
@@ -923,9 +942,11 @@ def main():
                         nave.shield += 20
                         if nave.shield >= pct_shield:
                             nave.shield = pct_shield
+                            pow_sounds[1].play()
                         
                     if hit.type == 'gun':
                         nave.powerup()
+                        pow_sounds[0].play()
                         
                 if score >= 0:
                     mensagem('{0}'.format(score), WIDTH/2, 20, 30, YELLOW)
