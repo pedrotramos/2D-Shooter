@@ -246,6 +246,10 @@ class Stalker(pygame.sprite.Sprite):
         self.rect.centerx += self.vx
         self.rect.centery += self.vy
         self.rotacao()
+        if self.rect.top > HEIGHT or self.rect.right < 0 or \
+        self.rect.left > WIDTH:
+            self.rect.y = randrange(-100, -40)
+            self.rect.x = randrange(0, 1000)
     
     def rotacao(self):
         tempo = pygame.time.get_ticks()
@@ -769,7 +773,7 @@ def main():
                 tela.blit(fundo, (0, rel_y))
             y += 5
             
-            '''Meteoro bate na Nave'''
+            '''Inimigo bate na Nave'''
             hits = pygame.sprite.spritecollide\
             (nave, enemy_group, False, pygame.sprite.collide_circle)
             '''Tiro inimigo acerta a nave'''
@@ -814,6 +818,13 @@ def main():
                     nave.hide()
                     nave.lives -= 1
                     nave.shield = pct_shield
+                    
+                elif nave.shield < 1 and nave.lives == 1:
+                    death_explosion = Explosion(nave.rect.center, 'nave')
+                    tudo.add(death_explosion)
+                    nave.hide()
+                    nave.lives -= 1
+                    nave.shield = 0
                     
             if nave.lives == 0:
                 nave.kill()
@@ -927,7 +938,7 @@ def main():
                         tudo.add(pow)
                         powerups_group.add(pow)
                 
-                if score >= 2000:
+                if score >= 100:
                     for mob in mobs:
                         if randrange(1, 200) == 5:
                             mob.enemy_shoot(tudo, enemy_bullets)
