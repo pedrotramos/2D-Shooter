@@ -379,22 +379,6 @@ def mensagem(mensagem, x, y, tamanho, COR):
     TextSurf, TextRect = textos(mensagem, texto)
     TextRect.center = (x, y)
     tela.blit(TextSurf, TextRect)
-
-def sair():
-    pygame.quit()
-    quit()
-
-def botao(msg, x, y, w, h, cor, cor_mouse):
-    mouse = pygame.mouse.get_pos()
-        
-    if x + w > mouse[0] > x and\
-    y + h > mouse[1] > y:
-        pygame.draw.rect(tela, cor_mouse, (x, y, w, h))
-            
-    else:
-        pygame.draw.rect(tela, cor, (x, y, w, h))
-    
-    mensagem(msg, x + (w/2),  y + (h/2), 40, WHITE)
         
 def main():
     loop = True
@@ -415,7 +399,7 @@ def main():
                 intro = False
                 instruction = False
                 loop = False
-                sair()
+                return
             if pressed_keys[pygame.K_RETURN]:
                 Game = False
                 escolha_nave = True
@@ -429,7 +413,7 @@ def main():
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    sair()
+                    return
                     
             rel_x = x % mn.get_rect().width
             tela.blit(mn, (rel_x - mn.get_rect().width, 0))
@@ -470,7 +454,7 @@ def main():
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    sair()
+                    return
                     
             rel_x = x % inst.get_rect().width
             tela.blit(inst, (rel_x - inst.get_rect().width, 0))
@@ -498,7 +482,7 @@ def main():
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    sair()
+                    return
                     
             rel_y = y % img_escolha.get_rect().height
             tela.blit(img_escolha, (0, rel_y - img_escolha.get_rect().height))
@@ -693,7 +677,7 @@ def main():
                             
                             for event in pygame.event.get():
                                 if event.type == pygame.QUIT:
-                                    sair()
+                                    return
                                 if event.type == pygame.KEYDOWN:
                                     if event.key != pygame.K_q:
                                         fim_pause = time.time()
@@ -770,7 +754,7 @@ def main():
                 while over:
                     for event in pygame.event.get():
                         if event.type == pygame.QUIT:
-                            sair()
+                            return
                         
                     pressed_keys = pygame.key.get_pressed()
                     
@@ -928,3 +912,5 @@ relogio =  pygame.time.Clock()
 FPS = 120
 
 main()
+
+pygame.quit()
