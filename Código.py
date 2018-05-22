@@ -91,7 +91,6 @@ class Nave(pygame.sprite.Sprite):
         if self.lives > 1:
             if self.hidden and pygame.time.get_ticks() - self.hide_timer > 2000:
                 self.hidden = False
-                
             
     def powerup(self):
         self.power += 1
@@ -100,7 +99,6 @@ class Nave(pygame.sprite.Sprite):
     def hide(self):
         self.hidden = True
         self.hide_timer = pygame.time.get_ticks()
-        self.rect.center = (WIDTH / 2, HEIGHT + 200)
         
     def shoot(self, img_tiros, tudo, bullets_group):
         now = pygame.time.get_ticks()
@@ -153,8 +151,8 @@ class Meteoros(pygame.sprite.Sprite):
         self.image = self.image_orig.copy()
         self.rect = self.image.get_rect()
         self.radius = int(self.rect.width / 2)
-        self.rect.x = randrange(0, 1000)
-        self.rect.y = randrange(-150, -100)
+        self.rect.centerx = randrange(0, 1000)
+        self.rect.centery = randrange(-150, -100)
         self.vy =  randrange(1, 8)
         self.vx =  randrange(-3, 3)
         self.rot = 0
@@ -220,48 +218,72 @@ class Pow(pygame.sprite.Sprite):
         self.rect.y += self.speedy
         if self.rect.top > HEIGHT:
             self.kill()
+
+class Stalker(pygame.sprite.Sprite):
+    
+    def __init__(self, arquivo_imagem, alvo):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load(arquivo_imagem)
+        self.rect = self.image.get_rect()
+        self.radius = int(self.rect.width / 2)
+        self.rect.centery = randrange(-150, -100)
+        self.rect.centerx = randrange(0, 1000)
+        self.vy = 5
+        self.alvo = alvo
         
+    def update(self):
+        if self.rect.centerx > self.alvo.rect.centerx:
+            self.vx = -1.5
+        elif self.rect.centerx < self.alvo.rect.centerx:
+            self.vx = 1.5
+        else:
+            self.vx = 0
+        self.rect.centerx += self.vx
+        self.rect.centery += self.vy
+        
+            
+       
 class Atirador(pygame.sprite.Sprite):
     
-        def __init__(self, arquivo_imagem):
-            pygame.sprite.Sprite.__init__(self)
-            self.image = pygame.image.load(arquivo_imagem)
-            self.rect = self.image.get_rect()
-            self.radius = 56
-            self.rect.y = randrange(-150, -100)
-            self.rect.x = randrange(0, 1000)
-            self.vy = 4
-            self.vx = randrange(-5,5,2)
+    def __init__(self, arquivo_imagem):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load(arquivo_imagem)
+        self.rect = self.image.get_rect()
+        self.radius = 56
+        self.rect.centery = randrange(-150, -100)
+        self.rect.centerx = randrange(0, 1000)
+        self.vy = 4
+        self.vx = randrange(-5,5,2)
             
-        def update(self):
-            self.rect.y += self.vy
-            self.rect.x += self.vx
-            if self.rect.right > WIDTH - 5:
-                self.rect.right = WIDTH - 5
-                self.vx = -self.vx
-            if self.rect.left < 5:
-                self.rect.left = 5
-                self.vx = -self.vx
-            if self.rect.bottom > 150:
-                self.rect.bottom = 150
+    def update(self):
+        self.rect.y += self.vy
+        self.rect.x += self.vx
+        if self.rect.right > WIDTH - 5:
+            self.rect.right = WIDTH - 5
+            self.vx = -self.vx
+        if self.rect.left < 5:
+            self.rect.left = 5
+            self.vx = -self.vx
+        if self.rect.bottom > 150:
+            self.rect.bottom = 150
                 
-        def enemy_shoot(self, tudo, enemy_bullets):
-            tiro = Enemybullets('Assets/tiro_inimigo.png',
-                                self.rect.centerx,
-                                self.rect.bottom, 0)
-            tiro1 = Enemybullets('Assets/tiro_inimigo_direita.png',
-                                self.rect.centerx,
-                                self.rect.bottom, 3)
-            tiro2 = Enemybullets('Assets/tiro_inimigo_esquerda.png',
-                                self.rect.centerx,
-                                self.rect.bottom, -3)
-            tudo.add(tiro)
-            tudo.add(tiro1)
-            tudo.add(tiro2)
-            enemy_bullets.add(tiro)
-            enemy_bullets.add(tiro1)
-            enemy_bullets.add(tiro2)
-            enemy_shoot_sound.play()
+    def enemy_shoot(self, tudo, enemy_bullets):
+        tiro = Enemybullets('Assets/tiro_inimigo.png',
+                            self.rect.centerx,
+                            self.rect.bottom, 0)
+        tiro1 = Enemybullets('Assets/tiro_inimigo_direita.png',
+                             self.rect.centerx,
+                             self.rect.bottom, 3)
+        tiro2 = Enemybullets('Assets/tiro_inimigo_esquerda.png',
+                             self.rect.centerx,
+                             self.rect.bottom, -3)
+        tudo.add(tiro)
+        tudo.add(tiro1)
+        tudo.add(tiro2)
+        enemy_bullets.add(tiro)
+        enemy_bullets.add(tiro1)
+        enemy_bullets.add(tiro2)
+        enemy_shoot_sound.play()
 
 class Enemybullets(pygame.sprite.Sprite):
     def __init__(self, arquivo_imagem, pos_x, pos_y, vx):
@@ -305,11 +327,6 @@ exp_sounds = []
 for snd in ['Explosion1.wav', 'Explosion2.wav']:
     exp_sounds.append(pygame.mixer.Sound(path.join(snd_dir, snd)))
     
-#sons dos powerups 
-pow_sounds = []
-for snd in ['Pickup_Coin.wav', 'Pickup_Coin2.wav' ]:
-    pow_sounds.append(pygame.mixer.Sound(path.join(snd_dir, snd)))
-    
 #som da morte
 crash_sound = pygame.mixer.Sound(path.join(snd_dir, 'Crash.wav'))
 
@@ -328,6 +345,12 @@ def novo_meteoro(lista_meteoros, tudo, enemy_group):
     meteor = Meteoros(random.choice(lista_meteoros))
     tudo.add(meteor)
     enemy_group.add(meteor)
+    
+def novo_stalker(tudo, enemy_group, stalkers, alvo):
+    stalker = Stalker('Assets/StalkerUFO.gif', alvo)
+    tudo.add(stalker)
+    enemy_group.add(stalker)
+    stalkers.add(stalker)
     
 def novo_atirador(tudo, enemy_group, mobs):
     mob = Atirador('Assets/enemy_atirador.png')
@@ -384,6 +407,18 @@ def mensagem(mensagem, x, y, tamanho, COR):
     TextSurf, TextRect = textos(mensagem, texto)
     TextRect.center = (x, y)
     tela.blit(TextSurf, TextRect)
+
+def botao(msg, x, y, w, h, cor, cor_mouse):
+    mouse = pygame.mouse.get_pos()
+        
+    if x + w > mouse[0] > x and\
+    y + h > mouse[1] > y:
+        pygame.draw.rect(tela, cor_mouse, (x, y, w, h))
+            
+    else:
+        pygame.draw.rect(tela, cor, (x, y, w, h))
+    
+    mensagem(msg, x + (w/2),  y + (h/2), 40, WHITE)
         
 def main():
     loop = True
@@ -550,6 +585,7 @@ def main():
                 tudo = pygame.sprite.Group()
                 vidas = pygame.sprite.Group()
                 mobs = pygame.sprite.Group()
+                stalkers = pygame.sprite.Group()
                                 
                 img_tiros = 'Assets/tiro3.png'
                     
@@ -560,7 +596,8 @@ def main():
             
                 for i in range(4):
                     novo_meteoro(lista_meteoros, tudo, enemy_group)
-                    
+                
+                tudo.add(stalkers)
                 tudo.add(enemy_group)
                 tudo.add(nave_group)
                 tudo.add(vidas)
@@ -573,7 +610,7 @@ def main():
                 
             elif pressed_keys[pygame.K_2]:
                 pct_shield = 75
-                nave = Nave(ship2, 6, pct_shield)
+                nave = Nave(ship2, 7.5, pct_shield)
                 nave_group.add(nave)
                 escolha_nave = False
                 intro = False
@@ -589,6 +626,7 @@ def main():
                 tudo = pygame.sprite.Group()
                 vidas = pygame.sprite.Group()
                 mobs = pygame.sprite.Group()
+                stalkers = pygame.sprite.Group()
                 
                 img_tiros = 'Assets/tiro1.png'
                                     
@@ -599,7 +637,8 @@ def main():
             
                 for i in range(4):
                     novo_meteoro(lista_meteoros, tudo, enemy_group)
-                    
+               
+                tudo.add(stalkers)
                 tudo.add(enemy_group)
                 tudo.add(nave_group)
                 tudo.add(vidas)
@@ -628,6 +667,7 @@ def main():
                 tudo = pygame.sprite.Group()
                 vidas = pygame.sprite.Group()
                 mobs = pygame.sprite.Group()
+                stalkers = pygame.sprite.Group()
                 
                 img_tiros = 'Assets/tiro2.png'
                     
@@ -638,7 +678,8 @@ def main():
             
                 for i in range(4):
                     novo_meteoro(lista_meteoros, tudo, enemy_group)
-                    
+                
+                tudo.add(stalkers)
                 tudo.add(enemy_group)
                 tudo.add(nave_group)
                 tudo.add(vidas)
@@ -727,12 +768,23 @@ def main():
                 expl = Explosion(hit.rect.center, 'sm')
                 tudo.add(expl)
                 
-                if nave.shield < 1:
+                if nave.shield < 1 and nave.lives > 1:
                     death_explosion = Explosion(nave.rect.center, 'nave')
                     tudo.add(death_explosion)
                     nave.hide()
                     nave.lives -= 1
                     nave.shield = pct_shield
+                    nave.rect.centerx = WIDTH/2
+                    nave.rect.bottom = HEIGHT - 10
+                    
+                elif nave.shield < 1 and nave.lives == 1:
+                    death_explosion = Explosion(nave.rect.center, 'nave')
+                    tudo.add(death_explosion)
+                    nave.hide()
+                    nave.lives -= 1
+                    nave.shield = 0
+                    nave.rect.centerx = WIDTH/2
+                    nave.rect.bottom = HEIGHT - 10
                     
             for pipoco in pipocos:
                 crash_sound.play()
@@ -779,6 +831,7 @@ def main():
                         bullets_group = pygame.sprite.Group()
                         enemy_bullets = pygame.sprite.Group()
                         mobs = pygame.sprite.Group()
+                        stalkers = pygame.sprite.Group()
                         tudo = pygame.sprite.Group()
                         fundo = pygame.image.load\
                         ("Assets/StarBackground.jpg").convert()
@@ -828,25 +881,30 @@ def main():
                 True, pygame.sprite.collide_circle)
 
                 for tiro in tiros:
-                    if score < 2000:
+                    if score < 100:
                         novo_meteoro(lista_meteoros, tudo, enemy_group)
                         random.choice(exp_sounds).play()
                         expl = Explosion(tiro.rect.center, 'sm')
                         tudo.add(expl)
-                    if score >= 2000:
-                        inimigos = [1, 2]
-                        escolha = random.choice(inimigos)
-                        if escolha == 1:
+                    if score >= 100:
+                        randchoice_enemy = [1, 2, 3]
+                        resp = random.choice(randchoice_enemy)
+                        if resp == 1:
                             novo_atirador(tudo, enemy_group, mobs)
                             random.choice(exp_sounds).play()
                             expl = Explosion(tiro.rect.center, 'lg')
                             tudo.add(expl)
-                        if escolha == 2:
+                        elif resp == 2:
                             novo_meteoro(lista_meteoros, tudo, enemy_group)
                             random.choice(exp_sounds).play()
                             expl = Explosion(tiro.rect.center, 'sm')
                             tudo.add(expl)
-                        
+                        else:
+                            novo_stalker(tudo, enemy_group, stalkers, nave)
+                            random.choice(exp_sounds).play()
+                            expl = Explosion(tiro.rect.center, 'lg')
+                            tudo.add(expl)
+
                     score_tiros += 100 - tiro.radius
                     if random.random() > 0.9:
                         pow = Pow(tiro.rect.center)
@@ -863,12 +921,10 @@ def main():
                 for hit in hits:
                     if hit.type == 'shield':
                         nave.shield += 20
-                        pow_sounds[0].play()
                         if nave.shield >= pct_shield:
                             nave.shield = pct_shield
                         
                     if hit.type == 'gun':
-                        pow_sounds[1].play()
                         nave.powerup()
                         
                 if score >= 0:
@@ -919,5 +975,4 @@ relogio =  pygame.time.Clock()
 FPS = 120
 
 main()
-
 pygame.quit()
