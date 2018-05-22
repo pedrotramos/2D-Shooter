@@ -99,6 +99,7 @@ class Nave(pygame.sprite.Sprite):
     def hide(self):
         self.hidden = True
         self.hide_timer = pygame.time.get_ticks()
+        self.rect.center = (WIDTH / 2, HEIGHT + 200)
         
     def shoot(self, img_tiros, tudo, bullets_group):
         now = pygame.time.get_ticks()
@@ -793,8 +794,6 @@ def main():
                     nave.hide()
                     nave.lives -= 1
                     nave.shield = pct_shield
-                    nave.rect.centerx = WIDTH/2
-                    nave.rect.bottom = HEIGHT - 10
                     
                 elif nave.shield < 1 and nave.lives == 1:
                     death_explosion = Explosion(nave.rect.center, 'nave')
@@ -802,8 +801,6 @@ def main():
                     nave.hide()
                     nave.lives -= 1
                     nave.shield = 0
-                    nave.rect.centerx = WIDTH/2
-                    nave.rect.bottom = HEIGHT - 10
                     
             for pipoco in pipocos:
                 crash_sound.play()
@@ -816,7 +813,7 @@ def main():
                     tudo.add(death_explosion)
                     nave.hide()
                     nave.lives -= 1
-                    nave.shield = 100
+                    nave.shield = pct_shield
                     
             if nave.lives == 0:
                 nave.kill()
