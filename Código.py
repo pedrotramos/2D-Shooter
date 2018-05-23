@@ -319,7 +319,68 @@ class Enemybullets(pygame.sprite.Sprite):
         self.rect.x += self.vx
         if self.rect.top > 600:
             self.kill()
+
+class Boss(pygame.sprite.Sprite):
+    def __init__(self, arquivo_imagem):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load(arquivo_imagem)
+        self.rect = self.image.get_rect()
+        self.radius = 100
+        self.rect.centery = randrange(-150, -100)
+        self.rect.centerx = WIDTH / 2
+        self.vy = 4
+        self.shield = 1000
+        self.lives = 1
             
+    def update(self):
+        self.rect.y += self.vy
+        if self.rect.bottom > 200:
+            self.rect.bottom = 200
+            
+    def enemy_mobs(self, tudo, enemy_bullets, alvo, enemy_group, stalkers):
+        stalker = Stalker('Assets/StalkerUFO.gif', alvo)
+        tudo.add(stalker)
+        enemy_group.add(stalker)
+        stalkers.add(stalker)
+        
+    def enemy_shoot(self, tudo, enemy_bullets):
+        tiro = Enemybullets('Assets/tiro_inimigo.png',
+                            self.rect.centerx,
+                            self.rect.bottom, 0)
+        tiro1 = Enemybullets('Assets/tiro_inimigo.png',
+                             self.rect.centerx,
+                             self.rect.bottom, 3)
+        tiro2 = Enemybullets('Assets/tiro_inimigo.png',
+                             self.rect.centerx,
+                             self.rect.bottom, -3)
+        tiro3 = Enemybullets('Assets/tiro_inimigo.png',
+                             self.rect.centerx,
+                             self.rect.bottom, 6)
+        tiro4 = Enemybullets('Assets/tiro_inimigo.png',
+                             self.rect.centerx,
+                             self.rect.bottom, -6)
+        tiro5 = Enemybullets('Assets/tiro_inimigo.png',
+                             self.rect.centerx,
+                             self.rect.bottom, 9)
+        tiro6 = Enemybullets('Assets/tiro_inimigo.png',
+                             self.rect.centerx,
+                             self.rect.bottom, -9)
+        tudo.add(tiro)
+        tudo.add(tiro1)
+        tudo.add(tiro2)
+        tudo.add(tiro3)
+        tudo.add(tiro4)
+        tudo.add(tiro5)
+        tudo.add(tiro6)
+        enemy_bullets.add(tiro)
+        enemy_bullets.add(tiro1)
+        enemy_bullets.add(tiro2)
+        enemy_bullets.add(tiro3)
+        enemy_bullets.add(tiro4)
+        enemy_bullets.add(tiro5)
+        enemy_bullets.add(tiro6)
+        enemy_shoot_sound.play()
+        
 #===============================     Cores     ===============================#
 GREEN = (0, 150, 0)
 LIGHTGREEN = (0, 255, 0)
@@ -381,16 +442,21 @@ def novo_atirador(tudo, enemy_group, mobs):
     tudo.add(mob)
     enemy_group.add(mob)
     mobs.add(mob)
-    
-def shield(surf, x, y, pct, maximo):
+
+def novo_boss(tudo, enemy_group, bosses):
+    boss = Boss('Assets/Boss1.gif')
+    tudo.add(boss)
+    bosses.add(boss)
+
+def shield(surf, x, y, pct, maximo, cor, w, h):
     if pct < 0:
         pct = 0
-    BAR_LENGTH = 100
-    BAR_HEIGHT = 20
+    BAR_LENGTH = w
+    BAR_HEIGHT = h
     fill = (pct / maximo) * BAR_LENGTH
     outline_rect = pygame.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
     fill_rect = pygame.Rect(x, y, fill, BAR_HEIGHT)
-    pygame.draw.rect(surf, GREEN, fill_rect)
+    pygame.draw.rect(surf, cor, fill_rect)
     pygame.draw.rect(surf, WHITE, outline_rect, 2)
     
 def draw_lives(surf, x, y, lives, img):
@@ -610,7 +676,12 @@ def main():
                 vidas = pygame.sprite.Group()
                 mobs = pygame.sprite.Group()
                 stalkers = pygame.sprite.Group()
-                                
+                
+                boss = Boss('Assets/Boss1.gif')
+                bosses = pygame.sprite.Group()
+                bosses.add(boss)
+                tudo.add(bosses)
+                
                 img_tiros = 'Assets/tiro3.png'
                     
                 fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
@@ -652,6 +723,11 @@ def main():
                 mobs = pygame.sprite.Group()
                 stalkers = pygame.sprite.Group()
                 
+                boss = Boss('Assets/Boss1.gif')
+                bosses = pygame.sprite.Group()
+                bosses.add(boss)
+                tudo.add(bosses)
+                
                 img_tiros = 'Assets/tiro1.png'
                                     
                 fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
@@ -692,6 +768,11 @@ def main():
                 vidas = pygame.sprite.Group()
                 mobs = pygame.sprite.Group()
                 stalkers = pygame.sprite.Group()
+                
+                boss = Boss('Assets/Boss1.gif')
+                bosses = pygame.sprite.Group()
+                bosses.add(boss)
+                tudo.add(bosses)
                 
                 img_tiros = 'Assets/tiro2.png'
                     
@@ -784,7 +865,25 @@ def main():
             pygame.sprite.groupcollide\
             (enemy_group, nave_group, True,
             False, pygame.sprite.collide_circle)
+            '''Nave acerta Boss'''
+            danos = pygame.sprite.groupcollide\
+            (bullets_group, bosses, True, False, pygame.sprite.collide_circle)
             
+            for dano in danos:
+                boss.shield -= dano.radius * 1
+                expl = Explosion(dano.rect.center, 'lg')
+                tudo.add(expl)
+                
+                if boss.shield < 1:
+                    death_explosion = Explosion(boss.rect.center, 'boss')
+                    tudo.add(death_explosion)
+                    boss.lives -= 1
+                    boss.shield = 0
+            
+            if boss.lives == 0:
+                boss.kill()
+                
+                
             for hit in hits:
                 crash_sound.play()
                 nave.shield -= hit.radius * 1.5
@@ -898,8 +997,11 @@ def main():
                     relogio.tick(FPS)
 
             if Game:
+                '''boss shield'''
+                shield(tela, WIDTH/2 - 50, HEIGHT - 20, boss.shield, 1000, RED,\
+                       100, 20)
                 '''desenhando escudo'''
-                shield(tela, 10, 50, nave.shield, pct_shield)
+                shield(tela, 10, 50, nave.shield, pct_shield, GREEN, 100, 20)
                 '''desenhando vidas'''
                 draw_lives(tela, 10, 10, nave.lives, vida)
                 '''Tiro da Nave acerta nos inimigos'''
@@ -908,13 +1010,13 @@ def main():
                 True, pygame.sprite.collide_circle)
 
                 for tiro in tiros:
-                    if score < 100:
+                    if score < 1000:
                         novo_meteoro(lista_meteoros, tudo, enemy_group)
                         random.choice(exp_sounds).play()
                         expl = Explosion(tiro.rect.center, 'sm')
                         tudo.add(expl)
-                    if score >= 100:
-                        randchoice_enemy = [1, 2, 3]
+                    if score >= 1000 and score <= 2000:
+                        randchoice_enemy = [1, 2, 3, 4]
                         resp = random.choice(randchoice_enemy)
                         if resp == 1:
                             novo_atirador(tudo, enemy_group, mobs)
@@ -926,8 +1028,13 @@ def main():
                             random.choice(exp_sounds).play()
                             expl = Explosion(tiro.rect.center, 'sm')
                             tudo.add(expl)
-                        else:
+                        elif resp == 3:
                             novo_stalker(tudo, enemy_group, stalkers, nave)
+                            random.choice(exp_sounds).play()
+                            expl = Explosion(tiro.rect.center, 'lg')
+                            tudo.add(expl)
+                    if score > 5000 and score < 5100:
+                            novo_boss(tudo, enemy_group, bosses)
                             random.choice(exp_sounds).play()
                             expl = Explosion(tiro.rect.center, 'lg')
                             tudo.add(expl)
@@ -938,10 +1045,15 @@ def main():
                         tudo.add(pow)
                         powerups_group.add(pow)
                 
-                if score >= 100:
-                    for mob in mobs:
-                        if randrange(1, 200) == 5:
-                            mob.enemy_shoot(tudo, enemy_bullets)
+                for mob in mobs:
+                    if randrange(1, 200) == 5:
+                        mob.enemy_shoot(tudo, enemy_bullets)
+                
+                for boss in bosses:
+                    if randrange(1, 400) == 5:
+                        boss.enemy_mobs\
+                        (tudo, enemy_bullets, nave, enemy_group, stalkers)
+                        boss.enemy_shoot( tudo, enemy_bullets)
                 
                 hits = pygame.sprite.spritecollide\
                 (nave, powerups_group, True)
@@ -986,6 +1098,7 @@ explosion ={}
 explosion['lg'] = []
 explosion['sm'] = []
 explosion['nave'] = []
+explosion['boss'] = []
 for i in range(9):
     explo = 'Assets/regularExplosion0{}.png'.format(i)
     img = pygame.image.load(explo).convert()
@@ -996,6 +1109,8 @@ for i in range(9):
     explosion['sm'].append(img_sm)
     img_nave = pygame.transform.scale(img, (150, 150))
     explosion['nave'].append(img_nave)
+    img_boss = pygame.transform.scale(img, (300, 300))
+    explosion['boss'].append(img_boss)
     
 vida = pygame.image.load('Assets/Lives.png').convert()
 
