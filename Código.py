@@ -961,6 +961,10 @@ def main():
                         tudo = pygame.sprite.Group()
                         fundo = pygame.image.load\
                         ("Assets/StarBackground.jpg").convert()
+                        boss = Boss('Assets/Boss1.gif')
+                        bosses = pygame.sprite.Group()
+                        bosses.add(boss)
+                        tudo.add(bosses)
 
                         nave_group.add(nave)
 
@@ -1015,7 +1019,7 @@ def main():
                         random.choice(exp_sounds).play()
                         expl = Explosion(tiro.rect.center, 'sm')
                         tudo.add(expl)
-                    if score >= 1000 and score <= 2000:
+                    if score >= 1000:
                         randchoice_enemy = [1, 2, 3, 4]
                         resp = random.choice(randchoice_enemy)
                         if resp == 1:
@@ -1053,7 +1057,7 @@ def main():
                     if randrange(1, 400) == 5:
                         boss.enemy_mobs\
                         (tudo, enemy_bullets, nave, enemy_group, stalkers)
-                        boss.enemy_shoot( tudo, enemy_bullets)
+                        boss.enemy_shoot(tudo, enemy_bullets)
                 
                 hits = pygame.sprite.spritecollide\
                 (nave, powerups_group, True)
