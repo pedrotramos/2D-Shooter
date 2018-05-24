@@ -517,8 +517,7 @@ def main():
             
         lista_atirador = ['Assets/enemy_atirador.png',
                           'Assets/enemy_atirador2.png',
-                          'Assets/enemy_atirador3.png',
-                          'Assets/enemy_atirador4.gif']
+                          'Assets/enemy_atirador3.png']
         while intro:
 
             pressed_keys = pygame.key.get_pressed()
