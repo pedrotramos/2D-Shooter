@@ -338,7 +338,7 @@ class Boss(pygame.sprite.Sprite):
             self.rect.bottom = 200
             
     def enemy_mobs(self, tudo, enemy_bullets, alvo, enemy_group, stalkers):
-        stalker = Stalker('Assets/StalkerUFO.gif', alvo)
+        stalker = Stalker('Assets/starfish.png', alvo)
         tudo.add(stalker)
         enemy_group.add(stalker)
         stalkers.add(stalker)
@@ -931,19 +931,20 @@ def main():
                     nave.hide()
                     nave.lives -= 1
                     nave.shield = 0
-                    
+           
+            if score >= (boss_spawns + 1) * 5000:
+                spawn_boss = True
+                boss_spawns += 1     
+                
             if nave.lives == 0:
                 nave.kill()
             if nave.lives == 0 and not death_explosion.alive():
                 Game = False
+                spawn_boss = False
                 Musicas(3)
                 over = True
                 x = 0
-                
-            if score >= (boss_spawns + 1) * 5000:
-                spawn_boss = True
-                boss_spawns += 1
-                
+
                 go = pygame.image.load("Assets/StarBackground.jpg").convert()
                 while over:
                     for event in pygame.event.get():
