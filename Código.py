@@ -17,6 +17,7 @@ import pygame
 from random import randrange
 import random
 from os import path
+import os
 import time
 
 #==============================     Classes     ==============================#
@@ -338,27 +339,31 @@ class Boss(pygame.sprite.Sprite):
             self.rect.bottom = 150
         
     def enemy_shoot(self, tudo, enemy_bullets):
+        vxt1 = randrange(1, 4)
+        vxt2 = randrange(vxt1 + 1, vxt1 + 4)
+        vxt3 = randrange(vxt2 + 1, vxt2 + 4)
+        
         tiro = Enemybullets('Assets/BossAttack.png',
                             self.rect.centerx,
                             self.rect.bottom, 0)
         tiro1 = Enemybullets('Assets/BossAttack.png',
                              self.rect.centerx,
-                             self.rect.bottom, randrange(1,4))
+                             self.rect.bottom, vxt1)
         tiro2 = Enemybullets('Assets/BossAttack.png',
                              self.rect.centerx,
-                             self.rect.bottom, randrange(-4,-1))
+                             self.rect.bottom, -vxt1)
         tiro3 = Enemybullets('Assets/BossAttack.png',
                              self.rect.centerx,
-                             self.rect.bottom, randrange(4, 7))
+                             self.rect.bottom, vxt2)
         tiro4 = Enemybullets('Assets/BossAttack.png',
                              self.rect.centerx,
-                             self.rect.bottom, randrange(-7, -4))
+                             self.rect.bottom, -vxt2)
         tiro5 = Enemybullets('Assets/BossAttack.png',
                              self.rect.centerx,
-                             self.rect.bottom, randrange(7, 10))
+                             self.rect.bottom, vxt3)
         tiro6 = Enemybullets('Assets/BossAttack.png',
                              self.rect.centerx,
-                             self.rect.bottom, randrange(-10, -7))
+                             self.rect.bottom, -vxt3)
         tudo.add(tiro)
         tudo.add(tiro1)
         tudo.add(tiro2)
@@ -603,6 +608,13 @@ def main():
         img_escolha = pygame.image.load("Assets/StarBackground.jpg").convert()    
             
         while escolha_nave:
+            
+            with open ('highscore.txt', 'r') as file:
+                if os.stat('highscore.txt').st_size == 0:
+                    existe_highscore = False
+                else:
+                    existe_highscore = True
+                    highscore = file.read()
             
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -969,6 +981,13 @@ def main():
                         Musicas(randrange(0,2))
                         score = 0
                         score_tiros = 0
+                        
+                        with open ('highscore.txt', 'r') as file:
+                            if os.stat('highscore.txt').st_size == 0:
+                                existe_highscore = False
+                            else:
+                                existe_highscore = True
+                                highscore = file.read()
 
                     if pressed_keys[pygame.K_q]:
                         over = False
@@ -983,15 +1002,41 @@ def main():
                     if rel_x < WIDTH:
                         tela.blit(go, (rel_x, 0))
                     x += 2
-
-                    mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 150, 130, WHITE)
-                    mensagem('Score: {0}' .format(score),
-                             WIDTH/2, HEIGHT/2, 50, YELLOW)
-                    mensagem('Press R to restart', WIDTH/2, HEIGHT/2 + 100,
-                                 50, LIGHTGREEN)
-                    mensagem('Press Q to go back to the Menu', WIDTH/2,
-                                 HEIGHT/2 + 200, 50, LIGHTRED)
-
+                    if not existe_highscore:
+                        mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 150, 130, WHITE)
+                        mensagem('Score: {0}'.format(score),
+                                 WIDTH/2, HEIGHT/2 - 50, 50, YELLOW)
+                        mensagem('Congratulations you have set a new highscore!',
+                                 WIDTH/2,HEIGHT/2 + 25, 50,YELLOW)
+                        mensagem('Press R to restart', WIDTH/2, HEIGHT/2 + 100,
+                                     50, LIGHTGREEN)
+                        mensagem('Press Q to go back to the Menu', WIDTH/2,
+                                     HEIGHT/2 + 175, 50, LIGHTRED)
+                        with open ('highscore.txt', 'w') as file:
+                            file.write(str(score))
+                        
+                    elif existe_highscore and int(highscore) >= score:
+                        mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 150, 130, WHITE)
+                        mensagem('Score: {0}'.format(score),
+                                 WIDTH/2, HEIGHT/2 - 50, 50, YELLOW)
+                        mensagem('Highscore: {0}'.format(highscore), WIDTH/2,
+                                 HEIGHT/2 + 25, 50, YELLOW)
+                        mensagem('Press R to restart', WIDTH/2, HEIGHT/2 + 100,
+                                     50, LIGHTGREEN)
+                        mensagem('Press Q to go back to the Menu', WIDTH/2,
+                                     HEIGHT/2 + 175, 50, LIGHTRED)
+                    elif existe_highscore and int(highscore) < score:
+                        mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 150, 130, WHITE)
+                        mensagem('Score: {0}'.format(score),
+                                 WIDTH/2, HEIGHT/2 - 50, 50, YELLOW)
+                        mensagem('Congratulations! You have set a new highscore!',
+                                 WIDTH/2,HEIGHT/2 + 25, 50,YELLOW)
+                        mensagem('Press R to restart', WIDTH/2, HEIGHT/2 + 100,
+                                     50, LIGHTGREEN)
+                        mensagem('Press Q to go back to the Menu', WIDTH/2,
+                                     HEIGHT/2 + 175, 50, LIGHTRED)
+                        with open ('highscore.txt', 'w') as file:
+                            file.write(str(score))
                     pygame.display.update()
                     relogio.tick(FPS)
 
