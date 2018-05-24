@@ -329,7 +329,7 @@ class Boss(pygame.sprite.Sprite):
         self.rect.centery = randrange(-150, -100)
         self.rect.centerx = WIDTH / 2
         self.vy = 4
-        self.shield = 1000
+        self.shield = 500
         self.lives = 1
             
     def update(self):
@@ -338,7 +338,7 @@ class Boss(pygame.sprite.Sprite):
             self.rect.bottom = 150
             
     def enemy_mobs(self, tudo, enemy_bullets, alvo, enemy_group, stalkers):
-        stalker = Stalker('Assets/starfish.png', alvo)
+        stalker = Stalker('Assets/alien.gif', alvo)
         tudo.add(stalker)
         enemy_group.add(stalker)
         stalkers.add(stalker)
@@ -1116,7 +1116,7 @@ powerups_images = {}
 powerups_images['shield'] = pygame.image.load("Assets/Shield.gif").convert()
 powerups_images['gun'] = pygame.image.load("Assets/mis.gif").convert()
 
-explosion ={}
+explosion = {}
 explosion['lg'] = []
 explosion['sm'] = []
 explosion['nave'] = []
