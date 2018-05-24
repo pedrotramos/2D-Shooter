@@ -336,12 +336,6 @@ class Boss(pygame.sprite.Sprite):
         self.rect.y += self.vy
         if self.rect.bottom > 150:
             self.rect.bottom = 150
-            
-    def enemy_mobs(self, tudo, enemy_bullets, alvo, enemy_group, stalkers):
-        stalker = Stalker('Assets/alien.gif', alvo)
-        tudo.add(stalker)
-        enemy_group.add(stalker)
-        stalkers.add(stalker)
         
     def enemy_shoot(self, tudo, enemy_bullets):
         tiro = Enemybullets('Assets/BossAttack.png',
@@ -349,22 +343,22 @@ class Boss(pygame.sprite.Sprite):
                             self.rect.bottom, 0)
         tiro1 = Enemybullets('Assets/BossAttack.png',
                              self.rect.centerx,
-                             self.rect.bottom, 3)
+                             self.rect.bottom, randrange(1,4))
         tiro2 = Enemybullets('Assets/BossAttack.png',
                              self.rect.centerx,
-                             self.rect.bottom, -3)
+                             self.rect.bottom, randrange(-4,-1))
         tiro3 = Enemybullets('Assets/BossAttack.png',
                              self.rect.centerx,
-                             self.rect.bottom, 6)
+                             self.rect.bottom, randrange(4, 7))
         tiro4 = Enemybullets('Assets/BossAttack.png',
                              self.rect.centerx,
-                             self.rect.bottom, -6)
+                             self.rect.bottom, randrange(-7, -4))
         tiro5 = Enemybullets('Assets/BossAttack.png',
                              self.rect.centerx,
-                             self.rect.bottom, 9)
+                             self.rect.bottom, randrange(7, 10))
         tiro6 = Enemybullets('Assets/BossAttack.png',
                              self.rect.centerx,
-                             self.rect.bottom, -9)
+                             self.rect.bottom, randrange(-10, -7))
         tudo.add(tiro)
         tudo.add(tiro1)
         tudo.add(tiro2)
@@ -431,14 +425,17 @@ def novo_meteoro(lista_meteoros, tudo, enemy_group):
     tudo.add(meteor)
     enemy_group.add(meteor)
     
-def novo_stalker(tudo, enemy_group, stalkers, alvo):
-    stalker = Stalker('Assets/StalkerUFO.gif', alvo)
+def novo_stalker(tudo, enemy_group, stalkers, alvo, boss_alive):
+    if not boss_alive:
+        stalker = Stalker('Assets/StalkerUFO.gif', alvo)
+    else:
+        stalker = Stalker('Assets/alien.gif', alvo)
     tudo.add(stalker)
     enemy_group.add(stalker)
     stalkers.add(stalker)
     
-def novo_atirador(tudo, enemy_group, mobs):
-    mob = Atirador('Assets/enemy_atirador.png')
+def novo_atirador(tudo, enemy_group, mobs, lista_atirador):
+    mob = Atirador(random.choice(lista_atirador))
     tudo.add(mob)
     enemy_group.add(mob)
     mobs.add(mob)
@@ -519,6 +516,14 @@ def main():
         x = 0
         mn = pygame.image.load("Assets/StarBackground.jpg").convert()
         Musicas(2)
+        
+        fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
+        
+        lista_meteoros = ['Assets/asteroid.gif', 'Assets/meteor2_s.gif',
+                                  'Assets/fire_meteor_xs.gif']
+            
+        lista_atirador = ['Assets/enemy_atirador.png',
+                          'Assets/enemy_atirador2.png']
         while intro:
 
             pressed_keys = pygame.key.get_pressed()
@@ -685,12 +690,7 @@ def main():
                 tudo.add(bosses)
                 
                 img_tiros = 'Assets/tiro3.png'
-                    
-                fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
-           
-                lista_meteoros = ['Assets/asteroid.gif', 'Assets/meteor2_s.gif',
-                                  'Assets/fire_meteor_xs.gif']
-            
+                               
                 for i in range(4):
                     novo_meteoro(lista_meteoros, tudo, enemy_group)
                 
@@ -703,7 +703,6 @@ def main():
                 score = 0
                 y = 0
                 Musicas(randrange(0,2))
-                fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
                 
             elif pressed_keys[pygame.K_2]:
                 pct_shield = 75
@@ -733,12 +732,7 @@ def main():
                 tudo.add(bosses)
                 
                 img_tiros = 'Assets/tiro1.png'
-                                    
-                fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
-           
-                lista_meteoros = ['Assets/asteroid.gif', 'Assets/meteor2_s.gif',
-                                  'Assets/fire_meteor_xs.gif']
-            
+                                                
                 for i in range(4):
                     novo_meteoro(lista_meteoros, tudo, enemy_group)
                
@@ -751,7 +745,6 @@ def main():
                 score = 0
                 y = 0
                 Musicas(randrange(0,2))
-                fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
                 
             elif pressed_keys[pygame.K_3]:
                 pct_shield = 100
@@ -781,12 +774,7 @@ def main():
                 tudo.add(bosses)
                 
                 img_tiros = 'Assets/tiro2.png'
-                    
-                fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
-           
-                lista_meteoros = ['Assets/asteroid.gif', 'Assets/meteor2_s.gif',
-                                  'Assets/fire_meteor_xs.gif']
-            
+
                 for i in range(4):
                     novo_meteoro(lista_meteoros, tudo, enemy_group)
                 
@@ -799,7 +787,6 @@ def main():
                 score = 0
                 y = 0
                 Musicas(randrange(0,2))
-                fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
                 
             elif pressed_keys[pygame.K_q]:
                 escolha_nave = False
@@ -889,6 +876,7 @@ def main():
             if boss.lives == 0:
                 boss.kill()
                 boss_alive = False
+                score += 1000
                 
                 
             for hit in hits:
@@ -932,7 +920,7 @@ def main():
                     nave.lives -= 1
                     nave.shield = 0
            
-            if score >= (boss_spawns + 1) * 5000:
+            if score >= (boss_spawns + 1) * 7500:
                 spawn_boss = True
                 boss_spawns += 1     
                 
@@ -1005,11 +993,13 @@ def main():
                         tela.blit(go, (rel_x, 0))
                     x += 2
 
-                    mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 100, 130, WHITE)
-                    mensagem('Press R to restart', WIDTH/2, HEIGHT/2 + 10,
+                    mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 150, 130, WHITE)
+                    mensagem('Score: {0}' .format(score),
+                             WIDTH/2, HEIGHT/2, 50, YELLOW)
+                    mensagem('Press R to restart', WIDTH/2, HEIGHT/2 + 100,
                                  50, LIGHTGREEN)
                     mensagem('Press Q to go back to the Menu', WIDTH/2,
-                                 HEIGHT/2 + 100, 50, LIGHTRED)
+                                 HEIGHT/2 + 200, 50, LIGHTRED)
 
                     pygame.display.update()
                     relogio.tick(FPS)
@@ -1017,7 +1007,7 @@ def main():
             if Game:
                 if boss_alive:
                     '''boss shield'''
-                    shield(tela, WIDTH - 120, 20, boss.shield, 1000, RED,\
+                    shield(tela, WIDTH - 120, 20, boss.shield, 500, RED,\
                            100, 20)
                 '''desenhando escudo'''
                 shield(tela, 10, 50, nave.shield, pct_shield, GREEN, 100, 20)
@@ -1034,26 +1024,48 @@ def main():
                         random.choice(exp_sounds).play()
                         expl = Explosion(tiro.rect.center, 'sm')
                         tudo.add(expl)
-                    if score >= 1000:
-                        randchoice_enemy = [1, 2, 3]
+                    if score >= 1000 and score <= 2500:
+                        randchoice_enemy = [1, 2]
                         resp = random.choice(randchoice_enemy)
                         if resp == 1:
-                            novo_atirador(tudo, enemy_group, mobs)
-                            random.choice(exp_sounds).play()
-                            expl = Explosion(tiro.rect.center, 'lg')
-                            tudo.add(expl)
-                        elif resp == 2:
                             novo_meteoro(lista_meteoros, tudo, enemy_group)
                             random.choice(exp_sounds).play()
                             expl = Explosion(tiro.rect.center, 'sm')
                             tudo.add(expl)
+                        elif resp == 2:
+                            novo_stalker(tudo, enemy_group, stalkers,
+                                         nave, boss_alive)
+                            random.choice(exp_sounds).play()
+                            expl = Explosion(tiro.rect.center, 'lg')
+                            tudo.add(expl)
+                    if score >= 2500 and score <= 5000:
+                        novo_atirador(tudo, enemy_group,
+                                      mobs, lista_atirador)
+                        random.choice(exp_sounds).play()
+                        expl = Explosion(tiro.rect.center, 'lg')
+                        tudo.add(expl)
+                    if score > 5000:
+                        randchoice_enemy = [1, 2, 3]
+                        resp = random.choice(randchoice_enemy)
+                        if resp == 1:
+                            novo_meteoro(lista_meteoros, tudo, enemy_group)
+                            random.choice(exp_sounds).play()
+                            expl = Explosion(tiro.rect.center, 'sm')
+                            tudo.add(expl)
+                        elif resp == 2:
+                            novo_stalker(tudo, enemy_group, stalkers,
+                                         nave, boss_alive)
+                            random.choice(exp_sounds).play()
+                            expl = Explosion(tiro.rect.center, 'lg')
+                            tudo.add(expl)
                         elif resp == 3:
-                            novo_stalker(tudo, enemy_group, stalkers, nave)
+                            novo_atirador(tudo, enemy_group,
+                                      mobs, lista_atirador)
                             random.choice(exp_sounds).play()
                             expl = Explosion(tiro.rect.center, 'lg')
                             tudo.add(expl)
 
-                    score_tiros += 1000 - tiro.radius
+                    score_tiros += 100 - tiro.radius
                     if random.random() > 0.9:
                         pow = Pow(tiro.rect.center)
                         tudo.add(pow)
@@ -1072,9 +1084,7 @@ def main():
                         mob.enemy_shoot(tudo, enemy_bullets)
                 
                 for boss in bosses:
-                    if randrange(1, 300) == 5:
-                        boss.enemy_mobs\
-                        (tudo, enemy_bullets, nave, enemy_group, stalkers)
+                    if randrange(1, 200) == 5:
                         boss.enemy_shoot(tudo, enemy_bullets)
                 
                 hits = pygame.sprite.spritecollide\
