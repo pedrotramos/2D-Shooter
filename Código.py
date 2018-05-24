@@ -494,18 +494,6 @@ def mensagem(mensagem, x, y, tamanho, COR):
     TextSurf, TextRect = textos(mensagem, texto)
     TextRect.center = (x, y)
     tela.blit(TextSurf, TextRect)
-
-def botao(msg, x, y, w, h, cor, cor_mouse):
-    mouse = pygame.mouse.get_pos()
-        
-    if x + w > mouse[0] > x and\
-    y + h > mouse[1] > y:
-        pygame.draw.rect(tela, cor_mouse, (x, y, w, h))
-            
-    else:
-        pygame.draw.rect(tela, cor, (x, y, w, h))
-    
-    mensagem(msg, x + (w/2),  y + (h/2), 40, WHITE)
         
 def main():
     loop = True
@@ -549,7 +537,8 @@ def main():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return
-                    
+            
+            #Movimento da tela na horintal da Tela de início 
             rel_x = x % mn.get_rect().width
             tela.blit(mn, (rel_x - mn.get_rect().width, 0))
             if rel_x < WIDTH:
@@ -618,7 +607,8 @@ def main():
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     return
-                    
+            
+            #Movimento da tela na horintal da escolha das naves 
             rel_y = y % img_escolha.get_rect().height
             tela.blit(img_escolha, (0, rel_y - img_escolha.get_rect().height))
             if rel_y < HEIGHT:
@@ -986,7 +976,8 @@ def main():
                         instruction = False
                         Game = False
                         loop = True
-
+                    
+                    #Movimento da tela na horintal do Game Over 
                     rel_x = x % go.get_rect().width
                     tela.blit(go, (rel_x - go.get_rect().width, 0))
                     if rel_x < WIDTH:
@@ -1064,13 +1055,18 @@ def main():
                             random.choice(exp_sounds).play()
                             expl = Explosion(tiro.rect.center, 'lg')
                             tudo.add(expl)
-
+                    
+                    #Soma um determinado valor ao score
                     score_tiros += 100 - tiro.radius
+                    
+                    #Chance de 10% de aparecerem powerups
                     if random.random() > 0.9:
                         pow = Pow(tiro.rect.center)
                         tudo.add(pow)
                         powerups_group.add(pow)
-                        
+                
+                #Gera um novo boss caso não haja um boss na tela e 
+                #a pontuação necessária tenha sido atingida
                 if spawn_boss and not boss_alive:
                     novo_boss(tudo, enemy_group, bosses)
                     random.choice(exp_sounds).play()
@@ -1079,27 +1075,33 @@ def main():
                     spawn_boss = False
                     boss_alive = True
                 
+                #Se houver mobs (atiradores) na tela, há uma chance de
+                #cada um atirar
                 for mob in mobs:
                     if randrange(1, 400) == 5:
                         mob.enemy_shoot(tudo, enemy_bullets)
-                
+                #Se o boss estiver na tela, possui uma chance de executar
+                #a função de atirar
                 for boss in bosses:
                     if randrange(1, 200) == 5:
                         boss.enemy_shoot(tudo, enemy_bullets)
                 
+                '''Nave pega powerup'''
                 hits = pygame.sprite.spritecollide\
                 (nave, powerups_group, True)
                 for hit in hits:
+                    #Nave recebe + shield
                     if hit.type == 'shield':
                         nave.shield += 20
                         if nave.shield >= pct_shield:
                             nave.shield = pct_shield
                             pow_sounds[1].play()
-                        
+                    #Nave fica mais forte (+tiros)
                     if hit.type == 'gun':
                         nave.powerup()
                         pow_sounds[0].play()
                         
+                #Desenha score na tela de jogo
                 if score >= 0:
                     mensagem('{0}'.format(score), WIDTH/2, 20, 30, YELLOW)
                 else:
@@ -1108,8 +1110,11 @@ def main():
                 score_tempo = segundos_passados * 10
                 score = score_tempo + score_tiros
                 
+                #Executa a função "update" de todas as classes
                 tudo.update()
+                #Desenha todos os sprites na tela
                 tudo.draw(tela)
+                #Atualiza o display
                 pygame.display.update()
                 
 #==============================     Iniciar     ==============================#
