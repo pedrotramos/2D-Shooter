@@ -334,8 +334,8 @@ class Boss(pygame.sprite.Sprite):
             
     def update(self):
         self.rect.y += self.vy
-        if self.rect.bottom > 200:
-            self.rect.bottom = 200
+        if self.rect.bottom > 150:
+            self.rect.bottom = 150
             
     def enemy_mobs(self, tudo, enemy_bullets, alvo, enemy_group, stalkers):
         stalker = Stalker('Assets/starfish.png', alvo)
@@ -344,25 +344,25 @@ class Boss(pygame.sprite.Sprite):
         stalkers.add(stalker)
         
     def enemy_shoot(self, tudo, enemy_bullets):
-        tiro = Enemybullets('Assets/tiro_inimigo.png',
+        tiro = Enemybullets('Assets/BossAttack.png',
                             self.rect.centerx,
                             self.rect.bottom, 0)
-        tiro1 = Enemybullets('Assets/tiro_inimigo.png',
+        tiro1 = Enemybullets('Assets/BossAttack.png',
                              self.rect.centerx,
                              self.rect.bottom, 3)
-        tiro2 = Enemybullets('Assets/tiro_inimigo.png',
+        tiro2 = Enemybullets('Assets/BossAttack.png',
                              self.rect.centerx,
                              self.rect.bottom, -3)
-        tiro3 = Enemybullets('Assets/tiro_inimigo.png',
+        tiro3 = Enemybullets('Assets/BossAttack.png',
                              self.rect.centerx,
                              self.rect.bottom, 6)
-        tiro4 = Enemybullets('Assets/tiro_inimigo.png',
+        tiro4 = Enemybullets('Assets/BossAttack.png',
                              self.rect.centerx,
                              self.rect.bottom, -6)
-        tiro5 = Enemybullets('Assets/tiro_inimigo.png',
+        tiro5 = Enemybullets('Assets/BossAttack.png',
                              self.rect.centerx,
                              self.rect.bottom, 9)
-        tiro6 = Enemybullets('Assets/tiro_inimigo.png',
+        tiro6 = Enemybullets('Assets/BossAttack.png',
                              self.rect.centerx,
                              self.rect.bottom, -9)
         tudo.add(tiro)
@@ -877,7 +877,7 @@ def main():
             
             for dano in danos:
                 boss.shield -= dano.radius * 1
-                expl = Explosion(dano.rect.center, 'lg')
+                expl = Explosion(dano.rect.center, 'bosstiro')
                 tudo.add(expl)
                 
                 if boss.shield < 1:
@@ -1062,17 +1062,17 @@ def main():
                 if spawn_boss and not boss_alive:
                     novo_boss(tudo, enemy_group, bosses)
                     random.choice(exp_sounds).play()
-                    expl = Explosion(tiro.rect.center, 'lg')
+                    expl = Explosion(tiro.rect.center, 'bosstiro')
                     tudo.add(expl)
                     spawn_boss = False
                     boss_alive = True
                 
                 for mob in mobs:
-                    if randrange(1, 200) == 5:
+                    if randrange(1, 300) == 5:
                         mob.enemy_shoot(tudo, enemy_bullets)
                 
                 for boss in bosses:
-                    if randrange(1, 400) == 5:
+                    if randrange(1, 300) == 5:
                         boss.enemy_mobs\
                         (tudo, enemy_bullets, nave, enemy_group, stalkers)
                         boss.enemy_shoot(tudo, enemy_bullets)
@@ -1121,6 +1121,7 @@ explosion['lg'] = []
 explosion['sm'] = []
 explosion['nave'] = []
 explosion['boss'] = []
+explosion['bosstiro'] = []
 for i in range(9):
     explo = 'Assets/regularExplosion0{}.png'.format(i)
     img = pygame.image.load(explo).convert()
@@ -1131,8 +1132,17 @@ for i in range(9):
     explosion['sm'].append(img_sm)
     img_nave = pygame.transform.scale(img, (150, 150))
     explosion['nave'].append(img_nave)
+   
+for i in range(1, 12):
+    explo = 'Assets/BossExplosion{}.png'.format(i)
+    img = pygame.image.load(explo).convert()
+    img.set_colorkey(BLACK)
     img_boss = pygame.transform.scale(img, (300, 300))
     explosion['boss'].append(img_boss)
+    img_bosstiro = pygame.transform.scale(img, (100, 100))
+    explosion['bosstiro'].append(img_bosstiro)
+
+    
     
 vida = pygame.image.load('Assets/Lives.png').convert()
 
