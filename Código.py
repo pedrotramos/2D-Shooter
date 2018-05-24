@@ -661,6 +661,9 @@ def main():
                 pct_shield = 125
                 nave = Nave(ship1, 4, pct_shield)
                 nave_group.add(nave)
+                boss_spawns = 0
+                spawn_boss = False
+                boss_alive = False
                 escolha_nave = False
                 intro = False
                 Game = True
@@ -679,7 +682,6 @@ def main():
                 
                 boss = Boss('Assets/Boss1.gif')
                 bosses = pygame.sprite.Group()
-                bosses.add(boss)
                 tudo.add(bosses)
                 
                 img_tiros = 'Assets/tiro3.png'
@@ -707,6 +709,9 @@ def main():
                 pct_shield = 75
                 nave = Nave(ship2, 7.5, pct_shield)
                 nave_group.add(nave)
+                boss_spawns = 0
+                spawn_boss = False
+                boss_alive = False
                 escolha_nave = False
                 intro = False
                 Game = True
@@ -725,7 +730,6 @@ def main():
                 
                 boss = Boss('Assets/Boss1.gif')
                 bosses = pygame.sprite.Group()
-                bosses.add(boss)
                 tudo.add(bosses)
                 
                 img_tiros = 'Assets/tiro1.png'
@@ -753,6 +757,9 @@ def main():
                 pct_shield = 100
                 nave = Nave(ship3, 5, pct_shield)
                 nave_group.add(nave)
+                boss_spawns = 0
+                spawn_boss = False
+                boss_alive = False
                 escolha_nave = False
                 intro = False
                 Game = True
@@ -771,7 +778,6 @@ def main():
                 
                 boss = Boss('Assets/Boss1.gif')
                 bosses = pygame.sprite.Group()
-                bosses.add(boss)
                 tudo.add(bosses)
                 
                 img_tiros = 'Assets/tiro2.png'
@@ -882,6 +888,7 @@ def main():
             
             if boss.lives == 0:
                 boss.kill()
+                boss_alive = False
                 
                 
             for hit in hits:
@@ -932,6 +939,10 @@ def main():
                 Musicas(3)
                 over = True
                 x = 0
+                
+            if score >= (boss_spawns + 1) * 5000:
+                spawn_boss = True
+                boss_spawns += 1
                 
                 go = pygame.image.load("Assets/StarBackground.jpg").convert()
                 while over:
@@ -1001,9 +1012,10 @@ def main():
                     relogio.tick(FPS)
 
             if Game:
-                '''boss shield'''
-                shield(tela, WIDTH/2 - 50, HEIGHT - 20, boss.shield, 1000, RED,\
-                       100, 20)
+                if boss_alive:
+                    '''boss shield'''
+                    shield(tela, WIDTH - 120, 20, boss.shield, 1000, RED,\
+                           100, 20)
                 '''desenhando escudo'''
                 shield(tela, 10, 50, nave.shield, pct_shield, GREEN, 100, 20)
                 '''desenhando vidas'''
@@ -1020,7 +1032,7 @@ def main():
                         expl = Explosion(tiro.rect.center, 'sm')
                         tudo.add(expl)
                     if score >= 1000:
-                        randchoice_enemy = [1, 2, 3, 4]
+                        randchoice_enemy = [1, 2, 3]
                         resp = random.choice(randchoice_enemy)
                         if resp == 1:
                             novo_atirador(tudo, enemy_group, mobs)
@@ -1037,17 +1049,20 @@ def main():
                             random.choice(exp_sounds).play()
                             expl = Explosion(tiro.rect.center, 'lg')
                             tudo.add(expl)
-                    if score > 5000 and score < 5100:
-                            novo_boss(tudo, enemy_group, bosses)
-                            random.choice(exp_sounds).play()
-                            expl = Explosion(tiro.rect.center, 'lg')
-                            tudo.add(expl)
 
                     score_tiros += 100 - tiro.radius
                     if random.random() > 0.9:
                         pow = Pow(tiro.rect.center)
                         tudo.add(pow)
                         powerups_group.add(pow)
+                        
+                if spawn_boss and not boss_alive:
+                    novo_boss(tudo, enemy_group, bosses)
+                    random.choice(exp_sounds).play()
+                    expl = Explosion(tiro.rect.center, 'lg')
+                    tudo.add(expl)
+                    spawn_boss = False
+                    boss_alive = True
                 
                 for mob in mobs:
                     if randrange(1, 200) == 5:
