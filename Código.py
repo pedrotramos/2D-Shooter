@@ -329,7 +329,7 @@ class Boss(pygame.sprite.Sprite):
         self.rect.centery = randrange(-150, -100)
         self.rect.centerx = WIDTH / 2
         self.vy = 4
-        self.shield = 500
+        self.shield = 750
         self.lives = 1
             
     def update(self):
@@ -1007,7 +1007,7 @@ def main():
             if Game:
                 if boss_alive:
                     '''boss shield'''
-                    shield(tela, WIDTH - 120, 20, boss.shield, 500, RED,\
+                    shield(tela, WIDTH - 120, 20, boss.shield, 750, RED,\
                            100, 20)
                 '''desenhando escudo'''
                 shield(tela, 10, 50, nave.shield, pct_shield, GREEN, 100, 20)
@@ -1080,7 +1080,7 @@ def main():
                     boss_alive = True
                 
                 for mob in mobs:
-                    if randrange(1, 300) == 5:
+                    if randrange(1, 400) == 5:
                         mob.enemy_shoot(tudo, enemy_bullets)
                 
                 for boss in bosses:
@@ -1150,9 +1150,7 @@ for i in range(1, 12):
     img_boss = pygame.transform.scale(img, (300, 300))
     explosion['boss'].append(img_boss)
     img_bosstiro = pygame.transform.scale(img, (100, 100))
-    explosion['bosstiro'].append(img_bosstiro)
-
-    
+    explosion['bosstiro'].append(img_bosstiro)    
     
 vida = pygame.image.load('Assets/Lives.png').convert()
 
