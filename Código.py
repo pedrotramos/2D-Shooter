@@ -959,6 +959,9 @@ def main():
                         loop = True
                         intro = False
                         instruction = False
+                        boss_spawns = 0
+                        spawn_boss = False
+                        boss_alive = False
                         start = time.time()
                         tempo_pause = 0
                         nave.lives = 3
@@ -975,7 +978,6 @@ def main():
                         ("Assets/StarBackground.jpg").convert()
                         boss = Boss('Assets/Boss1.gif')
                         bosses = pygame.sprite.Group()
-                        bosses.add(boss)
                         tudo.add(bosses)
 
                         nave_group.add(nave)
@@ -1051,7 +1053,7 @@ def main():
                             expl = Explosion(tiro.rect.center, 'lg')
                             tudo.add(expl)
 
-                    score_tiros += 100 - tiro.radius
+                    score_tiros += 1000 - tiro.radius
                     if random.random() > 0.9:
                         pow = Pow(tiro.rect.center)
                         tudo.add(pow)
