@@ -1029,7 +1029,7 @@ def main():
                         start = time.time()
                         tempo_pause = 0
                         nave.lives = 3
-                        nave.nukes = 0
+                        nave.nukes = 3
                         nave.shield = pct_shield
                         
                         enemy_group = pygame.sprite.Group()
