@@ -37,6 +37,7 @@ class Nave(pygame.sprite.Sprite):
         self.power_time = pygame.time.get_ticks()
         self.shield = shield
         self.lives = 3
+        self.nukes = 3
         self.hidden = False
         self.hide_timer = pygame.time.get_ticks()
         self.shoot_delay = 250
@@ -96,6 +97,43 @@ class Nave(pygame.sprite.Sprite):
     def powerup(self):
         self.power += 1
         self.power_time = pygame.time.get_ticks()
+    
+    def nuke(self, enemy_group, tudo, boss, boss_alive, score, nave, stalkers,
+             lista_meteoros, mobs, lista_atirador):
+        for enemy in enemy_group:
+            expl = Explosion(enemy.rect.center, 'lg')
+            enemy.kill()
+            tudo.add(expl)
+        if boss_alive:
+            boss_expl = Explosion(boss.rect.center, 'boss')
+            boss.shield -= 200
+            tudo.add(boss_expl)
+            tudo.add()
+            random.choice(exp_sounds).play()
+        for i in range(4):
+            if score < 1000:
+                novo_meteoro(lista_meteoros, tudo, enemy_group)
+            if score >= 1000 and score <= 2500:
+                randchoice_enemy = [1, 2]
+                resp = random.choice(randchoice_enemy)
+                if resp == 1:
+                    novo_meteoro(lista_meteoros, tudo, enemy_group)
+                elif resp == 2:
+                    novo_stalker(tudo, enemy_group, stalkers, nave, boss_alive)
+            if score >= 2500 and score <= 5000:
+                novo_atirador(tudo, enemy_group, mobs, lista_atirador)
+            if score > 5000:
+                randchoice_enemy = [1, 2, 3]
+                resp = random.choice(randchoice_enemy)
+                if resp == 1:
+                    novo_meteoro(lista_meteoros, tudo, enemy_group)
+                elif resp == 2:
+                    novo_stalker(tudo, enemy_group, stalkers, nave, boss_alive)
+                elif resp == 3:
+                    novo_atirador(tudo, enemy_group, mobs, lista_atirador)
+            
+                
+        
         
     def hide(self):
         self.hidden = True
@@ -206,8 +244,22 @@ class Explosion(pygame.sprite.Sprite):
                 self.image = explosion[self.size][self.frame]
                 self.rect = self.image.get_rect()
                 self.rect.center = center
-            
+                
+class Nuke(pygame.sprite.Sprite):
+    
+    def __init__(self, center):
+           self.image = 'Assets/Nuke.png'
+           self.rect = self.image.get_rect()
+           self.rect.center = center
+           self.speedy = 2
+           
+    def update(self):
+        self.rect.y += self.speedy
+        if self.rect.top > HEIGHT:
+            self.kill()
+
 class Pow(pygame.sprite.Sprite):
+    
     def __init__(self, center):
         pygame.sprite.Sprite.__init__(self)
         self.type = random.choice(['gun', 'shield'])
@@ -461,6 +513,14 @@ def shield(surf, x, y, pct, maximo, cor, w, h):
     pygame.draw.rect(surf, cor, fill_rect)
     pygame.draw.rect(surf, WHITE, outline_rect, 2)
     
+def draw_nukes(surf, x, y, nukes, img):
+    if nukes > 0:
+        for i in range(nukes):
+            img_rect = img.get_rect()
+            img_rect.x = x + 35 * i
+            img_rect.y = y
+            surf.blit(img, img_rect)
+    
 def draw_lives(surf, x, y, lives, img):
     for i in range(lives):
         img_rect = img.get_rect()
@@ -484,10 +544,7 @@ def cronometro(value):
     valueS = (valueM)*60
     Seconds = int(valueS)
     
-    valueMS = (valueS - valueS//1)*1000
-    Miliseconds = int(valueMS)
-
-    return Seconds, Miliseconds
+    return Seconds
 
 def mensagem(mensagem, x, y, tamanho, COR):
    
@@ -809,6 +866,12 @@ def main():
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         nave.shoot(img_tiros, tudo, bullets_group)
+                    elif event.key == pygame.K_n:
+                        if nave.nukes > 0:
+                            nave.nukes -= 1
+                            nave.nuke(enemy_group, tudo, boss, boss_alive, 
+                                      score, nave, stalkers,lista_meteoros,
+                                      mobs, lista_atirador)
                     elif event.key == pygame.K_p:
                         pause = True
                         inicio_pause = time.time()
@@ -956,6 +1019,7 @@ def main():
                         start = time.time()
                         tempo_pause = 0
                         nave.lives = 3
+                        nave.nukes = 0
                         nave.shield = pct_shield
                         
                         enemy_group = pygame.sprite.Group()
@@ -1048,6 +1112,8 @@ def main():
                            100, 20)
                 '''desenhando escudo'''
                 shield(tela, 10, 50, nave.shield, pct_shield, GREEN, 100, 20)
+                '''desenhando nukes'''
+                draw_nukes(tela, 10, 80, nave.nukes, nuke)
                 '''desenhando vidas'''
                 draw_lives(tela, 10, 10, nave.lives, vida)
                 '''Tiro da Nave acerta nos inimigos'''
@@ -1152,7 +1218,7 @@ def main():
                     mensagem('{0}'.format(score), WIDTH/2, 20, 30, YELLOW)
                 else:
                     mensagem('0', WIDTH/2, 20, 30, YELLOW)
-                segundos_passados = cronometro(agora - start - tempo_pause)[0]
+                segundos_passados = cronometro(agora - start - tempo_pause)
                 score_tempo = segundos_passados * 10
                 score = score_tempo + score_tiros
                 
@@ -1204,6 +1270,9 @@ for i in range(1, 12):
     explosion['bosstiro'].append(img_bosstiro)    
     
 vida = pygame.image.load('Assets/Lives.png').convert()
+img_nuke = pygame.image.load('Assets/Nuke.png').convert()
+nuke = pygame.transform.scale(img_nuke, (30, 50 - 7))
+nuke.set_colorkey(BLACK)
 
 #===========================     Funcionamento     ===========================#
 relogio =  pygame.time.Clock()
