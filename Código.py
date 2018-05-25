@@ -114,7 +114,6 @@ class Nave(pygame.sprite.Sprite):
             boss.shield -= 200
             tudo.add(boss_expl)
             tudo.add()
-            random.choice(exp_sounds).play()
         for i in range(4):
             if score < 1000:
                 novo_meteoro(lista_meteoros, tudo, enemy_group)
@@ -468,6 +467,9 @@ for snd in ['Pickup_Coin.wav', 'Pickup_Coin2.wav' ]:
 #som da morte
 crash_sound = pygame.mixer.Sound(path.join(snd_dir, 'Crash.wav'))
 
+#som nuke
+nuke_sound = pygame.mixer.Sound(path.join(snd_dir, 'kaboom.wav'))
+
 #som do boss
 boss_sound = pygame.mixer.Sound(path.join(snd_dir, 'Alien.wav'))
 
@@ -658,7 +660,7 @@ def main():
             mensagem('Shoot: SPACE', WIDTH/2, HEIGHT/2 - 100, 50, WHITE)
             mensagem('Move: Arrow Keys', WIDTH/2, HEIGHT/2 - 50, 50, WHITE)
             mensagem('Pause: P',  WIDTH/2, HEIGHT/2, 50, WHITE)
-            mensagem('NUKE!!!: N',  WIDTH/2, HEIGHT/2 + 50, 50, WHITE)
+            mensagem('NUKE!!!: C or V',  WIDTH/2, HEIGHT/2 + 50, 50, WHITE)
 
             
             mensagem('Press Q to go back to the Menu', WIDTH/2,
@@ -709,15 +711,18 @@ def main():
         
             mensagem('PICK YOUR SHIP', WIDTH/2, 50, 100, YELLOW)    
             draw_ship_options(tela, WIDTH/2 - 250, HEIGHT/2, image1)
-            mensagem('Press 1', WIDTH/2 -250, HEIGHT/2 - 150, 30, WHITE)
+            mensagem('Millenium Falcon', WIDTH/2 - 250, HEIGHT/2 - 180, 30, WHITE)
+            mensagem('Press 1', WIDTH/2 -250, HEIGHT/2 - 140, 30, WHITE)
             mensagem('Slow', WIDTH/2 -250, HEIGHT/2 + 125, 30, WHITE)
             mensagem('Heavy Shield', WIDTH/2 -250, HEIGHT/2 + 150, 30, WHITE)
             draw_ship_options(tela, WIDTH/2, HEIGHT/2, image2)
-            mensagem('Press 2', WIDTH/2, HEIGHT/2 - 150, 30, WHITE)
+            mensagem('X-Wing', WIDTH/2, HEIGHT/2 - 180, 30, WHITE)
+            mensagem('Press 2', WIDTH/2, HEIGHT/2 - 140, 30, WHITE)
             mensagem('Fast', WIDTH/2, HEIGHT/2 + 125, 30, WHITE)
             mensagem('Light Shield', WIDTH/2, HEIGHT/2 + 150, 30, WHITE)
             draw_ship_options(tela, WIDTH/2 + 250, HEIGHT/2, image3)
-            mensagem('Press 3', WIDTH/2 + 250, HEIGHT/2 - 150, 30, WHITE)
+            mensagem('Galaga', WIDTH/2 + 250, HEIGHT/2 - 180, 30, WHITE)
+            mensagem('Press 3', WIDTH/2 + 250, HEIGHT/2 - 140, 30, WHITE)
             mensagem('All-rounder', WIDTH/2 +250, HEIGHT/2 + 137.5, 30, WHITE)
             mensagem('Press Q to go back to the Menu', WIDTH/2, HEIGHT/2 + 250,
                      50, LIGHTRED)
@@ -873,12 +878,14 @@ def main():
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         nave.shoot(img_tiros, tudo, bullets_group)
-                    elif event.key == pygame.K_n:
+                    elif event.key == pygame.K_v or event.key == pygame.K_c:
                         if nave.nukes > 0:
                             nave.nukes -= 1
                             nave.nuke(enemy_group, tudo, boss, boss_alive, 
                                       score, nave, stalkers,lista_meteoros,
                                       mobs, lista_atirador)
+                            nuke_sound.play()
+
                     elif event.key == pygame.K_p:
                         pause = True
                         inicio_pause = time.time()
