@@ -47,7 +47,7 @@ class Nave(pygame.sprite.Sprite):
         self.vx = 0
         self.vy = 0
         keystate = pygame.key.get_pressed()
-        if self.power>=2 and pygame.time.get_ticks() - self.power_time > 3000:
+        if self.power>=2 and pygame.time.get_ticks() - self.power_time > 5000:
             self.power -= 1
             self.power_time = pygame.time.get_ticks()
         """ MOVIMENTO HORIZONTAL E VERTICAL """
@@ -329,7 +329,7 @@ class Boss(pygame.sprite.Sprite):
         self.radius = 100
         self.rect.centery = randrange(-150, -100)
         self.rect.centerx = WIDTH / 2
-        self.vy = 4
+        self.vy = 1
         self.shield = 750
         self.lives = 1
             
