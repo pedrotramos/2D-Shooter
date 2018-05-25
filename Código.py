@@ -12,6 +12,11 @@ Cosmic Storm by A Himitsu https://soundcloud.com/a-himitsu
 Creative Commons — Attribution 3.0 Unported— CC BY 3.0 
 http://creativecommons.org/licenses/b...
 Music promoted by Audio Library https://youtu.be/U4wXUdhNxZk
+
+Battle (Boss) by BoxCat Games http://freemusicarchive.org/music/Box...
+Creative Commons — Attribution 3.0 Unported— CC BY 3.0 
+http://creativecommons.org/licenses/b...
+Music promoted by Audio Library https://youtu.be/F-vl7Djb96o
 """
 import pygame
 from random import randrange
@@ -48,7 +53,7 @@ class Nave(pygame.sprite.Sprite):
         self.vx = 0
         self.vy = 0
         keystate = pygame.key.get_pressed()
-        if self.power>=2 and pygame.time.get_ticks() - self.power_time > 3000:
+        if self.power>=2 and pygame.time.get_ticks() - self.power_time > 5000:
             self.power -= 1
             self.power_time = pygame.time.get_ticks()
         """ MOVIMENTO HORIZONTAL E VERTICAL """
@@ -131,10 +136,7 @@ class Nave(pygame.sprite.Sprite):
                     novo_stalker(tudo, enemy_group, stalkers, nave, boss_alive)
                 elif resp == 3:
                     novo_atirador(tudo, enemy_group, mobs, lista_atirador)
-            
-                
-        
-        
+    
     def hide(self):
         self.hidden = True
         self.hide_timer = pygame.time.get_ticks()
@@ -381,7 +383,7 @@ class Boss(pygame.sprite.Sprite):
         self.radius = 100
         self.rect.centery = randrange(-150, -100)
         self.rect.centerx = WIDTH / 2
-        self.vy = 4
+        self.vy = 1
         self.shield = 750
         self.lives = 1
             
@@ -466,8 +468,11 @@ for snd in ['Pickup_Coin.wav', 'Pickup_Coin2.wav' ]:
 #som da morte
 crash_sound = pygame.mixer.Sound(path.join(snd_dir, 'Crash.wav'))
 
+#som do boss
+boss_sound = pygame.mixer.Sound(path.join(snd_dir, 'Alien.wav'))
+
 musics = ['tgfcoder-FrozenJam-SeamlessLoop.ogg', 'Cosmic Storm.ogg',
-          'SW.ogg', 'DV.ogg']
+          'SW.ogg', 'DV.ogg', 'boss.mp3']
 
 def Musicas(mus):
     musica = musics[mus]
@@ -653,6 +658,8 @@ def main():
             mensagem('Shoot: SPACE', WIDTH/2, HEIGHT/2 - 100, 50, WHITE)
             mensagem('Move: Arrow Keys', WIDTH/2, HEIGHT/2 - 50, 50, WHITE)
             mensagem('Pause: P',  WIDTH/2, HEIGHT/2, 50, WHITE)
+            mensagem('NUKE!!!: N',  WIDTH/2, HEIGHT/2 + 50, 50, WHITE)
+
             
             mensagem('Press Q to go back to the Menu', WIDTH/2,
                      HEIGHT/2 + 170, 50, LIGHTRED)
@@ -943,6 +950,7 @@ def main():
                 boss.kill()
                 boss_alive = False
                 score += 1000
+                Musicas(randrange(0,2))
                 
                 
             for hit in hits:
@@ -988,6 +996,8 @@ def main():
            
             if score >= (boss_spawns + 1) * 7500:
                 spawn_boss = True
+                boss_sound.play()
+                Musicas(4)
                 boss_spawns += 1     
                 
             if nave.lives == 0:
