@@ -104,7 +104,7 @@ class Nave(pygame.sprite.Sprite):
         self.power_time = pygame.time.get_ticks()
     
     def nuke(self, enemy_group, tudo, boss, boss_alive, score, nave, stalkers,
-             lista_meteoros, mobs, lista_atirador):
+             lista_meteoros, mobs, lista_atirador, lista_stalkers):
         for enemy in enemy_group:
             expl = Explosion(enemy.rect.center, 'lg')
             enemy.kill()
@@ -123,7 +123,8 @@ class Nave(pygame.sprite.Sprite):
                 if resp == 1:
                     novo_meteoro(lista_meteoros, tudo, enemy_group)
                 elif resp == 2:
-                    novo_stalker(tudo, enemy_group, stalkers, nave, boss_alive)
+                    novo_stalker(tudo, enemy_group, stalkers, nave, boss_alive, 
+                                 lista_stalkers)
             if score >= 2500 and score <= 5000:
                 novo_atirador(tudo, enemy_group, mobs, lista_atirador)
             if score > 5000:
@@ -132,7 +133,8 @@ class Nave(pygame.sprite.Sprite):
                 if resp == 1:
                     novo_meteoro(lista_meteoros, tudo, enemy_group)
                 elif resp == 2:
-                    novo_stalker(tudo, enemy_group, stalkers, nave, boss_alive)
+                    novo_stalker(tudo, enemy_group, stalkers, nave, boss_alive,
+                                 lista_stalkers)
                 elif resp == 3:
                     novo_atirador(tudo, enemy_group, mobs, lista_atirador)
     
@@ -886,7 +888,7 @@ def main():
                             nave.nukes -= 1
                             nave.nuke(enemy_group, tudo, boss, boss_alive, 
                                       score, nave, stalkers,lista_meteoros,
-                                      mobs, lista_atirador)
+                                      mobs, lista_atirador, lista_stalkers)
                             nuke_sound.play()
 
                     elif event.key == pygame.K_p:
@@ -1293,6 +1295,9 @@ vida = pygame.image.load('Assets/Lives.png').convert()
 img_nuke = pygame.image.load('Assets/Nuke.png').convert()
 nuke = pygame.transform.scale(img_nuke, (30, 50 - 7))
 nuke.set_colorkey(BLACK)
+img_logo = pygame.image.load('Assets/Logo.png')
+logo = pygame.transform.scale(img_logo, (100, 100))
+pygame.display.set_icon(logo)
 
 #===========================     Funcionamento     ===========================#
 relogio =  pygame.time.Clock()
