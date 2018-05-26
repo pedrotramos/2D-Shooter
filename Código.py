@@ -704,10 +704,10 @@ def main():
             img2 = pygame.image.load(ship2)
             image2 = pygame.transform.scale(img2, (150, 154))
             
-            ship3 = 'Assets/Galaga.png'
+            ship3 = 'Assets/USS_Defiant.png'
             
             img3 = pygame.image.load(ship3)
-            image3 = pygame.transform.scale(img3, (150, 180))
+            image3 = pygame.transform.scale(img3, (150, 188))
         
             mensagem('PICK YOUR SHIP', WIDTH/2, 50, 100, YELLOW)    
             draw_ship_options(tela, WIDTH/2 - 250, HEIGHT/2, image1)
@@ -721,7 +721,7 @@ def main():
             mensagem('Fast', WIDTH/2, HEIGHT/2 + 125, 30, WHITE)
             mensagem('Light Shield', WIDTH/2, HEIGHT/2 + 150, 30, WHITE)
             draw_ship_options(tela, WIDTH/2 + 250, HEIGHT/2, image3)
-            mensagem('Galaga', WIDTH/2 + 250, HEIGHT/2 - 180, 30, WHITE)
+            mensagem('USS Defiant', WIDTH/2 + 250, HEIGHT/2 - 180, 30, WHITE)
             mensagem('Press 3', WIDTH/2 + 250, HEIGHT/2 - 140, 30, WHITE)
             mensagem('All-rounder', WIDTH/2 +250, HEIGHT/2 + 137.5, 30, WHITE)
             mensagem('Press Q to go back to the Menu', WIDTH/2, HEIGHT/2 + 250,
