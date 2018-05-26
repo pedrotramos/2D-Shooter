@@ -489,9 +489,9 @@ def novo_meteoro(lista_meteoros, tudo, enemy_group):
     tudo.add(meteor)
     enemy_group.add(meteor)
     
-def novo_stalker(tudo, enemy_group, stalkers, alvo, boss_alive):
+def novo_stalker(tudo, enemy_group, stalkers, alvo, boss_alive, lista_stalkers):
     if not boss_alive:
-        stalker = Stalker('Assets/StalkerUFO.gif', alvo)
+        stalker = Stalker(random.choice(lista_stalkers), alvo)
     else:
         stalker = Stalker('Assets/alien.gif', alvo)
     tudo.add(stalker)
@@ -582,6 +582,9 @@ def main():
         lista_atirador = ['Assets/enemy_atirador.png',
                           'Assets/enemy_atirador2.png',
                           'Assets/enemy_atirador3.png']
+        
+        lista_stalkers = ['Assets/StalkerUFO.gif', 'Assets/Stalker3.gif']
+        
         while intro:
 
             pressed_keys = pygame.key.get_pressed()
@@ -957,9 +960,9 @@ def main():
                 boss.kill()
                 boss_alive = False
                 score += 1000
-                Musicas(randrange(0,2))
-                
-                
+                Musicas(randrange(0, 2))
+                boss.lives = 1
+                    
             for hit in hits:
                 crash_sound.play()
                 nave.shield -= hit.radius * 1.5
@@ -1154,7 +1157,7 @@ def main():
                             tudo.add(expl)
                         elif resp == 2:
                             novo_stalker(tudo, enemy_group, stalkers,
-                                         nave, boss_alive)
+                                         nave, boss_alive, lista_stalkers)
                             random.choice(exp_sounds).play()
                             expl = Explosion(tiro.rect.center, 'lg')
                             tudo.add(expl)
@@ -1174,7 +1177,7 @@ def main():
                             tudo.add(expl)
                         elif resp == 2:
                             novo_stalker(tudo, enemy_group, stalkers,
-                                         nave, boss_alive)
+                                         nave, boss_alive, lista_stalkers)
                             random.choice(exp_sounds).play()
                             expl = Explosion(tiro.rect.center, 'lg')
                             tudo.add(expl)
