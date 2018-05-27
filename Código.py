@@ -935,6 +935,9 @@ def main():
             '''Inimigo bate na Nave'''
             hits = pygame.sprite.spritecollide\
             (nave, enemy_group, False, pygame.sprite.collide_circle)
+            '''Nave bate no Boss'''
+            boss_hits = pygame.sprite.spritecollide\
+            (nave, bosses, False, pygame.sprite.collide_circle)
             '''Tiro inimigo acerta a nave'''
             pipocos = pygame.sprite.groupcollide\
             (enemy_bullets, nave_group, True,
@@ -986,6 +989,20 @@ def main():
                     nave.lives -= 1
                     nave.shield = 0
                     
+            for boss_hit in boss_hits:
+                crash_sound.play()
+                nave.shield = 0
+                boss.shield -= 100
+                death_explosion = Explosion(nave.rect.center, 'nave')
+                tudo.add(death_explosion)
+                nave.hide()
+                if nave.lives > 1:
+                    nave.lives -= 1
+                    nave.shield = pct_shield
+                elif nave.lives == 1:
+                    nave.lives -= 1
+                    nave.shield = 0
+                    
             for pipoco in pipocos:
                 crash_sound.play()
                 nave.shield -= 50
@@ -1006,7 +1023,7 @@ def main():
                     nave.lives -= 1
                     nave.shield = 0
            
-            if score >= (boss_spawns + 1) * 7500:
+            if score >= (boss_spawns + 1) * 500:
                 spawn_boss = True
                 boss_sound.play()
                 Musicas(4)
