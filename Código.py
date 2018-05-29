@@ -1023,7 +1023,7 @@ def main():
                     nave.lives -= 1
                     nave.shield = 0
            
-            if score >= (boss_spawns + 1) * 500:
+            if score >= (boss_spawns + 1) * 7500:
                 spawn_boss = True
                 boss_sound.play()
                 Musicas(4)
