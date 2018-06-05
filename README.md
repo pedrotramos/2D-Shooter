@@ -3,8 +3,7 @@ Projeto Final
 
 
 Para jogar:
-* Instalar Pygame, a partir do prompt de comando
-  digitar: pip install pygame 
+* Instalar Pygame, a partir do prompt de comando. Digitar: pip install pygame 
  
  
  Fonte das Imagens:
