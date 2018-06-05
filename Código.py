@@ -2,9 +2,6 @@
 """
 Created on Fri Apr 27 11:17:40 2018
 
-Baseado no canal do Youtube KidsCanCode 
-https://www.youtube.com/channel/UCNaPQ5uLX5iIEHUCLmfAgKg
-
 Frozen Jam by tgfcoder <https://twitter.com/tgfcoder> 
 licensed under CC-BY-3 <http://creativecommons.org/licenses/by/3.0/>
 
@@ -17,6 +14,10 @@ Battle (Boss) by BoxCat Games http://freemusicarchive.org/music/Box...
 Creative Commons — Attribution 3.0 Unported— CC BY 3.0 
 http://creativecommons.org/licenses/b...
 Music promoted by Audio Library https://youtu.be/F-vl7Djb96o
+
+As linhas que apresentarem '#' no final foram retiradas ou adaptadas
+Baseado do canal do Youtube KidsCanCode 
+https://www.youtube.com/channel/UCNaPQ5uLX5iIEHUCLmfAgKg
 """
 import pygame
 from random import randrange
@@ -33,21 +34,20 @@ class Nave(pygame.sprite.Sprite):
         self.image = pygame.image.load(arquivo_imagem)
         self.rect = self.image.get_rect()
         self.radius = (self.rect.width / 2) - 2
-        self.rect.centerx = WIDTH / 2
+        self.rect.centerx = WIDTH / 2  
         self.rect.bottom = HEIGHT - 5
         self.vx = 0
         self.vy = 0
-        self.speed = speed
-        self.power = 1
-        self.power_time = pygame.time.get_ticks()
-        self.shield = shield
-        self.lives = 3
+        self.speed = speed 
+        self.power = 1 #
+        self.power_time = pygame.time.get_ticks() #
+        self.shield = shield #
+        self.lives = 3 #
         self.nukes = 3
-        self.hidden = False
-        self.hide_timer = pygame.time.get_ticks()
-        self.shoot_delay = 250
-        self.last_shot = pygame.time.get_ticks()
-        
+        self.hidden = False #
+        self.hide_timer = pygame.time.get_ticks() #
+        self.shoot_delay = 250 #
+        self.last_shot = pygame.time.get_ticks() #
         
     def update(self):
         self.vx = 0
@@ -95,13 +95,14 @@ class Nave(pygame.sprite.Sprite):
         if self.rect.top < 5:
             self.rect.top = 5
         
-        if self.lives > 1:
-            if self.hidden and pygame.time.get_ticks() - self.hide_timer > 2000:
-                self.hidden = False
+        if self.lives > 1: #
+            if self.hidden and pygame.time.get_ticks()\
+            - self.hide_timer > 2000: #
+                self.hidden = False #
             
-    def powerup(self):
-        self.power += 1
-        self.power_time = pygame.time.get_ticks()
+    def powerup(self): #
+        self.power += 1 #
+        self.power_time = pygame.time.get_ticks() #
     
     def nuke(self, enemy_group, tudo, boss, boss_alive, score, nave, stalkers,
              lista_meteoros, mobs, lista_atirador, lista_stalkers):
@@ -138,10 +139,10 @@ class Nave(pygame.sprite.Sprite):
                 elif resp == 3:
                     novo_atirador(tudo, enemy_group, mobs, lista_atirador)
     
-    def hide(self):
-        self.hidden = True
-        self.hide_timer = pygame.time.get_ticks()
-        self.rect.center = (WIDTH / 2, HEIGHT + 200)
+    def hide(self): #
+        self.hidden = True #
+        self.hide_timer = pygame.time.get_ticks() #
+        self.rect.center = (WIDTH / 2, HEIGHT + 200) #
         
     def shoot(self, img_tiros, tudo, bullets_group):
         now = pygame.time.get_ticks()
@@ -149,10 +150,10 @@ class Nave(pygame.sprite.Sprite):
             self.last_shot = now
         if self.power == 1:
             tiro = Tiros(img_tiros, self.rect.centerx, self.rect.top)
-            tudo.add(tiro)
+            tudo.add(tiro) #
             bullets_group.add(tiro)
             shoot_sound.play()
-        if self.power == 2:
+        if self.power == 2: #
             tiro1 = Tiros(img_tiros, self.rect.left, self.rect.centery)
             tiro2 = Tiros(img_tiros, self.rect.right, self.rect.centery)
             tudo.add(tiro1)
@@ -186,67 +187,67 @@ class Tiros(pygame.sprite.Sprite):
         if self.rect.bottom < 0:
             self.kill()
             
-class Meteoros(pygame.sprite.Sprite):
+class Meteoros(pygame.sprite.Sprite): #
     
-    def __init__(self, arquivo_imagem):
-        pygame.sprite.Sprite.__init__(self)
+    def __init__(self, arquivo_imagem): #
+        pygame.sprite.Sprite.__init__(self) #
         self.image_orig = pygame.image.load(arquivo_imagem).convert()
         self.image = self.image_orig.copy()
-        self.rect = self.image.get_rect()
-        self.radius = int(self.rect.width / 2)
-        self.rect.centerx = randrange(0, 1000)
-        self.rect.centery = randrange(-150, -100)
+        self.rect = self.image.get_rect() 
+        self.radius = int(self.rect.width / 2) 
+        self.rect.centerx = randrange(0, 1000) 
+        self.rect.centery = randrange(-150, -100) 
         self.vy =  randrange(1, 8)
         self.vx =  randrange(-3, 3)
-        self.rot = 0
-        self.rot_speed = randrange(-8, 8)
-        self.last_update = pygame.time.get_ticks()
+        self.rot = 0 #
+        self.rot_speed = randrange(-8, 8) #
+        self.last_update = pygame.time.get_ticks() #
         
     def update(self):
         self.rect.y += self.vy
         self.rect.x += self.vx
-        self.rotacao()
+        self.rotacao() #
         if self.rect.top > HEIGHT or self.rect.right < 0 or \
         self.rect.left > WIDTH:
-            self.rect.y = randrange(-100, -40)
-            self.rect.x = randrange(0, 1000)
-            self.vy = randrange(1, 8)
-            self.vx = randrange(-3,3)
+            self.rect.y = randrange(-100, -40) #
+            self.rect.x = randrange(0, 1000) #
+            self.vy = randrange(1, 8) #
+            self.vx = randrange(-3,3) #
             
-    def rotacao(self):
-        tempo = pygame.time.get_ticks()
-        if tempo - self.last_update > 10:
-            self.last_update = tempo
-            self.rot = (self.rot + self.rot_speed) % 360
-            new_image = pygame.transform.rotate(self.image_orig, self.rot)
-            old_center = self.rect.center
-            self.image = new_image
-            self.rect = self.image.get_rect()
-            self.rect.center = old_center
+    def rotacao(self): #
+        tempo = pygame.time.get_ticks() #
+        if tempo - self.last_update > 10: #
+            self.last_update = tempo #
+            self.rot = (self.rot + self.rot_speed) % 360 #
+            new_image = pygame.transform.rotate(self.image_orig, self.rot) #
+            old_center = self.rect.center #
+            self.image = new_image #
+            self.rect = self.image.get_rect() #
+            self.rect.center = old_center #
 
-class Explosion(pygame.sprite.Sprite):
-    def __init__(self, center, size):
-        pygame.sprite.Sprite.__init__(self)
-        self.size = size
-        self.image = explosion[self.size][0]
-        self.rect = self.image.get_rect()
-        self.rect.center = center
-        self.frame = 0
-        self.last_update = pygame.time.get_ticks()
-        self.frame_rate = 50
+class Explosion(pygame.sprite.Sprite): #
+    def __init__(self, center, size): #
+        pygame.sprite.Sprite.__init__(self) #
+        self.size = size #
+        self.image = explosion[self.size][0] #
+        self.rect = self.image.get_rect() #
+        self.rect.center = center #
+        self.frame = 0 #
+        self.last_update = pygame.time.get_ticks() #
+        self.frame_rate = 50 #
 
-    def update(self):
-        now = pygame.time.get_ticks()
-        if now - self.last_update > self.frame_rate:
-            self.last_update = now
-            self.frame += 1
-            if self.frame == len(explosion[self.size]):
-                self.kill()
-            else:
-                center = self.rect.center
-                self.image = explosion[self.size][self.frame]
-                self.rect = self.image.get_rect()
-                self.rect.center = center
+    def update(self): #
+        now = pygame.time.get_ticks() #
+        if now - self.last_update > self.frame_rate: #
+            self.last_update = now #
+            self.frame += 1 #
+            if self.frame == len(explosion[self.size]):  #
+                self.kill() #
+            else: 
+                center = self.rect.center #
+                self.image = explosion[self.size][self.frame] #
+                self.rect = self.image.get_rect() #
+                self.rect.center = center #
                 
 class Nuke(pygame.sprite.Sprite):
     
@@ -263,13 +264,13 @@ class Nuke(pygame.sprite.Sprite):
 
 class Pow(pygame.sprite.Sprite):
     
-    def __init__(self, center):
-        pygame.sprite.Sprite.__init__(self)
-        self.type = random.choice(['gun', 'shield'])
-        self.image = powerups_images[self.type]
-        self.rect = self.image.get_rect()
-        self.rect.center = center
-        self.speedy = 2
+    def __init__(self, center): 
+        pygame.sprite.Sprite.__init__(self) 
+        self.type = random.choice(['gun', 'shield']) #
+        self.image = powerups_images[self.type] 
+        self.rect = self.image.get_rect() 
+        self.rect.center = center 
+        self.speedy = 2 
         
     def update(self):
         self.rect.y += self.speedy
@@ -447,6 +448,9 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
 #================================     Som     ================================#
+#Toda a parte de inserir som no jogo foi inspirada no canal do youtube.
+#a função de Musicas foi feita pelo grupo para facilitar 
+#a inserção das músicas tema no jogo
 snd_dir = path.join(path.dirname (__file__), 'snd')
 pygame.mixer.init()
 
@@ -486,6 +490,7 @@ def Musicas(mus):
     pygame.mixer.music.play(loops = -1)
 
 #==============================     Funções     ==============================#  
+#Para não ficar repetindo as mesmas coisas durante o loop:
 def novo_meteoro(lista_meteoros, tudo, enemy_group):
     meteor = Meteoros(random.choice(lista_meteoros))
     tudo.add(meteor)
@@ -968,12 +973,12 @@ def main():
                 Musicas(randrange(0, 2))
                 boss.lives = 1
                     
-            for hit in hits:
-                crash_sound.play()
-                nave.shield -= hit.radius * 1.5
-                novo_meteoro(lista_meteoros, tudo, enemy_group)
-                expl = Explosion(hit.rect.center, 'sm')
-                tudo.add(expl)
+            for hit in hits: #
+                crash_sound.play() #
+                nave.shield -= hit.radius * 1.5 #
+                novo_meteoro(lista_meteoros, tudo, enemy_group) #
+                expl = Explosion(hit.rect.center, 'sm') #
+                tudo.add(expl) #
                 
                 if nave.shield < 1 and nave.lives > 1:
                     death_explosion = Explosion(nave.rect.center, 'nave')
@@ -1277,6 +1282,9 @@ HEIGHT = 600
 
 tela = pygame.display.set_mode((WIDTH, HEIGHT), 0, 32)
 pygame.display.set_caption('GOTU')
+
+#Explosões lm e sm baseadas no canal do youtube. Demais, adaptadas para o 
+#nosso jogo 
 
 powerups_images = {}
 powerups_images['shield'] = pygame.image.load("Assets/Shield.gif").convert()
