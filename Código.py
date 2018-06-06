@@ -670,7 +670,7 @@ def main():
             mensagem('Shoot: SPACE', WIDTH/2, HEIGHT/2 - 100, 50, WHITE)
             mensagem('Move: Arrow Keys', WIDTH/2, HEIGHT/2 - 50, 50, WHITE)
             mensagem('Pause: P',  WIDTH/2, HEIGHT/2, 50, WHITE)
-            mensagem('NUKE!!!: C or V',  WIDTH/2, HEIGHT/2 + 50, 50, WHITE)
+            mensagem('NUKE!!!: B',  WIDTH/2, HEIGHT/2 + 50, 50, WHITE)
 
             
             mensagem('Press Q to go back to the Menu', WIDTH/2,
@@ -888,7 +888,7 @@ def main():
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
                         nave.shoot(img_tiros, tudo, bullets_group)
-                    elif event.key == pygame.K_v or event.key == pygame.K_c:
+                    elif event.key == pygame.K_b:
                         if nave.nukes > 0:
                             nave.nukes -= 1
                             nave.nuke(enemy_group, tudo, boss, boss_alive, 
