@@ -19,6 +19,7 @@ As linhas que apresentarem '#' no final foram retiradas ou adaptadas
 Baseado do canal do Youtube KidsCanCode 
 https://www.youtube.com/channel/UCNaPQ5uLX5iIEHUCLmfAgKg
 """
+# Bibliotecas necessárias
 import pygame
 from random import randrange
 import random
@@ -41,19 +42,19 @@ class Nave(pygame.sprite.Sprite):
         self.speed = speed 
         self.power = 1 #
         self.power_time = pygame.time.get_ticks() #
-        self.shield = shield #
-        self.lives = 3 #
-        self.nukes = 3
-        self.hidden = False #
-        self.hide_timer = pygame.time.get_ticks() #
-        self.shoot_delay = 250 #
-        self.last_shot = pygame.time.get_ticks() #
+        self.shield = shield # Valor de shield que o jogador possui
+        self.lives = 3 # Número de vidas do jogador
+        self.nukes = 3 # Número de bombas (Não há a chance de ganhar mais)
+        self.hidden = False # Quando True tira a nave da tela
+        self.hide_timer = pygame.time.get_ticks() # Duração do período escondido
+        self.shoot_delay = 250 # Período entre tiros
+        self.last_shot = pygame.time.get_ticks() # Guarda momento do último tiro
         
-    def update(self):
+    def update(self, img_tiros, tudo, bullets_group):
         self.vx = 0
         self.vy = 0
         keystate = pygame.key.get_pressed()
-        if self.power>=2 and pygame.time.get_ticks() - self.power_time > 5000:
+        if self.power >= 2 and pygame.time.get_ticks() - self.power_time > 5000:
             self.power -= 1
             self.power_time = pygame.time.get_ticks()
         """ MOVIMENTO HORIZONTAL E VERTICAL """
@@ -95,26 +96,32 @@ class Nave(pygame.sprite.Sprite):
         if self.rect.top < 5:
             self.rect.top = 5
         
+        # Garante o Auto-fire
+        if keystate[pygame.K_SPACE]:
+            self.shoot(img_tiros, tudo, bullets_group)
+        
         if self.lives > 1: #
             if self.hidden and pygame.time.get_ticks()\
             - self.hide_timer > 2000: #
                 self.hidden = False #
             
-    def powerup(self): #
-        self.power += 1 #
+    def powerup(self): # Aumenta o número de tiros da nave
+        self.power += 1 # Aumenta as linhas de tiro em 1
         self.power_time = pygame.time.get_ticks() #
     
+    # Explode todos os inimigos na tela e tira 200 de shield do boss
     def nuke(self, enemy_group, tudo, boss, boss_alive, score, nave, stalkers,
              lista_meteoros, mobs, lista_atirador, lista_stalkers):
-        for enemy in enemy_group:
+        for enemy in enemy_group: # Explode inimigos
             expl = Explosion(enemy.rect.center, 'lg')
             enemy.kill()
             tudo.add(expl)
-        if boss_alive:
+        if boss_alive: # Tira 200 de shield do boss
             boss_expl = Explosion(boss.rect.center, 'boss')
             boss.shield -= 200
             tudo.add(boss_expl)
             tudo.add()
+        # Gera novos inimigos
         for i in range(4):
             if score < 1000:
                 novo_meteoro(lista_meteoros, tudo, enemy_group)
@@ -139,39 +146,40 @@ class Nave(pygame.sprite.Sprite):
                 elif resp == 3:
                     novo_atirador(tudo, enemy_group, mobs, lista_atirador)
     
-    def hide(self): #
-        self.hidden = True #
-        self.hide_timer = pygame.time.get_ticks() #
-        self.rect.center = (WIDTH / 2, HEIGHT + 200) #
+    def hide(self): # Tira a nave da tela
+        self.hidden = True
+        self.hide_timer = pygame.time.get_ticks() # Timer para voltar a aparecer
+        self.rect.center = (WIDTH / 2, HEIGHT + 200) # Manda a nave de volta à sua origem
         
-    def shoot(self, img_tiros, tudo, bullets_group):
+    def shoot(self, img_tiros, tudo, bullets_group): # Método atirar
         now = pygame.time.get_ticks()
-        if now - self.last_shot > self.shoot_delay:
+        if now - self.last_shot >= self.shoot_delay: # Auto-fire
             self.last_shot = now
-        if self.power == 1:
-            tiro = Tiros(img_tiros, self.rect.centerx, self.rect.top)
-            tudo.add(tiro) #
-            bullets_group.add(tiro)
-            shoot_sound.play()
-        if self.power == 2: #
-            tiro1 = Tiros(img_tiros, self.rect.left, self.rect.centery)
-            tiro2 = Tiros(img_tiros, self.rect.right, self.rect.centery)
-            tudo.add(tiro1)
-            tudo.add(tiro2)
-            bullets_group.add(tiro1)
-            bullets_group.add(tiro2)
-            shoot_sound.play()
-        if self.power >= 3:
-            tiro1 = Tiros(img_tiros, self.rect.left, self.rect.centery)
-            tiro2 = Tiros(img_tiros, self.rect.right, self.rect.centery)
-            tiro3 = Tiros(img_tiros, self.rect.centerx, self.rect.top)
-            tudo.add(tiro1)
-            tudo.add(tiro2)
-            tudo.add(tiro3)
-            bullets_group.add(tiro1)
-            bullets_group.add(tiro2)
-            bullets_group.add(tiro3)
-            shoot_sound.play()
+            if self.power == 1: # Para 1 linha de tiro
+                # Define imagem e posição inicial da linha de tiro
+                tiro = Tiros(img_tiros, self.rect.centerx, self.rect.top)
+                tudo.add(tiro) # Adiciona o tiro ao grupo tudo
+                bullets_group.add(tiro) # Adiciona o tiro ao grupo bullets_group
+                shoot_sound.play() # Executa o som do tiro
+            if self.power == 2: # Para 2 linhas de tiro
+                tiro1 = Tiros(img_tiros, self.rect.left, self.rect.centery)
+                tiro2 = Tiros(img_tiros, self.rect.right, self.rect.centery)
+                tudo.add(tiro1)
+                tudo.add(tiro2)
+                bullets_group.add(tiro1)
+                bullets_group.add(tiro2)
+                shoot_sound.play()
+            if self.power >= 3: # Para 3 linhas de tiro
+                tiro1 = Tiros(img_tiros, self.rect.left, self.rect.centery)
+                tiro2 = Tiros(img_tiros, self.rect.right, self.rect.centery)
+                tiro3 = Tiros(img_tiros, self.rect.centerx, self.rect.top)
+                tudo.add(tiro1)
+                tudo.add(tiro2)
+                tudo.add(tiro3)
+                bullets_group.add(tiro1)
+                bullets_group.add(tiro2)
+                bullets_group.add(tiro3)
+                shoot_sound.play()
         
 class Tiros(pygame.sprite.Sprite):
     def __init__(self, arquivo_imagem, pos_x, pos_y):
@@ -180,41 +188,41 @@ class Tiros(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.bottom = pos_y
         self.rect.centerx = pos_x
-        self.vy = -10
+        self.vy = -10 # Os tiros só se movem em y
         
-    def update(self):
+    def update(self): # Move os tiros
         self.rect.y += self.vy
-        if self.rect.bottom < 0:
+        if self.rect.bottom < 0: # Se o tiro sair da tela ele sai do jogo
             self.kill()
             
-class Meteoros(pygame.sprite.Sprite): #
+class Meteoros(pygame.sprite.Sprite): # Inimigos de tipo meteoro
     
-    def __init__(self, arquivo_imagem): #
-        pygame.sprite.Sprite.__init__(self) #
+    def __init__(self, arquivo_imagem):
+        pygame.sprite.Sprite.__init__(self)
         self.image_orig = pygame.image.load(arquivo_imagem).convert()
         self.image = self.image_orig.copy()
         self.rect = self.image.get_rect() 
         self.radius = int(self.rect.width / 2) 
-        self.rect.centerx = randrange(0, 1000) 
-        self.rect.centery = randrange(-150, -100) 
-        self.vy =  randrange(1, 8)
-        self.vx =  randrange(-3, 3)
+        self.rect.centerx = randrange(0, 1000) # Posição inicial em x do meteoro
+        self.rect.centery = randrange(-100, -40) # Posição inicial em y do meteoro
+        self.vy =  randrange(1, 7) # Velocidade em y do meteoro
+        self.vx =  randrange(-3, 3) # Velocidade em x do meteoro
         self.rot = 0 #
-        self.rot_speed = randrange(-8, 8) #
+        self.rot_speed = randrange(-8, 8) # Velocidade de rotação do meteoro
         self.last_update = pygame.time.get_ticks() #
         
     def update(self):
         self.rect.y += self.vy
         self.rect.x += self.vx
-        self.rotacao() #
+        self.rotacao() # Rotaciona o meteoro
         if self.rect.top > HEIGHT or self.rect.right < 0 or \
         self.rect.left > WIDTH:
-            self.rect.y = randrange(-100, -40) #
-            self.rect.x = randrange(0, 1000) #
-            self.vy = randrange(1, 8) #
-            self.vx = randrange(-3,3) #
+            self.rect.y = randrange(-100, -40) # Posição inicial em y do meteoro
+            self.rect.x = randrange(0, 1000) # Posição inicial em x do meteoro
+            self.vy = randrange(1, 7) # Velocidade em y do meteoro
+            self.vx = randrange(-3,3) # Velocidade em x do meteoro
             
-    def rotacao(self): #
+    def rotacao(self): # Rotaciona o meteoro
         tempo = pygame.time.get_ticks() #
         if tempo - self.last_update > 10: #
             self.last_update = tempo #
@@ -225,10 +233,10 @@ class Meteoros(pygame.sprite.Sprite): #
             self.rect = self.image.get_rect() #
             self.rect.center = old_center #
 
-class Explosion(pygame.sprite.Sprite): #
-    def __init__(self, center, size): #
-        pygame.sprite.Sprite.__init__(self) #
-        self.size = size #
+class Explosion(pygame.sprite.Sprite): # Classe resposável pelas animações de explosão
+    def __init__(self, center, size):
+        pygame.sprite.Sprite.__init__(self)
+        self.size = size # Define tamanho da explosão
         self.image = explosion[self.size][0] #
         self.rect = self.image.get_rect() #
         self.rect.center = center #
@@ -252,32 +260,26 @@ class Explosion(pygame.sprite.Sprite): #
 class Nuke(pygame.sprite.Sprite):
     
     def __init__(self, center):
-           self.image = 'Assets/Nuke.png'
+           self.image = 'Assets/Nuke.png' # Imagem do ícone Nuke
            self.rect = self.image.get_rect()
            self.rect.center = center
-           self.speedy = 2
-           
-    def update(self):
-        self.rect.y += self.speedy
-        if self.rect.top > HEIGHT:
-            self.kill()
 
 class Pow(pygame.sprite.Sprite):
     
     def __init__(self, center): 
         pygame.sprite.Sprite.__init__(self) 
-        self.type = random.choice(['gun', 'shield']) #
+        self.type = random.choice(['gun', 'shield']) # Escolhe 1 power-up aleatóriamente
         self.image = powerups_images[self.type] 
         self.rect = self.image.get_rect() 
-        self.rect.center = center 
-        self.speedy = 2 
+        self.rect.center = center # Define posição inicial do power-up
+        self.speedy = 2 # Velocidade em y do power-up
         
     def update(self):
         self.rect.y += self.speedy
         if self.rect.top > HEIGHT:
-            self.kill()
+            self.kill() # Tira o power-up do jogo
 
-class Stalker(pygame.sprite.Sprite):
+class Stalker(pygame.sprite.Sprite): # Inimigo que segue o jogador
     
     def __init__(self, arquivo_imagem, alvo):
         pygame.sprite.Sprite.__init__(self)
@@ -285,15 +287,16 @@ class Stalker(pygame.sprite.Sprite):
         self.image = self.image_orig.copy()
         self.rect = self.image.get_rect()
         self.radius = int(self.rect.width / 2)
-        self.rect.centery = randrange(-150, -100)
-        self.rect.centerx = randrange(0, 1000)
-        self.vy = 3
-        self.alvo = alvo
+        self.rect.centery = randrange(-100, -40) # Posição inicial em y
+        self.rect.centerx = randrange(0, 1000) # Posição inicial em x
+        self.vy = 3 # Velocidade em y
+        self.alvo = alvo # Define o alvo a ser perseguido
         self.rot = 0
         self.rot_speed = randrange(-8, 8)
         self.last_update = pygame.time.get_ticks()
         
     def update(self):
+        # Checa posição em x em relação à posição em x do alvo
         if self.rect.centerx > self.alvo.rect.centerx:
             self.vx = -2.5
         elif self.rect.centerx < self.alvo.rect.centerx:
@@ -304,9 +307,9 @@ class Stalker(pygame.sprite.Sprite):
         self.rect.centery += self.vy
         self.rotacao()
         if self.rect.top > HEIGHT or self.rect.right < 0 or \
-        self.rect.left > WIDTH:
-            self.rect.y = randrange(-100, -40)
-            self.rect.x = randrange(0, 1000)
+        self.rect.left > WIDTH: # Caso saia da tela
+            self.rect.y = randrange(-100, -40) # Retorna ao x inicial
+            self.rect.x = randrange(0, 1000) # Retorn ao y inicial
     
     def rotacao(self):
         tempo = pygame.time.get_ticks()
@@ -326,24 +329,24 @@ class Atirador(pygame.sprite.Sprite):
         self.image = pygame.image.load(arquivo_imagem)
         self.rect = self.image.get_rect()
         self.radius = 56
-        self.rect.centery = randrange(-150, -100)
-        self.rect.centerx = randrange(0, 1000)
-        self.vy = 4
-        self.vx = randrange(-5,5,2)
+        self.rect.centery = randrange(-100, -40) # Posição inicial em y
+        self.rect.centerx = randrange(0, 1000) # Posição inicial em x
+        self.vy = 4 # Velocidade em y
+        self.vx = randrange(-5,5,2) # Velocidade em x
             
     def update(self):
         self.rect.y += self.vy
         self.rect.x += self.vx
-        if self.rect.right > WIDTH - 5:
+        if self.rect.right > WIDTH - 5: # Mudança de direção em x
             self.rect.right = WIDTH - 5
             self.vx = -self.vx
         if self.rect.left < 5:
             self.rect.left = 5
             self.vx = -self.vx
-        if self.rect.bottom > 150:
+        if self.rect.bottom > 150: # Para de descer na altura de 150
             self.rect.bottom = 150
                 
-    def enemy_shoot(self, tudo, enemy_bullets):
+    def enemy_shoot(self, tudo, enemy_bullets): # Faz inimigo atirar
         tiro = Enemybullets('Assets/tiro_inimigo.png',
                             self.rect.centerx,
                             self.rect.bottom, 0)
@@ -361,40 +364,40 @@ class Atirador(pygame.sprite.Sprite):
         enemy_bullets.add(tiro2)
         enemy_shoot_sound.play()
 
-class Enemybullets(pygame.sprite.Sprite):
+class Enemybullets(pygame.sprite.Sprite): # Gera tiro de inimigo
     def __init__(self, arquivo_imagem, pos_x, pos_y, vx):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load(arquivo_imagem)
+        self.image = pygame.image.load(arquivo_imagem) # imagem do tiro
         self.rect = self.image.get_rect()
-        self.rect.centery = pos_y
-        self.rect.centerx = pos_x
-        self.vy = 3
-        self.vx = vx
+        self.rect.centery = pos_y # Posição y inicial
+        self.rect.centerx = pos_x # Posição x inicial
+        self.vy = 3 # Velocidade em y
+        self.vx = vx # Velocidade em x
         
     def update(self):
         self.rect.y += self.vy
         self.rect.x += self.vx
-        if self.rect.top > 600:
+        if self.rect.top > 600: # Tira tiro do jogo
             self.kill()
 
-class Boss(pygame.sprite.Sprite):
+class Boss(pygame.sprite.Sprite): # Chefão do jogo
     def __init__(self, arquivo_imagem):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(arquivo_imagem)
         self.rect = self.image.get_rect()
-        self.radius = 100
-        self.rect.centery = randrange(-150, -100)
-        self.rect.centerx = WIDTH / 2
-        self.vy = 1
-        self.shield = 750
-        self.lives = 1
+        self.radius = 100 # Raio em que pode-se atingi-lo
+        self.rect.centery = randrange(-150, -100) # Posição inicial em y
+        self.rect.centerx = WIDTH / 2 # Posição inicial em x
+        self.vy = 1 # Velocidade em y
+        self.shield = 750 # Shield do chefão
+        self.lives = 1 # Número de vidas do chefão
             
     def update(self):
         self.rect.y += self.vy
-        if self.rect.bottom > 150:
+        if self.rect.bottom > 150: # Boss para quando chega a altura de 150
             self.rect.bottom = 150
         
-    def enemy_shoot(self, tudo, enemy_bullets):
+    def enemy_shoot(self, tudo, enemy_bullets): # Gera 7 tiros para o boss
         vxt1 = randrange(1, 4)
         vxt2 = randrange(vxt1 + 1, vxt1 + 4)
         vxt3 = randrange(vxt2 + 1, vxt2 + 4)
@@ -434,7 +437,7 @@ class Boss(pygame.sprite.Sprite):
         enemy_bullets.add(tiro4)
         enemy_bullets.add(tiro5)
         enemy_bullets.add(tiro6)
-        enemy_shoot_sound.play()
+        enemy_shoot_sound.play() # Som de tiro
         
 #===============================     Cores     ===============================#
 GREEN = (0, 150, 0)
@@ -491,11 +494,13 @@ def Musicas(mus):
 
 #==============================     Funções     ==============================#  
 #Para não ficar repetindo as mesmas coisas durante o loop:
+# Adiciona um novo meteoro ao jogo
 def novo_meteoro(lista_meteoros, tudo, enemy_group):
     meteor = Meteoros(random.choice(lista_meteoros))
     tudo.add(meteor)
     enemy_group.add(meteor)
-    
+
+# Adiciona um novo stalker ao jogo   
 def novo_stalker(tudo, enemy_group, stalkers, alvo, boss_alive, lista_stalkers):
     if not boss_alive:
         stalker = Stalker(random.choice(lista_stalkers), alvo)
@@ -504,18 +509,21 @@ def novo_stalker(tudo, enemy_group, stalkers, alvo, boss_alive, lista_stalkers):
     tudo.add(stalker)
     enemy_group.add(stalker)
     stalkers.add(stalker)
-    
+
+# Adiciona um novo atirador ao jogo    
 def novo_atirador(tudo, enemy_group, mobs, lista_atirador):
     mob = Atirador(random.choice(lista_atirador))
     tudo.add(mob)
     enemy_group.add(mob)
     mobs.add(mob)
 
+# Adiciona um novo boss ao jogo
 def novo_boss(tudo, enemy_group, bosses):
     boss = Boss('Assets/Boss1.gif')
     tudo.add(boss)
     bosses.add(boss)
 
+# Desenha a barra de shield na tela
 def shield(surf, x, y, pct, maximo, cor, w, h):
     if pct < 0:
         pct = 0
@@ -526,7 +534,8 @@ def shield(surf, x, y, pct, maximo, cor, w, h):
     fill_rect = pygame.Rect(x, y, fill, BAR_HEIGHT)
     pygame.draw.rect(surf, cor, fill_rect)
     pygame.draw.rect(surf, WHITE, outline_rect, 2)
-    
+
+# Desenha os nukes na tela  
 def draw_nukes(surf, x, y, nukes, img):
     if nukes > 0:
         for i in range(nukes):
@@ -534,20 +543,23 @@ def draw_nukes(surf, x, y, nukes, img):
             img_rect.x = x + 35 * i
             img_rect.y = y
             surf.blit(img, img_rect)
-    
+
+# Desenha as vidas na tela
 def draw_lives(surf, x, y, lives, img):
     for i in range(lives):
         img_rect = img.get_rect()
         img_rect.x = x + 35 * i
         img_rect.y = y
         surf.blit(img, img_rect)
-        
+
+# Desenha as opções de nave na tela de escolha        
 def draw_ship_options(surf, x, y, img):
     img_rect = img.get_rect()
     img_rect.centerx = x
     img_rect.centery = y
     surf.blit(img, img_rect)
-    
+
+# Conta a passagem de segundos    
 def cronometro(value):
     valueD = (((value/365)/24)/60)
 
@@ -560,6 +572,7 @@ def cronometro(value):
     
     return Seconds
 
+# Responsável pelas mensagens que aparecem no jogo
 def mensagem(mensagem, x, y, tamanho, COR):
    
     def textos(mensagem, fonte):
@@ -570,51 +583,53 @@ def mensagem(mensagem, x, y, tamanho, COR):
     TextSurf, TextRect = textos(mensagem, texto)
     TextRect.center = (x, y)
     tela.blit(TextSurf, TextRect)
-        
+
+# Loop principal        
 def main():
+    # Variáveis que definem a tela que será exibida
     loop = True
     intro = True
     instruction = False
     Game = False
     while loop:
         x = 0
-        mn = pygame.image.load("Assets/StarBackground.jpg").convert()
-        Musicas(2)
+        mn = pygame.image.load("Assets/StarBackground.jpg").convert() # Imagem de fundo
+        Musicas(2) # Música do menu
         
-        fundo = pygame.image.load("Assets/StarBackground.jpg").convert()
+        fundo = pygame.image.load("Assets/StarBackground.jpg").convert() # Imagem de fundo
         
         lista_meteoros = ['Assets/asteroid.gif', 'Assets/meteor2_s.gif',
-                                  'Assets/fire_meteor_xs.gif']
+                                  'Assets/fire_meteor_xs.gif'] # Lista de imagens de meteoros
             
         lista_atirador = ['Assets/enemy_atirador.png',
                           'Assets/enemy_atirador2.png',
-                          'Assets/enemy_atirador3.png']
+                          'Assets/enemy_atirador3.png'] # Lista de imagens de atiradores
         
-        lista_stalkers = ['Assets/StalkerUFO.gif', 'Assets/Stalker3.gif']
+        lista_stalkers = ['Assets/StalkerUFO.gif', 'Assets/Stalker3.gif'] # Lista de imagens de stalkers
         
-        while intro:
+        while intro: # Menu inicial
 
             pressed_keys = pygame.key.get_pressed()
             
-            if pressed_keys[pygame.K_ESCAPE]:
+            if pressed_keys[pygame.K_ESCAPE]: # Sair do jogo
                 Game = False
                 escolha_nave = False
                 intro = False
                 instruction = False
                 loop = False
                 return
-            if pressed_keys[pygame.K_RETURN]:
+            if pressed_keys[pygame.K_RETURN]: # Jogar
                 Game = False
                 escolha_nave = True
                 intro = False
                 instruction = False
-            if pressed_keys[pygame.K_i]:
+            if pressed_keys[pygame.K_i]: # Instruções
                 Game = False
                 escolha_nave = False
                 intro = False
                 instruction = True
             
-            for event in pygame.event.get():
+            for event in pygame.event.get(): # Sair caso clique no X da janela
                 if event.type == pygame.QUIT:
                     return
             
@@ -625,6 +640,7 @@ def main():
                 tela.blit(mn, (rel_x, 0))
             x += 2
             
+            # Textoa do Menu inicial
             mensagem('GUARDIANS', WIDTH/2, HEIGHT/2 - 200, 130, YELLOW)
             mensagem('OF THE', WIDTH/2, HEIGHT/2 - 125, 30, YELLOW)
             mensagem('UNIVERSE', WIDTH/2, HEIGHT/2 - 50, 130, YELLOW)
@@ -642,30 +658,32 @@ def main():
         x = 0
         inst = pygame.image.load("Assets/StarBackground.jpg").convert()
         
-        while instruction:
+        while instruction: # Tela de instruções
             
             pressed_keys = pygame.key.get_pressed()
             
-            if pressed_keys[pygame.K_RETURN]:
+            if pressed_keys[pygame.K_RETURN]: # Jogar
                 Game = False
                 escolha_nave = True
                 intro = False
                 instruction = False
-            if pressed_keys[pygame.K_q]:
+            if pressed_keys[pygame.K_q]: # Voltar ao Menu inicial
                 Game = False
                 intro = True
                 instruction = False
             
-            for event in pygame.event.get():
+            for event in pygame.event.get(): # Sair do jogo caso clique o X da janela
                 if event.type == pygame.QUIT:
                     return
-                    
+            
+            # Movimento Horizontal da tela de instruções
             rel_x = x % inst.get_rect().width
             tela.blit(inst, (rel_x - inst.get_rect().width, 0))
             if rel_x < WIDTH:
                 tela.blit(inst, (rel_x, 0))
             x -= 2
             
+            # Textos da tela de instruções
             mensagem('INSTRUCTIONS', WIDTH/2, HEIGHT/2 - 200, 130, WHITE)
             mensagem('Shoot: SPACE', WIDTH/2, HEIGHT/2 - 100, 50, WHITE)
             mensagem('Move: Arrow Keys', WIDTH/2, HEIGHT/2 - 50, 50, WHITE)
@@ -684,8 +702,9 @@ def main():
         y = 0
         img_escolha = pygame.image.load("Assets/StarBackground.jpg").convert()    
             
-        while escolha_nave:
+        while escolha_nave: # Tela de escolha de nave
             
+            # Abre o arquivo highscore e identifica o recorde atual
             with open ('highscore.txt', 'r') as file:
                 if os.stat('highscore.txt').st_size == 0:
                     existe_highscore = False
@@ -693,17 +712,18 @@ def main():
                     existe_highscore = True
                     highscore = file.read()
             
-            for event in pygame.event.get():
+            for event in pygame.event.get(): # Sai do jogo caso o X da janela seja clicado
                 if event.type == pygame.QUIT:
                     return
             
-            #Movimento da tela na horintal da escolha das naves 
+            #Movimento da tela na vertical da escolha da nave
             rel_y = y % img_escolha.get_rect().height
             tela.blit(img_escolha, (0, rel_y - img_escolha.get_rect().height))
             if rel_y < HEIGHT:
                 tela.blit(img_escolha, (0, rel_y))
             y += 2
-                    
+            
+            # Define as imagens a serem exibidas
             ship1 = 'Assets/MilleniumFalcon.png'
             
             img1 = pygame.image.load(ship1)
@@ -718,7 +738,8 @@ def main():
             
             img3 = pygame.image.load(ship3)
             image3 = pygame.transform.scale(img3, (150, 188))
-        
+            
+            # Exibe mensagens e imagens das naves
             mensagem('PICK YOUR SHIP', WIDTH/2, 50, 100, YELLOW)    
             draw_ship_options(tela, WIDTH/2 - 250, HEIGHT/2, image1)
             mensagem('Millenium Falcon', WIDTH/2 - 250, HEIGHT/2 - 180, 30, WHITE)
@@ -744,7 +765,8 @@ def main():
             
             nave_group = pygame.sprite.Group()
             
-            if pressed_keys[pygame.K_1]:
+            if pressed_keys[pygame.K_1]: # Escolhe a Millenium Falcon
+                # Define todas as variáveis necessárias para que o jogo seja iniciado
                 pct_shield = 125
                 nave = Nave(ship1, 4, pct_shield)
                 nave_group.add(nave)
@@ -778,7 +800,6 @@ def main():
                 
                 tudo.add(stalkers)
                 tudo.add(enemy_group)
-                tudo.add(nave_group)
                 tudo.add(vidas)
                 
                 score_tiros = 0
@@ -786,7 +807,8 @@ def main():
                 y = 0
                 Musicas(randrange(0,2))
                 
-            elif pressed_keys[pygame.K_2]:
+            elif pressed_keys[pygame.K_2]: # Escolhe a X-Wing
+                # Define todas as variáveis necessárias para que o jogo seja iniciado
                 pct_shield = 75
                 nave = Nave(ship2, 7.5, pct_shield)
                 nave_group.add(nave)
@@ -820,7 +842,6 @@ def main():
                
                 tudo.add(stalkers)
                 tudo.add(enemy_group)
-                tudo.add(nave_group)
                 tudo.add(vidas)
                 
                 score_tiros = 0
@@ -828,7 +849,8 @@ def main():
                 y = 0
                 Musicas(randrange(0,2))
                 
-            elif pressed_keys[pygame.K_3]:
+            elif pressed_keys[pygame.K_3]: # Escolhe a USS Defiant
+                # Define todas as variáveis necessárias para que o jogo seja iniciado
                 pct_shield = 100
                 nave = Nave(ship3, 5, pct_shield)
                 nave_group.add(nave)
@@ -862,7 +884,6 @@ def main():
                 
                 tudo.add(stalkers)
                 tudo.add(enemy_group)
-                tudo.add(nave_group)
                 tudo.add(vidas)
                 
                 score_tiros = 0
@@ -870,55 +891,55 @@ def main():
                 y = 0
                 Musicas(randrange(0,2))
                 
-            elif pressed_keys[pygame.K_q]:
+            elif pressed_keys[pygame.K_q]: # Retorna ao Menu inicial
                 escolha_nave = False
                 Game = False
                 instruction = False
                 over = False
                 intro = True
                 
-        while Game:
+        while Game: # Loop do jogo
             relogio.tick(FPS)
             agora = time.time()
             
             for event in pygame.event.get():
-                if event.type == pygame.QUIT:            
+                if event.type == pygame.QUIT: # Sai do jogo se o X da janela for clicado            
                     Game = False
                     loop = False
                 elif event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_SPACE:
-                        nave.shoot(img_tiros, tudo, bullets_group)
-                    elif event.key == pygame.K_b:
+                    if event.key == pygame.K_b: # Usa o nuke
                         if nave.nukes > 0:
-                            nave.nukes -= 1
+                            nave.nukes -= 1 # Perde um nuke
                             nave.nuke(enemy_group, tudo, boss, boss_alive, 
                                       score, nave, stalkers,lista_meteoros,
                                       mobs, lista_atirador, lista_stalkers)
-                            nuke_sound.play()
+                            nuke_sound.play() # Toca o som "Kaboom"
 
-                    elif event.key == pygame.K_p:
+                    elif event.key == pygame.K_p: # Pausa o jogo
                         pause = True
                         inicio_pause = time.time()
-                        while pause:
+                        while pause: # Tela de pause
                             
                             pressed_keys = pygame.key.get_pressed()
                         
-                            if pressed_keys[pygame.K_q]:
+                            if pressed_keys[pygame.K_q]: # Volta ao Menu inicial
                                 Game = False
                                 intro = True
                                 instruction = False
                                 pause = False
                             
-                            for event in pygame.event.get():
+                            for event in pygame.event.get(): # Sai do jogo caso o X da janela seja clicado
                                 if event.type == pygame.QUIT:
                                     return
                                 if event.type == pygame.KEYDOWN:
+                                    # Volta pro jogo caso uma tecla sem ser Q seja clicada
                                     if event.key != pygame.K_q:
                                         fim_pause = time.time()
                                         tempo_pause = tempo_pause + fim_pause\
-                                        - inicio_pause
+                                        - inicio_pause # Desconta o tempo pausado dos pontos ganhos por tempo jogado
                                         pause = False
                                         
+                            # Textos da tela de pause            
                             mensagem('PAUSED', WIDTH/2, HEIGHT/2 - 100, 130,
                                      WHITE)
                             mensagem('Press any key to continue', WIDTH/2,
@@ -951,21 +972,24 @@ def main():
             pygame.sprite.groupcollide\
             (enemy_group, nave_group, True,
             False, pygame.sprite.collide_circle)
-            '''Nave acerta Boss'''
+            '''Tiro da nave acerta Boss'''
             danos = pygame.sprite.groupcollide\
             (bullets_group, bosses, True, False, pygame.sprite.collide_circle)
             
+            # A cada hit no boss
             for dano in danos:
                 boss.shield -= dano.radius * 1
                 expl = Explosion(dano.rect.center, 'bosstiro')
                 tudo.add(expl)
                 
+                # Boss explode caso perca todo seu shield
                 if boss.shield < 1:
                     death_explosion = Explosion(boss.rect.center, 'boss')
                     tudo.add(death_explosion)
                     boss.lives -= 1
                     boss.shield = 0
             
+            # Consequências da morte do boss
             if boss.lives == 0:
                 boss.kill()
                 boss_alive = False
@@ -973,31 +997,34 @@ def main():
                 Musicas(randrange(0, 2))
                 boss.lives = 1
                     
-            for hit in hits: #
-                crash_sound.play() #
-                nave.shield -= hit.radius * 1.5 #
-                novo_meteoro(lista_meteoros, tudo, enemy_group) #
-                expl = Explosion(hit.rect.center, 'sm') #
-                tudo.add(expl) #
+            for hit in hits: # A cada choque entre nave e inimigo
+                crash_sound.play() # Som de batida
+                nave.shield -= hit.radius * 1.5 # Nave perde shield
+                novo_meteoro(lista_meteoros, tudo, enemy_group) # Novo meteoro surge
+                expl = Explosion(hit.rect.center, 'sm') # Animação de explosão
+                tudo.add(expl)
                 
+                # Nave perdendo vida
                 if nave.shield < 1 and nave.lives > 1:
                     death_explosion = Explosion(nave.rect.center, 'nave')
                     tudo.add(death_explosion)
                     nave.hide()
                     nave.lives -= 1
                     nave.shield = pct_shield
-                    
+                
+                # Nave perdendo a última vida
                 elif nave.shield < 1 and nave.lives == 1:
                     death_explosion = Explosion(nave.rect.center, 'nave')
                     tudo.add(death_explosion)
                     nave.hide()
                     nave.lives -= 1
                     nave.shield = 0
-                    
+            
+            # Nave se choca com o boss
             for boss_hit in boss_hits:
                 crash_sound.play()
-                nave.shield = 0
-                boss.shield -= 100
+                nave.shield = 0 # Nave perde todo seu shield
+                boss.shield -= 100 # Boss perde 100 de shield
                 death_explosion = Explosion(nave.rect.center, 'nave')
                 tudo.add(death_explosion)
                 nave.hide()
@@ -1007,20 +1034,23 @@ def main():
                 elif nave.lives == 1:
                     nave.lives -= 1
                     nave.shield = 0
-                    
+            
+            # A cada tiro que acerta a nave
             for pipoco in pipocos:
                 crash_sound.play()
-                nave.shield -= 50
-                expl = Explosion(pipoco.rect.center, 'sm')
+                nave.shield -= 50 # Nave perde 50 de shield
+                expl = Explosion(pipoco.rect.center, 'sm') # Explosão acontece
                 tudo.add(expl)
                 
+                # NAve perdendo vida
                 if nave.shield < 1:
                     death_explosion = Explosion(nave.rect.center, 'nave')
                     tudo.add(death_explosion)
                     nave.hide()
                     nave.lives -= 1
                     nave.shield = pct_shield
-                    
+                 
+                # Nave perdendo a última vida    
                 elif nave.shield < 1 and nave.lives == 1:
                     death_explosion = Explosion(nave.rect.center, 'nave')
                     tudo.add(death_explosion)
@@ -1028,12 +1058,14 @@ def main():
                     nave.lives -= 1
                     nave.shield = 0
            
+            # Define quando o boss deve aparecer
             if score >= (boss_spawns + 1) * 7500:
                 spawn_boss = True
                 boss_sound.play()
                 Musicas(4)
                 boss_spawns += 1     
-                
+            
+            # Some com a nave caso não haja mais vidas
             if nave.lives == 0:
                 nave.kill()
             if nave.lives == 0 and not death_explosion.alive():
@@ -1044,14 +1076,15 @@ def main():
                 x = 0
 
                 go = pygame.image.load("Assets/StarBackground.jpg").convert()
-                while over:
-                    for event in pygame.event.get():
+                while over: # Tela de Game Over
+                    for event in pygame.event.get(): # Sai do jogo caso o X da janela seja clicado
                         if event.type == pygame.QUIT:
                             return
                         
                     pressed_keys = pygame.key.get_pressed()
                     
-                    if pressed_keys[pygame.K_r]:
+                    if pressed_keys[pygame.K_r]: # Recomeça o jogo
+                        # Define varáveis para o que o jogo seja recomeçado
                         over = False
                         Game = True
                         loop = True
@@ -1091,6 +1124,7 @@ def main():
                         score = 0
                         score_tiros = 0
                         
+                        # Encontra o valor atual de highscore
                         with open ('highscore.txt', 'r') as file:
                             if os.stat('highscore.txt').st_size == 0:
                                 existe_highscore = False
@@ -1098,7 +1132,7 @@ def main():
                                 existe_highscore = True
                                 highscore = file.read()
 
-                    if pressed_keys[pygame.K_q]:
+                    if pressed_keys[pygame.K_q]: # Retorna ao menu inicial
                         over = False
                         intro = True
                         instruction = False
@@ -1111,6 +1145,8 @@ def main():
                     if rel_x < WIDTH:
                         tela.blit(go, (rel_x, 0))
                     x += 2
+                    
+                    # Caso não exista um highscore
                     if not existe_highscore:
                         mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 150, 130, WHITE)
                         mensagem('Score: {0}'.format(score),
@@ -1123,7 +1159,8 @@ def main():
                                      HEIGHT/2 + 175, 50, LIGHTRED)
                         with open ('highscore.txt', 'w') as file:
                             file.write(str(score))
-                        
+                    
+                    # Caso o highscore atual seja maior que a pontuação do jogador
                     elif existe_highscore and int(highscore) >= score:
                         mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 150, 130, WHITE)
                         mensagem('Score: {0}'.format(score),
@@ -1134,6 +1171,8 @@ def main():
                                      50, LIGHTGREEN)
                         mensagem('Press Q to go back to the Menu', WIDTH/2,
                                      HEIGHT/2 + 175, 50, LIGHTRED)
+                    
+                    # Caso o highscore atual seja menor que a pontuação do jogador
                     elif existe_highscore and int(highscore) < score:
                         mensagem('GAME OVER', WIDTH/2, HEIGHT/2 - 150, 130, WHITE)
                         mensagem('Score: {0}'.format(score),
@@ -1144,12 +1183,13 @@ def main():
                                      50, LIGHTGREEN)
                         mensagem('Press Q to go back to the Menu', WIDTH/2,
                                      HEIGHT/2 + 175, 50, LIGHTRED)
+                        # Guarda no arquivo highscore.txt o novo highscore
                         with open ('highscore.txt', 'w') as file:
                             file.write(str(score))
                     pygame.display.update()
                     relogio.tick(FPS)
 
-            if Game:
+            if Game: # Se estiver no jogo
                 if boss_alive:
                     '''boss shield'''
                     shield(tela, WIDTH - 120, 20, boss.shield, 750, RED,\
@@ -1165,7 +1205,8 @@ def main():
                 (enemy_group, bullets_group, True,
                 True, pygame.sprite.collide_circle)
 
-                for tiro in tiros:
+                for tiro in tiros: # Para cada hit nos inimigos
+                    # Define tipo de inimigo que deverá aparecer
                     if score < 1000:
                         novo_meteoro(lista_meteoros, tudo, enemy_group)
                         random.choice(exp_sounds).play()
@@ -1268,8 +1309,10 @@ def main():
                 
                 #Executa a função "update" de todas as classes
                 tudo.update()
+                nave_group.update(img_tiros, tudo, bullets_group)
                 #Desenha todos os sprites na tela
                 tudo.draw(tela)
+                nave_group.draw(tela)
                 #Atualiza o display
                 pygame.display.update()
                 
