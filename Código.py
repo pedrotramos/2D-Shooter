@@ -111,11 +111,14 @@ class Nave(pygame.sprite.Sprite):
     
     # Explode todos os inimigos na tela e tira 200 de shield do boss
     def nuke(self, enemy_group, tudo, boss, boss_alive, score, nave, stalkers,
-             lista_meteoros, mobs, lista_atirador, lista_stalkers):
+             lista_meteoros, mobs, lista_atirador, lista_stalkers,
+             enemy_bullets):
         for enemy in enemy_group: # Explode inimigos
             expl = Explosion(enemy.rect.center, 'lg')
             enemy.kill()
             tudo.add(expl)
+        for bullet in enemy_bullets:
+            bullet.kill()
         if boss_alive: # Tira 200 de shield do boss
             boss_expl = Explosion(boss.rect.center, 'boss')
             boss.shield -= 200
@@ -389,7 +392,7 @@ class Boss(pygame.sprite.Sprite): # Chefão do jogo
         self.rect.centery = randrange(-150, -100) # Posição inicial em y
         self.rect.centerx = WIDTH / 2 # Posição inicial em x
         self.vy = 1 # Velocidade em y
-        self.shield = 750 # Shield do chefão
+        self.shield = 500 # Shield do chefão
         self.lives = 1 # Número de vidas do chefão
             
     def update(self):
@@ -912,7 +915,8 @@ def main():
                             nave.nukes -= 1 # Perde um nuke
                             nave.nuke(enemy_group, tudo, boss, boss_alive, 
                                       score, nave, stalkers,lista_meteoros,
-                                      mobs, lista_atirador, lista_stalkers)
+                                      mobs, lista_atirador, lista_stalkers,
+                                      enemy_bullets)
                             nuke_sound.play() # Toca o som "Kaboom"
 
                     elif event.key == pygame.K_p: # Pausa o jogo
