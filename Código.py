@@ -1118,7 +1118,6 @@ def main():
                             novo_meteoro(lista_meteoros, tudo, enemy_group)
 
                         tudo.add(enemy_group)
-                        tudo.add(nave_group)
                         tudo.add(vidas)
                         Musicas(randrange(0,2))
                         score = 0
