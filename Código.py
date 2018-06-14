@@ -1195,7 +1195,7 @@ def main():
             if Game: # Se estiver no jogo
                 if boss_alive:
                     '''boss shield'''
-                    shield(tela, WIDTH - 120, 20, boss.shield, 750, RED,\
+                    shield(tela, WIDTH - 120, 20, boss.shield, 500, RED,\
                            100, 20)
                 '''desenhando escudo'''
                 shield(tela, 10, 50, nave.shield, pct_shield, GREEN, 100, 20)
