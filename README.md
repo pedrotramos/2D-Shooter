@@ -6,7 +6,7 @@ This is a simple pygame. To play just make sure to install pygame.
 
 Run the game.py script and enjoy.
  
- Reference for the assets:
+ ### References for the assets:
  * Millennium Falcon: https://goo.gl/VK2ZwF
  * X Wing: https://goo.gl/BhYh4J
  * USS Defiant: https://goo.gl/DiFjWo
